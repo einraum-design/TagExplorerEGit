@@ -108,6 +108,8 @@ public class SQLhelper {
 					Tag_User user = new Tag_User("users", msql.getInt("ID"),
 							msql.getString("name"), msql.getString("password"));
 					tags.add(user);
+				} else {
+					System.out.println(tableName + " not yet Listed in queryTagList");
 				}
 			}
 		} else {
@@ -115,6 +117,45 @@ public class SQLhelper {
 		}
 		return tags;
 	}
+	
+	
+	// TAGS DER TABELLE GEFILTERT ABFRAGEN
+		public ArrayList<Tag> queryTagListFiltered(String tableName, Filter filter) {
+			ArrayList<Tag> tags = new ArrayList<Tag>();
+
+			if (checkConnection()) {
+				// String queryFields = queries.get(tableName);
+				// msql.query("SELECT (" + queryFields + ") FROM " + tableName);
+				msql.query("SELECT " + tableName + ".* FROM " + tableName + " INNER JOIN tag_binding ON (" + tableName + ".ID = tag_binding.file_ID) WHERE tag_binding.type = '" + filter.tag.type + "' AND tag_binding.tag_ID = '" + filter.tag.id + "' ");
+
+				while (msql.next()) { 
+					if (tableName.equals("files")) {
+						Tag tag = new Tag_File(tableName, msql.getInt("ID"),
+								msql.getString("name"), msql.getFloat("size"),
+								msql.getString("path"),
+								msql.getTimestamp("creation_time"),
+								msql.getTimestamp("expiration_time"),
+								msql.getInt("origin_ID"), msql.getInt("score"));
+						tags.add(tag);
+					} else if (tableName.equals("locations")) {
+						Tag tag = new Tag_Location(tableName, msql.getInt("ID"),
+								msql.getString("name"),
+								msql.getString("coordinates"));
+						tags.add(tag);
+					} else if (tableName.equals("users")) {
+						Tag_User user = new Tag_User("users", msql.getInt("ID"),
+								msql.getString("name"), msql.getString("password"));
+						tags.add(user);
+					} else{
+						System.out.println(tableName + " not yet Listed in queryTagListFiltered");
+					}
+				}
+			} else {
+				System.out.println("not Connected queryTagList()");
+			}
+			return tags;
+		}
+	
 
 	// not finished, get Ids and types
 	public ArrayList<Tag> queryConnectedTagList(String tableName, Tag_File t) {

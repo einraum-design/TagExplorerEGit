@@ -67,10 +67,10 @@ public class TagExplorer extends PApplet {
 		textFont(font, 14);
 		
 		// test SQL Join
-		SQL.msql.query("SELECT files.* FROM files INNER JOIN tag_binding ON (files.ID = tag_binding.file_ID) WHERE tag_binding.type = 'users' AND tag_binding.tag_ID = '1' ");
-		while(SQL.msql.next()){
-			System.out.println(SQL.msql.getString("name"));
-		}
+//		SQL.msql.query("SELECT files.* FROM files INNER JOIN tag_binding ON (files.ID = tag_binding.file_ID) WHERE tag_binding.type = 'users' AND tag_binding.tag_ID = '1' ");
+//		while(SQL.msql.next()){
+//			System.out.println(SQL.msql.getString("name"));
+//		}
 		
 	}
 
@@ -122,14 +122,7 @@ public class TagExplorer extends PApplet {
 	
 	public void updateShowFiles(){
 		if(filters.size() > 0){
-			ArrayList<Tag> allFiles = SQL.queryTagList("files");
-			
-//			SQL.msql.query("SELECT files.name FROM files INNER JOIN tag_binding ON (files.ID = tag_binding.file_ID) WHERE tag_binding.type = 'users'");
-			
-			
-			
-			
-			
+			showFiles = SQL.queryTagListFiltered("files", filters.get(0));
 		} else {
 			showFiles = SQL.queryTagList("files");
 		}
