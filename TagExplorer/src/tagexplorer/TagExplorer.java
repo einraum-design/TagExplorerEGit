@@ -44,6 +44,9 @@ public class TagExplorer extends PApplet {
 		font = createFont("arial", 20);
 
 		SQL = new SQLhelper(this);
+		
+		// Standartuser: …ffentlich
+		user = (Tag_User) SQL.queryTagList("users").get(0);
 
 		// ControlP5
 		cp5_Promt = new ControlP5(this);
@@ -140,20 +143,14 @@ public class TagExplorer extends PApplet {
 				
 				if(file != null){
 					System.out.println(file.toString());
-					if(user != null){
-						//Tag_File file = (Tag_File) showFiles.get(0);
-						SQL.bindTag(file, user);
-					}
+					SQL.bindTag(file, user);
 				}
-				
-				
-				
 			}
 			updateShowFiles();
 			break;
 		case 'U':
 			// Set User
-			user = (Tag_User) SQL.queryTagList("users").get(0);
+			user = (Tag_User) SQL.queryTagList("users").get(1);
 			filters.add(new Filter(user, true));
 			updateShowFiles();
 			break;

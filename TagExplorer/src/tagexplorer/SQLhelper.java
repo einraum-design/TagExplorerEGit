@@ -124,10 +124,13 @@ public class SQLhelper {
 			ArrayList<Tag> tags = new ArrayList<Tag>();
 
 			if (checkConnection()) {
-				// String queryFields = queries.get(tableName);
-				// msql.query("SELECT (" + queryFields + ") FROM " + tableName);
-				msql.query("SELECT " + tableName + ".* FROM " + tableName + " INNER JOIN tag_binding ON (" + tableName + ".ID = tag_binding.file_ID) WHERE tag_binding.type = '" + filter.tag.type + "' AND tag_binding.tag_ID = '" + filter.tag.id + "' ");
 
+				if(filter.inOut){
+					msql.query("SELECT " + tableName + ".* FROM " + tableName + " INNER JOIN tag_binding ON (" + tableName + ".ID = tag_binding.file_ID) WHERE tag_binding.type LIKE '" + filter.tag.type + "' AND tag_binding.tag_ID LIKE '" + filter.tag.id + "'");
+				} else{
+					// Funktioniert noch nicht richtig! Es werden nur Dateien gewählt, die ein tag binding mit dem filtertyp haben. andere werden ignoriert
+					msql.query("SELECT " + tableName + ".* FROM " + tableName + " INNER JOIN tag_binding ON (" + tableName + ".ID = tag_binding.file_ID) WHERE tag_binding.type LIKE '" + filter.tag.type + "' AND tag_binding.tag_ID NOT LIKE '" + filter.tag.id + "'");
+				}
 				while (msql.next()) { 
 					if (tableName.equals("files")) {
 						Tag tag = new Tag_File(tableName, msql.getInt("ID"),
