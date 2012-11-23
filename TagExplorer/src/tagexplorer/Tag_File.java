@@ -1,6 +1,7 @@
 package tagexplorer;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 
 public class Tag_File extends Tag {
 	
@@ -12,6 +13,10 @@ public class Tag_File extends Tag {
 	Timestamp expiration_time;
 	int origin_ID;
 	int score;
+	
+	ArrayList<Tag> attributes = new ArrayList<Tag>();
+	
+	String viewName;
 
 	public Tag_File(String tableName, int id, String name, float size,
 			String path, Timestamp createion_time, Timestamp expiration_time, int origin_ID,
@@ -24,6 +29,22 @@ public class Tag_File extends Tag {
 		this.expiration_time = expiration_time;
 		this.origin_ID = origin_ID;
 		this.score = score;
+		
+		viewName = name;
+	}
+	
+	public void setAttributes(ArrayList<Tag> attributes){
+		this.attributes = attributes;
+	}
+	
+	public void updateViewName(){
+		String anhang = "";
+		
+		for(Tag t : attributes){
+			anhang += ", " + t.type + ": " +  t.name;
+		}
+		
+		viewName = super.name + anhang;
 	}
 	
 	@Override
