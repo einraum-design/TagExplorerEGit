@@ -8,4 +8,9 @@ public class Tag_Location extends Tag {
 		this.type = "locations";
 		this.coordinates = coordinates;
 	}
+
+	@Override
+	public String toString() {
+		return "Tag_Location [coordinates=" + coordinates + "]";
+	}
 }

@@ -109,12 +109,14 @@ public class TagExplorer extends PApplet {
 			String url = selectInput("Select a file to process:");
 			if (url != null) {
 				println("Create new File: url: " + url);
-				createNewFile("files", url);
+				Tag_File file = createNewFile("files", url);
 				
-				Tag_File file = SQL.getLastFile();
-				if(user != null){
-					//Tag_File file = (Tag_File) showFiles.get(0);
-					SQL.bindTag(file, user);
+				if(file != null){
+					System.out.println(file.toString());
+					if(user != null){
+						//Tag_File file = (Tag_File) showFiles.get(0);
+						SQL.bindTag(file, user);
+					}
 				}
 				
 				
@@ -150,14 +152,16 @@ public class TagExplorer extends PApplet {
 
 
 	// ////////// Tag Creation /////////////////////
-	public void createNewFile(String tableName, String s) {
+	public Tag_File createNewFile(String tableName, String s) {
+		Tag_File file = null;
 		s = s.trim();
 		if (SQL.inDataBase(tableName, s)) {
 			System.out.println("Tag " + s + " is already imported in "
 					+ tableName);
 		} else {
-			SQL.createDbTag(tableName, s);
+			file = (Tag_File) SQL.createDbTag(tableName, s);
 		}
+		return file;
 	}
 
 	public void locationInput(String theText) {

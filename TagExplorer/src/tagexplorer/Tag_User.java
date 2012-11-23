@@ -13,4 +13,9 @@ public class Tag_User extends Tag{
 		this.password = password;
 		type = "users";
 	}
+
+	@Override
+	public String toString() {
+		return "Tag_User [password=" + password + "]";
+	}
 }
