@@ -9,14 +9,10 @@ public class Tag {
 	public Tag(){
 	}
 	
-	//locations
 	public Tag(String tableName, int id, String name){
 		this.id = id;
 		this.name = name;
-		
-		if(tableName.equals("locations")){
-			
-		}
+		type = tableName;
 	}
 
 	@Override

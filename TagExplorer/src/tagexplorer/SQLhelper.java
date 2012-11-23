@@ -268,62 +268,40 @@ public class SQLhelper {
 		
 		// files
 		if(tableName.equals("files")){
-			tag = new Tag_File("files", msql.getInt("ID"),
+			tag = new Tag_File(tableName, msql.getInt("ID"),
 					msql.getString("name"), msql.getFloat("size"),
 					msql.getString("path"), msql.getTimestamp("creation_time"),
 					msql.getTimestamp("expiration_time"), msql.getInt("origin_ID"),
 					msql.getInt("score"));
 
 			System.out.println("TAG: " + tag.toString());
-		} else if(tableName.equals("files")){
-			System.out.println("SQL.getLastCreatedTag noch nicht fertig für " + tableName);
-		} else {
+		} 
+		// users
+		else if(tableName.equals("users")){
+					tag = new Tag_User(tableName, msql.getInt("ID"),
+							msql.getString("name"), msql.getString("password"));
+
+					System.out.println("TAG: " + tag.toString());
+				} 
+		// locations
+		else if(tableName.equals("locations")){
+			tag = new Tag_Location(tableName, msql.getInt("ID"),
+					msql.getString("name"), msql.getString("coordinates"));
+		} 
+		// keywords
+		else if(tableName.equals("keywords")){
+			tag = new Tag(tableName, msql.getInt("ID"),
+					msql.getString("name"));
+		}
+		// projects
+		else if(tableName.equals("projects")){
+			tag = new Tag(tableName, msql.getInt("ID"),
+			msql.getString("name"));
+		}else {
 			System.out.println("SQL.getLastCreatedTag noch nicht fertig für " + tableName);
 		}
 
 		return tag;
 	}
-	
-	public Tag_File getLastFile() {
-		Tag_File file = null;
 
-		msql.query("SELECT LAST_INSERT_ID() FROM files");
-		msql.next();
-		int fileId = msql.getInt(1);
-
-		msql.query("SELECT * FROM files WHERE ID = \"" + fileId + "\"");
-		msql.next();
-
-		// int originId = msql.getInt("origin_ID");
-		// if(msql.getInt("origin_ID") == 0){
-		// originId = fileId;
-		// }
-		Tag tag = new Tag_File("files", msql.getInt("ID"),
-				msql.getString("name"), msql.getFloat("size"),
-				msql.getString("path"), msql.getTimestamp("creation_time"),
-				msql.getTimestamp("expiration_time"), msql.getInt("origin_ID"),
-				msql.getInt("score"));
-
-		System.out.println("TAG: " + tag.toString());
-
-		// int originId = msql.getInt("origin_ID");
-		// if(msql.getInt("origin_ID") == 0){
-		// originId = fileId;
-		// }
-		//
-		// int expirationTime =
-		// msql.getTimestamp("expiration_time").getSeconds();
-		// if(msql.getTimestamp("expiration_time") == null){
-		// expirationTime = msql.getTimestamp(System.get).getSeconds();
-		// }
-		//
-		// file = new Tag_File("files", msql.getInt("ID"),
-		// msql.getString("name"), msql.getFloat("size"),
-		// msql.getString("path"),
-		// msql.getTimestamp("creation_time").getSeconds(), expirationTime,
-		// msql.getInt("origin_ID"),
-		// msql.getInt("score"));
-
-		return file;
-	}
 }
