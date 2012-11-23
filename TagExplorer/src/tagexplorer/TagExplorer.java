@@ -31,6 +31,8 @@ public class TagExplorer extends PApplet {
 
 	ArrayList<Tag> tags = new ArrayList<Tag>();
 	ArrayList<Tag> showFiles = null;
+	
+	ArrayList<Filter> filters = new ArrayList<Filter>();
 
 	// PFrame f;
 
@@ -53,8 +55,9 @@ public class TagExplorer extends PApplet {
 
 		// User registration
 		// user = (Tag_User) SQL.queryTagList("users").get(0);
-		showFiles = SQL.queryTagList("files");
-
+		
+		updateShowFiles();
+		
 		// toxi VerletPhysics
 		physics = new VerletPhysics();
 		GravityBehavior g = new GravityBehavior(new Vec3D(0, 0, -0.01f));
@@ -62,6 +65,13 @@ public class TagExplorer extends PApplet {
 
 		// Display settings
 		textFont(font, 14);
+		
+		// test SQL Join
+		SQL.msql.query("SELECT files.* FROM files INNER JOIN tag_binding ON (files.ID = tag_binding.file_ID) WHERE tag_binding.type = 'users' AND tag_binding.tag_ID = '1' ");
+		while(SQL.msql.next()){
+			System.out.println(SQL.msql.getString("name"));
+		}
+		
 	}
 
 	// /////////// draw ////////////////////
@@ -75,8 +85,6 @@ public class TagExplorer extends PApplet {
 			removeController = !removeController;
 		}
 
-		showFiles();
-
 		fill(150);
 		if(user != null){
 			text("User: " + user.name, 5, 16);
@@ -85,6 +93,8 @@ public class TagExplorer extends PApplet {
 		if(location != null){
 			text("Location: " + location.name, 150, 16);
 		}
+		
+		showFiles();
 		
 		
 		// Promt Messages
@@ -101,9 +111,27 @@ public class TagExplorer extends PApplet {
 	// ///////// display Files ////////////////////
 	public void showFiles() {
 		if (showFiles != null) {
+			
+			
 			for (int i = 0; i < showFiles.size(); i++) {
+				
 				text(showFiles.get(i).name, 10, 40 + i * 16);
 			}
+		}
+	}
+	
+	public void updateShowFiles(){
+		if(filters.size() > 0){
+			ArrayList<Tag> allFiles = SQL.queryTagList("files");
+			
+//			SQL.msql.query("SELECT files.name FROM files INNER JOIN tag_binding ON (files.ID = tag_binding.file_ID) WHERE tag_binding.type = 'users'");
+			
+			
+			
+			
+			
+		} else {
+			showFiles = SQL.queryTagList("files");
 		}
 	}
 
@@ -128,11 +156,13 @@ public class TagExplorer extends PApplet {
 				
 				
 			}
-			
+			updateShowFiles();
 			break;
 		case 'U':
 			// Set User
 			user = (Tag_User) SQL.queryTagList("users").get(0);
+			filters.add(new Filter(user, true));
+			updateShowFiles();
 			break;
 		case 'L':
 			createPromt("locations");
@@ -148,8 +178,8 @@ public class TagExplorer extends PApplet {
 			Tag_File file = (Tag_File) showFiles.get(0);
 			Tag tag = new Tag_Location("locations", 5, "Ort", "coordinaten");
 			SQL.bindTag(file, tag);
+			updateShowFiles();
 			break;
-
 		}
 	}
 
