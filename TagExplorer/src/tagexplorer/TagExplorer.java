@@ -38,7 +38,7 @@ public class TagExplorer extends PApplet {
 	VerletPhysics physics;
 
 	public void setup() {
-		size(400, 400);
+		size(800, 400);
 		font = createFont("arial", 20);
 
 		SQL = new SQLhelper(this);
@@ -82,6 +82,12 @@ public class TagExplorer extends PApplet {
 			text("User: " + user.name, 5, 16);
 		}
 		
+		if(location != null){
+			text("Location: " + location.name, 150, 16);
+		}
+		
+		
+		// Promt Messages
 		if (p != null) {
 			p.showMessages();
 		}
