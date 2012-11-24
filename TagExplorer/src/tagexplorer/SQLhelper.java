@@ -154,9 +154,21 @@ public class SQLhelper {
 					}
 				}
 			} else {
-				System.out.println("not Connected queryTagList()");
+				System.out.println("not Connected queryTagListFiltered()");
 			}
 			return tags;
+		}
+		
+		// next work: alle verknüpften Tags finden
+		public ArrayList<Tag> getBindedTagList(Tag_File file) {
+			ArrayList<Tag> tagList = new ArrayList<Tag>();
+//			if (checkConnection()) {
+//				msql.query("SELECT files.* FROM files INNER JOIN tag_binding ON (files.ID = tag_binding.file_ID) WHERE tag_binding.type LIKE '" + filter.tag.type + "' AND tag_binding.tag_ID LIKE '" + filter.tag.id + "'");
+//			}else{
+//				System.out.println("not Connected getBindedTagList()");
+//			}
+			
+			return null;
 		}
 	
 
@@ -347,5 +359,4 @@ public class SQLhelper {
 
 		return tag;
 	}
-
 }

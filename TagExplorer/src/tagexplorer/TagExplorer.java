@@ -114,11 +114,8 @@ public class TagExplorer extends PApplet {
 	// ///////// display Files ////////////////////
 	public void showFiles() {
 		if (showFiles != null) {
-			
-			
 			for (int i = 0; i < showFiles.size(); i++) {
-				
-				text(showFiles.get(i).name, 10, 40 + i * 16);
+				text(((Tag_File)showFiles.get(i)).viewName, 10, 40 + i * 16);
 			}
 		}
 	}
@@ -129,7 +126,16 @@ public class TagExplorer extends PApplet {
 		} else {
 			showFiles = SQL.queryTagList("files");
 		}
+		
+		// Add Tagattribute zu showFiles
+		for(Tag t : showFiles){
+			Tag_File fileTag = (Tag_File) t;
+			
+			// not finished
+			// fileTag.setAttributes(SQL.getBindedTagList(fileTag));
+		}
 	}
+	
 
 	// ///////// INPUT ///////////////////
 	public void keyPressed() {
@@ -142,7 +148,7 @@ public class TagExplorer extends PApplet {
 				Tag_File file = createNewFile("files", url);
 				
 				if(file != null){
-					System.out.println(file.toString());
+//					System.out.println(file.toString());
 					SQL.bindTag(file, user);
 				}
 			}
