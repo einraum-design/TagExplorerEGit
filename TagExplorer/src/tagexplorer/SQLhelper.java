@@ -124,12 +124,16 @@ public class SQLhelper {
 			ArrayList<Tag> tags = new ArrayList<Tag>();
 
 			if (checkConnection()) {
-
+				
+				String selectString = "SELECT " + tableName + ".* FROM " + tableName + " INNER JOIN tag_binding ON (" + tableName + ".ID = tag_binding.file_ID) WHERE tag_binding.type LIKE '" + filter.tag.type + "' AND tag_binding.tag_ID LIKE '" + filter.tag.id + "'";
+				String selectStringId = "SELECT " + tableName + ".ID FROM " + tableName + " INNER JOIN tag_binding ON (" + tableName + ".ID = tag_binding.file_ID) WHERE tag_binding.type LIKE '" + filter.tag.type + "' AND tag_binding.tag_ID LIKE '" + filter.tag.id + "'";
+				
 				if(filter.inOut){
-					msql.query("SELECT " + tableName + ".* FROM " + tableName + " INNER JOIN tag_binding ON (" + tableName + ".ID = tag_binding.file_ID) WHERE tag_binding.type LIKE '" + filter.tag.type + "' AND tag_binding.tag_ID LIKE '" + filter.tag.id + "'");
+					msql.query(selectString);
 				} else{
 					// Funktioniert noch nicht richtig! Es werden nur Dateien gewählt, die ein tag binding mit dem filtertyp haben. andere werden ignoriert
-					msql.query("SELECT " + tableName + ".* FROM " + tableName + " INNER JOIN tag_binding ON (" + tableName + ".ID = tag_binding.file_ID) WHERE tag_binding.type LIKE '" + filter.tag.type + "' AND tag_binding.tag_ID NOT LIKE '" + filter.tag.id + "'");
+					msql.query("SELECT " + tableName + ".* FROM " + tableName + " WHERE " + tableName + ".ID NOT IN (" + selectStringId + ")");
+					//+	"WHERE tag_binding.type NOT LIKE '" + filter.tag.type + "' OR (tag_binding.type LIKE '" + filter.tag.type + "' AND tag_binding.tag_ID NOT LIKE '" + filter.tag.id + "')");
 				}
 				while (msql.next()) { 
 					if (tableName.equals("files")) {

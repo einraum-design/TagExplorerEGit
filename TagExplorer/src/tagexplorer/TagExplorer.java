@@ -46,7 +46,7 @@ public class TagExplorer extends PApplet {
 		SQL = new SQLhelper(this);
 		
 		// Standartuser: …ffentlich
-		user = (Tag_User) SQL.queryTagList("users").get(0);
+		//user = (Tag_User) SQL.queryTagList("users").get(0);
 
 		// ControlP5
 		cp5_Promt = new ControlP5(this);
@@ -73,6 +73,12 @@ public class TagExplorer extends PApplet {
 //		SQL.msql.query("SELECT files.* FROM files INNER JOIN tag_binding ON (files.ID = tag_binding.file_ID) WHERE tag_binding.type = 'users' AND tag_binding.tag_ID = '1' ");
 //		while(SQL.msql.next()){
 //			System.out.println(SQL.msql.getString("name"));
+//		}
+		
+		// UNION!
+//		SQL.msql.query("SELECT files.* FROM files INNER JOIN tag_binding ON (files.ID = tag_binding.file_ID) WHERE tag_binding.type = 'users' AND tag_binding.tag_ID = '1' ");
+//		while(SQL.msql.next()){
+//			//System.out.println(SQL.msql.getString("name"));
 //		}
 		
 	}
@@ -147,7 +153,7 @@ public class TagExplorer extends PApplet {
 				println("Create new File: url: " + url);
 				Tag_File file = createNewFile("files", url);
 				
-				if(file != null){
+				if(file != null && user != null){
 //					System.out.println(file.toString());
 					SQL.bindTag(file, user);
 				}
@@ -157,7 +163,15 @@ public class TagExplorer extends PApplet {
 		case 'U':
 			// Set User
 			user = (Tag_User) SQL.queryTagList("users").get(1);
-			filters.add(new Filter(user, true));
+			filters.clear();
+			filters.add(new Filter(user, false));
+			updateShowFiles();
+			break;
+		case 'I':
+			// Set User
+			user = (Tag_User) SQL.queryTagList("users").get(2);
+			filters.clear();
+			filters.add(new Filter(user, false));
 			updateShowFiles();
 			break;
 		case 'L':
