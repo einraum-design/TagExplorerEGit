@@ -1,11 +1,5 @@
 package tagexplorer;
 
-import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -129,6 +123,8 @@ public class TagExplorer extends PApplet {
 	public void updateShowFiles(){
 		if(filters.size() > 0){
 			showFiles = SQL.queryTagListFiltered("files", filters.get(0));
+			
+			//showFiles = SQL.queryTagListFiltered("files", filters);
 		} else {
 			showFiles = SQL.queryTagList("files");
 		}
@@ -137,8 +133,8 @@ public class TagExplorer extends PApplet {
 		for(Tag t : showFiles){
 			Tag_File fileTag = (Tag_File) t;
 			
-			// not finished
-			// fileTag.setAttributes(SQL.getBindedTagList(fileTag));
+			fileTag.setAttributes(SQL.getBindedTagList(fileTag));
+			fileTag.updateViewName();
 		}
 	}
 	
@@ -164,14 +160,14 @@ public class TagExplorer extends PApplet {
 			// Set User
 			user = (Tag_User) SQL.queryTagList("users").get(1);
 			filters.clear();
-			filters.add(new Filter(user, false));
+			filters.add(new Filter(user, true));
 			updateShowFiles();
 			break;
 		case 'I':
 			// Set User
 			user = (Tag_User) SQL.queryTagList("users").get(2);
 			filters.clear();
-			filters.add(new Filter(user, false));
+			filters.add(new Filter(user, true));
 			updateShowFiles();
 			break;
 		case 'L':

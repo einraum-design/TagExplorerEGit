@@ -16,6 +16,9 @@ public class Tag_User extends Tag{
 
 	@Override
 	public String toString() {
-		return "Tag_User [password=" + password + "]";
+		return "Tag_User [password=" + password + ", id=" + id + ", name="
+				+ name + ", type=" + type + "]";
 	}
+
+
 }

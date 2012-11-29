@@ -90,26 +90,9 @@ public class SQLhelper {
 			msql.query("SELECT * FROM " + tableName);
 
 			while (msql.next()) {
-
-				if (tableName.equals("files")) {
-					Tag tag = new Tag_File(tableName, msql.getInt("ID"),
-							msql.getString("name"), msql.getFloat("size"),
-							msql.getString("path"),
-							msql.getTimestamp("creation_time"),
-							msql.getTimestamp("expiration_time"),
-							msql.getInt("origin_ID"), msql.getInt("score"));
-					tags.add(tag);
-				} else if (tableName.equals("locations")) {
-					Tag tag = new Tag_Location(tableName, msql.getInt("ID"),
-							msql.getString("name"),
-							msql.getString("coordinates"));
-					tags.add(tag);
-				} else if (tableName.equals("users")) {
-					Tag_User user = new Tag_User("users", msql.getInt("ID"),
-							msql.getString("name"), msql.getString("password"));
-					tags.add(user);
-				} else {
-					System.out.println(tableName + " not yet Listed in queryTagList");
+				Tag t = getSpecificTags(tableName);
+				if(t != null){
+					tags.add(t);
 				}
 			}
 		} else {
@@ -117,64 +100,200 @@ public class SQLhelper {
 		}
 		return tags;
 	}
-	
-	
-	// TAGS DER TABELLE GEFILTERT ABFRAGEN
-		public ArrayList<Tag> queryTagListFiltered(String tableName, Filter filter) {
-			ArrayList<Tag> tags = new ArrayList<Tag>();
 
-			if (checkConnection()) {
-				
-				String selectString = "SELECT " + tableName + ".* FROM " + tableName + " INNER JOIN tag_binding ON (" + tableName + ".ID = tag_binding.file_ID) WHERE tag_binding.type LIKE '" + filter.tag.type + "' AND tag_binding.tag_ID LIKE '" + filter.tag.id + "'";
-				String selectStringId = "SELECT " + tableName + ".ID FROM " + tableName + " INNER JOIN tag_binding ON (" + tableName + ".ID = tag_binding.file_ID) WHERE tag_binding.type LIKE '" + filter.tag.type + "' AND tag_binding.tag_ID LIKE '" + filter.tag.id + "'";
-				
-				if(filter.inOut){
-					msql.query(selectString);
-				} else{
-					// Funktioniert noch nicht richtig! Es werden nur Dateien gewählt, die ein tag binding mit dem filtertyp haben. andere werden ignoriert
-					msql.query("SELECT " + tableName + ".* FROM " + tableName + " WHERE " + tableName + ".ID NOT IN (" + selectStringId + ")");
-					//+	"WHERE tag_binding.type NOT LIKE '" + filter.tag.type + "' OR (tag_binding.type LIKE '" + filter.tag.type + "' AND tag_binding.tag_ID NOT LIKE '" + filter.tag.id + "')");
+	// TAGS DER TABELLE GEFILTERT ABFRAGEN
+	// Ein Filter
+	public ArrayList<Tag> queryTagListFiltered(String tableName, Filter filter) {
+		ArrayList<Tag> tags = new ArrayList<Tag>();
+
+		if (checkConnection()) {
+
+			String selectString = "SELECT "
+					+ tableName
+					+ ".* FROM "
+					+ tableName
+					+ " INNER JOIN tag_binding ON ("
+					+ tableName
+					+ ".ID = tag_binding.file_ID) WHERE tag_binding.type LIKE '"
+					+ filter.tag.type + "' AND tag_binding.tag_ID LIKE '"
+					+ filter.tag.id + "'";
+			String selectStringId = "SELECT "
+					+ tableName
+					+ ".ID FROM "
+					+ tableName
+					+ " INNER JOIN tag_binding ON ("
+					+ tableName
+					+ ".ID = tag_binding.file_ID) WHERE tag_binding.type LIKE '"
+					+ filter.tag.type + "' AND tag_binding.tag_ID LIKE '"
+					+ filter.tag.id + "'";
+
+			if (filter.inOut) {
+				msql.query(selectString);
+			} else {
+				// Funktioniert noch nicht richtig! Es werden nur Dateien
+				// gewählt, die ein tag binding mit dem filtertyp haben. andere
+				// werden ignoriert
+				msql.query("SELECT " + tableName + ".* FROM " + tableName
+						+ " WHERE " + tableName + ".ID NOT IN ("
+						+ selectStringId + ")");
+				// + "WHERE tag_binding.type NOT LIKE '" + filter.tag.type +
+				// "' OR (tag_binding.type LIKE '" + filter.tag.type +
+				// "' AND tag_binding.tag_ID NOT LIKE '" + filter.tag.id +
+				// "')");
+			}
+			while (msql.next()) {
+				Tag t = getSpecificTags(tableName);
+				if(t != null){
+					tags.add(t);
 				}
-				while (msql.next()) { 
-					if (tableName.equals("files")) {
-						Tag tag = new Tag_File(tableName, msql.getInt("ID"),
-								msql.getString("name"), msql.getFloat("size"),
-								msql.getString("path"),
-								msql.getTimestamp("creation_time"),
-								msql.getTimestamp("expiration_time"),
-								msql.getInt("origin_ID"), msql.getInt("score"));
-						tags.add(tag);
-					} else if (tableName.equals("locations")) {
-						Tag tag = new Tag_Location(tableName, msql.getInt("ID"),
-								msql.getString("name"),
-								msql.getString("coordinates"));
-						tags.add(tag);
-					} else if (tableName.equals("users")) {
-						Tag_User user = new Tag_User("users", msql.getInt("ID"),
-								msql.getString("name"), msql.getString("password"));
-						tags.add(user);
-					} else{
-						System.out.println(tableName + " not yet Listed in queryTagListFiltered");
+			}
+		} else {
+			System.out.println("not Connected queryTagListFiltered()");
+		}
+		return tags;
+	}
+
+	// Filter List on files
+	// not ready UNION ist falser WEG -> müssen IN sein
+	public ArrayList<Tag> queryTagListFiltered(String tableName,
+			ArrayList<Filter> filterList) {
+		ArrayList<Tag> tags = new ArrayList<Tag>();
+
+		if (checkConnection()) {
+
+			// built queryString
+
+			String inIdSelection = "";
+
+			ArrayList<String> inIdSelectionList = new ArrayList<String>();
+			ArrayList<String> outIdSelectionList = new ArrayList<String>();
+
+			for (Filter f : filterList) {
+
+				String selection = "SELECT "
+						+ tableName
+						+ ".ID FROM "
+						+ tableName
+						+ " INNER JOIN tag_binding ON ("
+						+ tableName
+						+ ".ID = tag_binding.file_ID) WHERE tag_binding.type LIKE '"
+						+ f.tag.type + "' AND tag_binding.tag_ID LIKE '"
+						+ f.tag.id + "'";
+				if (f.inOut) {
+					inIdSelectionList.add(selection);
+				} else {
+					outIdSelectionList.add(selection);
+				}
+
+			}
+
+			String inQuery = "";
+			for (int i = 0; i < inIdSelectionList.size(); i++) {
+				inQuery += "( " + inIdSelectionList.get(i) + " )";
+				if (i != inIdSelectionList.size() - 1)
+					inQuery += " UNION ";
+			}
+			System.out.println("inQuery: " + inQuery);
+
+			String outQuery = "";
+			for (int i = 0; i < outIdSelectionList.size(); i++) {
+				outQuery += "( " + outIdSelectionList.get(i) + " )";
+				if (i != outIdSelectionList.size() - 1)
+					outQuery += " UNION ";
+			}
+			System.out.println("outQuery: " + outQuery);
+			// msql.query()
+
+			// String selectString = "SELECT " + tableName + ".* FROM " +
+			// tableName + " INNER JOIN tag_binding ON (" + tableName +
+			// ".ID = tag_binding.file_ID) WHERE tag_binding.type LIKE '" +
+			// filter.tag.type + "' AND tag_binding.tag_ID LIKE '" +
+			// filter.tag.id + "'";
+			// String selectStringId = "SELECT " + tableName + ".ID FROM " +
+			// tableName + " INNER JOIN tag_binding ON (" + tableName +
+			// ".ID = tag_binding.file_ID) WHERE tag_binding.type LIKE '" +
+			// filter.tag.type + "' AND tag_binding.tag_ID LIKE '" +
+			// filter.tag.id + "'";
+			//
+			// if(filter.inOut){
+			// msql.query(selectString);
+			// } else{
+			// // Funktioniert noch nicht richtig! Es werden nur Dateien
+			// gewählt, die ein tag binding mit dem filtertyp haben. andere
+			// werden ignoriert
+			// msql.query("SELECT " + tableName + ".* FROM " + tableName +
+			// " WHERE " + tableName + ".ID NOT IN (" + selectStringId + ")");
+			// //+ "WHERE tag_binding.type NOT LIKE '" + filter.tag.type +
+			// "' OR (tag_binding.type LIKE '" + filter.tag.type +
+			// "' AND tag_binding.tag_ID NOT LIKE '" + filter.tag.id + "')");
+			// }
+			// while (msql.next()) {
+			// Tag t = getSpecificTags(tableName);
+			//			if(t != null){
+			//				tags.add(t);
+			//			}
+			// }
+		} else {
+			System.out.println("not Connected queryTagListFiltered()");
+		}
+		return tags;
+	}
+
+	// alle verknüpften Tags finden
+	public ArrayList<Tag> getBindedTagList(Tag_File file) {
+		ArrayList<Tag> tagList = new ArrayList<Tag>();
+
+		if (checkConnection()) {
+
+			msql.query("SELECT type, tag_ID FROM tag_binding WHERE file_ID = " + file.id);
+			ArrayList<String> types = new ArrayList<String>();
+			ArrayList tagIds = new ArrayList();
+			while (msql.next()) {
+				types.add(msql.getString("type"));
+				tagIds.add(msql.getInt("tag_ID"));
+			}
+
+			for (int i = 0; i < types.size(); i++) {
+				msql.query("SELECT * FROM " + types.get(i) + " WHERE ID = "
+						+ tagIds.get(i));
+				while (msql.next()) {
+					Tag t = getSpecificTags(types.get(i));
+					if(t != null){
+						tagList.add(t);
 					}
 				}
-			} else {
-				System.out.println("not Connected queryTagListFiltered()");
 			}
-			return tags;
+
+		} else {
+			System.out.println("not Connected getBindedTagList()");
 		}
-		
-		// next work: alle verknüpften Tags finden
-		public ArrayList<Tag> getBindedTagList(Tag_File file) {
-			ArrayList<Tag> tagList = new ArrayList<Tag>();
-//			if (checkConnection()) {
-//				msql.query("SELECT files.* FROM files INNER JOIN tag_binding ON (files.ID = tag_binding.file_ID) WHERE tag_binding.type LIKE '" + filter.tag.type + "' AND tag_binding.tag_ID LIKE '" + filter.tag.id + "'");
-//			}else{
-//				System.out.println("not Connected getBindedTagList()");
-//			}
-			
-			return null;
+
+		return tagList;
+	}
+
+	//
+	public Tag getSpecificTags(String tableName) {
+		Tag t = null;
+		if (tableName.equals("files")) {
+			Tag tag = new Tag_File(tableName, msql.getInt("ID"),
+					msql.getString("name"), msql.getFloat("size"),
+					msql.getString("path"), msql.getTimestamp("creation_time"),
+					msql.getTimestamp("expiration_time"),
+					msql.getInt("origin_ID"), msql.getInt("score"));
+			t = tag;
+		} else if (tableName.equals("locations")) {
+			Tag tag = new Tag_Location(tableName, msql.getInt("ID"),
+					msql.getString("name"), msql.getString("coordinates"));
+			t = tag;
+		} else if (tableName.equals("users")) {
+			Tag_User tag = new Tag_User("users", msql.getInt("ID"),
+					msql.getString("name"), msql.getString("password"));
+			t = tag;
+		} else {
+			System.out.println(tableName + " not yet Listed in queryTagList");
 		}
-	
+		return t;
+	}
 
 	// not finished, get Ids and types
 	public ArrayList<Tag> queryConnectedTagList(String tableName, Tag_File t) {
@@ -243,8 +362,9 @@ public class SQLhelper {
 				e.printStackTrace();
 				System.out.println("File not saved");
 			}
-		} else{
-			System.out.println(tableName + "wrong or not yet in SQL.createDBTag");
+		} else {
+			System.out.println(tableName
+					+ "wrong or not yet in SQL.createDBTag");
 		}
 		return null;
 	}
@@ -254,19 +374,17 @@ public class SQLhelper {
 		if (checkConnection()) {
 			// files
 
-			System.out.println("SELECT COUNT(*) FROM tag_binding WHERE file_ID = \""
-							+ file.id
-							+ "\" AND type = \""
-							+ tag.type
-							+ "\" AND tag_ID = \"" + tag.id + "\"");
+//			System.out.println("SELECT COUNT(*) FROM tag_binding WHERE file_ID = \""
+//							+ file.id
+//							+ "\" AND type = \""
+//							+ tag.type
+//							+ "\" AND tag_ID = \"" + tag.id + "\"");
 			// ask if COUNT der connection == 0 -> binding exists
 			msql.query("SELECT COUNT(*) FROM tag_binding WHERE file_ID = \""
-					+ file.id
-					+ "\" AND type = \""
-					+ tag.type
+					+ file.id + "\" AND type = \"" + tag.type
 					+ "\" AND tag_ID = \"" + tag.id + "\"");
 			msql.next();
-			System.out.println("number of rows: " + msql.getInt(1));
+//			System.out.println("number of rows: " + msql.getInt(1));
 
 			if (msql.getInt(1) == 0) {
 
@@ -312,53 +430,52 @@ public class SQLhelper {
 		}
 		return isInDB;
 	}
-	
-	
+
 	// noch nicht fertig!
-	public Tag getLastCreatedTag(String tableName){
+	public Tag getLastCreatedTag(String tableName) {
 		Tag tag = null;
-		
+
 		// get last ID in table
 		msql.query("SELECT LAST_INSERT_ID() FROM files");
 		msql.next();
 		int fileId = msql.getInt(1);
 
-		msql.query("SELECT * FROM " + tableName + " WHERE ID = \"" + fileId + "\"");
+		msql.query("SELECT * FROM " + tableName + " WHERE ID = \"" + fileId
+				+ "\"");
 		msql.next();
-		
+
 		// files
-		if(tableName.equals("files")){
+		if (tableName.equals("files")) {
 			tag = new Tag_File(tableName, msql.getInt("ID"),
 					msql.getString("name"), msql.getFloat("size"),
 					msql.getString("path"), msql.getTimestamp("creation_time"),
-					msql.getTimestamp("expiration_time"), msql.getInt("origin_ID"),
-					msql.getInt("score"));
+					msql.getTimestamp("expiration_time"),
+					msql.getInt("origin_ID"), msql.getInt("score"));
 
 			System.out.println("TAG: " + tag.toString());
-		} 
+		}
 		// users
-		else if(tableName.equals("users")){
-					tag = new Tag_User(tableName, msql.getInt("ID"),
-							msql.getString("name"), msql.getString("password"));
+		else if (tableName.equals("users")) {
+			tag = new Tag_User(tableName, msql.getInt("ID"),
+					msql.getString("name"), msql.getString("password"));
 
-					System.out.println("TAG: " + tag.toString());
-				} 
+			System.out.println("TAG: " + tag.toString());
+		}
 		// locations
-		else if(tableName.equals("locations")){
+		else if (tableName.equals("locations")) {
 			tag = new Tag_Location(tableName, msql.getInt("ID"),
 					msql.getString("name"), msql.getString("coordinates"));
-		} 
+		}
 		// keywords
-		else if(tableName.equals("keywords")){
-			tag = new Tag(tableName, msql.getInt("ID"),
-					msql.getString("name"));
+		else if (tableName.equals("keywords")) {
+			tag = new Tag(tableName, msql.getInt("ID"), msql.getString("name"));
 		}
 		// projects
-		else if(tableName.equals("projects")){
-			tag = new Tag(tableName, msql.getInt("ID"),
-			msql.getString("name"));
-		}else {
-			System.out.println("SQL.getLastCreatedTag noch nicht fertig für " + tableName);
+		else if (tableName.equals("projects")) {
+			tag = new Tag(tableName, msql.getInt("ID"), msql.getString("name"));
+		} else {
+			System.out.println("SQL.getLastCreatedTag noch nicht fertig für "
+					+ tableName);
 		}
 
 		return tag;
