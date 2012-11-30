@@ -34,6 +34,7 @@ public class TagExplorer extends PApplet {
 
 	// toxi VerletPhysics
 	VerletPhysics physics;
+	VerletPhysics filePhysics;
 
 	public void setup() {
 		size(800, 400);
@@ -57,11 +58,13 @@ public class TagExplorer extends PApplet {
 
 		// toxi VerletPhysics
 		physics = new VerletPhysics();
-//		GravityBehavior g = new GravityBehavior(new Vec3D(0, 0, -0.01f));
-//		physics.addBehavior(g);
-		
+		// GravityBehavior g = new GravityBehavior(new Vec3D(0, 0, -0.01f));
+		// physics.addBehavior(g);
+		filePhysics = new VerletPhysics();
+
 		updateShowFiles();
 		updateTags();
+		updateSprings();
 
 		// Display settings
 		textFont(font, 14);
@@ -100,9 +103,10 @@ public class TagExplorer extends PApplet {
 			text("Location: " + location.name, 150, 16);
 		}
 
-		showFiles();
+		drawFiles();
 
-		showTags();
+		drawTags();
+		drawSprings();
 
 		// Promt Messages
 		if (p != null) {
@@ -113,10 +117,11 @@ public class TagExplorer extends PApplet {
 		// text("Location: " + user.getName(), 5, 16);
 
 		physics.update();
+		filePhysics.update();
 	}
 
 	// ///////// display Files ////////////////////
-	public void showFiles() {
+	public void drawFiles() {
 		if (showFiles != null) {
 			for (int i = 0; i < showFiles.size(); i++) {
 				text(((Tag_File) showFiles.get(i)).viewName, 10, 40 + i * 16);
@@ -124,35 +129,22 @@ public class TagExplorer extends PApplet {
 		}
 	}
 
-	public void showTags() {
-		if (tags != null) {
-			drawParticles();
-		}
-	}
-	
-	
-	
-	public void drawParticles(){
-		for (int i = 0; i<physics.particles.size(); i++){
+	public void drawTags() {
+		for (int i = 0; i < physics.particles.size(); i++) {
 			VerletParticleTag vp = (VerletParticleTag) physics.particles.get(i);
 			vp.draw();
-			// point(vp.x, vp.y, vp.z);
 		}
 	}
-	
-	public void drawSprings(){
-		for(int i = 0; i< physics.springs.size(); i++){
+
+	public void drawSprings() {
+		for (int i = 0; i < physics.springs.size(); i++) {
 			VerletSpring sp = (VerletSpring) physics.springs.get(i);
-			
+
 			stroke(255);
 			strokeWeight(1);
-			line(sp.a.x, sp.a.y, sp.a.z, sp.b.x, sp.b.y, sp.b.z);	
+			line(sp.a.x, sp.a.y, sp.a.z, sp.b.x, sp.b.y, sp.b.z);
 		}
 	}
-	
-	
-	
-	
 
 	public void updateShowFiles() {
 		if (filters.size() > 0) {
@@ -169,6 +161,8 @@ public class TagExplorer extends PApplet {
 
 			fileTag.setAttributes(SQL.getBindedTagList(fileTag));
 			fileTag.updateViewName();
+			
+			
 		}
 	}
 
@@ -177,25 +171,53 @@ public class TagExplorer extends PApplet {
 		tags.addAll(SQL.queryTagList("locations"));
 		tags.addAll(SQL.queryTagList("projects"));
 		tags.addAll(SQL.queryTagList("users"));
-		
-		//physics.clear();
-		if(physics.particles.size() > 0)
+
+		// physics.clear();
+//		if (physics.particles.size() > 0)
 			physics.particles.clear();
-		
+
 		int count = tags.size();
-		float dist = ((float)height-40)/(count-1);
-		
-		for(int i = 0; i<tags.size(); i++){
+		float dist = ((float) height - 40) / (count - 1);
+
+		for (int i = 0; i < tags.size(); i++) {
 			dropParticles(width - 150, i * dist + 20, 0, tags.get(i));
 		}
 	}
-	
-	private void dropParticles(float x, float y, float z, Tag t) {
+
+	public void updateSprings() {
+		
+		filePhysics.particles.clear();
+		println("updateSprings noch nicht fertig");
+		// noch nicht fertig
+		for (Tag t : showFiles) {
+			Tag_File file = (Tag_File) t;
+			if (file.attributes.size() > 0) {
+				for(Tag tag : file.attributes){
+					dropSpring();
+				}
+			}
+		}
+	}
+
+	public void dropParticles(float x, float y, float z, Tag t) {
 		VerletParticleTag p = new VerletParticleTag(this, x, y, z, t);
-		if(z == 0){
+		if (z == 0) {
 			p.lock();
 		}
 		physics.addParticle(p);
+	}
+	float LEN = 10; 			// 10
+	float STR = 0.01f; 	// 0.01f
+	
+	public void dropSpring() {
+
+			VerletParticle p0 = (VerletParticle) physics.particles
+					.get(1);
+			VerletParticle p1 = (VerletParticle) physics.particles
+					.get(2);
+			
+			VerletSpring sp = new VerletSpring(p0, p1, LEN, STR);
+			physics.addSpring(sp);
 	}
 
 	// ///////// INPUT ///////////////////
