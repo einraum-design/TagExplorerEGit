@@ -289,6 +289,10 @@ public class SQLhelper {
 			Tag_User tag = new Tag_User("users", msql.getInt("ID"),
 					msql.getString("name"), msql.getString("password"));
 			t = tag;
+		} else if (tableName.equals("projects") || tableName.equals("keywords")) {
+			Tag tag = new Tag(tableName, msql.getInt("ID"),
+					msql.getString("name"));
+			t = tag;
 		} else {
 			System.out.println(tableName + " not yet Listed in queryTagList");
 		}

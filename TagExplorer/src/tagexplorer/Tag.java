@@ -5,6 +5,7 @@ public class Tag {
 	int id;
 	String name;
 	String type = "tag";
+//	TagField tagField;
 	
 	public Tag(){
 	}
@@ -13,6 +14,8 @@ public class Tag {
 		this.id = id;
 		this.name = name;
 		type = tableName;
+		//this.tagField = new TagField(p5);
+		
 	}
 
 	@Override

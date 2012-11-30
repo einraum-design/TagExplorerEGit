@@ -9,23 +9,25 @@ import controlP5.Textfield;
 import processing.core.PApplet;
 import processing.core.PFont;
 import toxi.geom.Vec3D;
+import toxi.physics.VerletParticle;
 import toxi.physics.VerletPhysics;
+import toxi.physics.VerletSpring;
 import toxi.physics.behaviors.GravityBehavior;
 
 public class TagExplorer extends PApplet {
 
-	//Tag_User user = new Tag_User("users", 0, "noname", "no Password");
+	// Tag_User user = new Tag_User("users", 0, "noname", "no Password");
 	Tag_User user = null;
 	Tag_Location location = null;
-	
+
 	SQLhelper SQL;
 	PFont font;
 	ControlP5 cp5_Promt;
 	ControlP5 cp5_Menu;
 
-	ArrayList<Tag> tags = new ArrayList<Tag>();
+	ArrayList<Tag> tags = null;
 	ArrayList<Tag> showFiles = null;
-	
+
 	ArrayList<Filter> filters = new ArrayList<Filter>();
 
 	// PFrame f;
@@ -38,9 +40,9 @@ public class TagExplorer extends PApplet {
 		font = createFont("arial", 20);
 
 		SQL = new SQLhelper(this);
-		
+
 		// Standartuser: …ffentlich
-		//user = (Tag_User) SQL.queryTagList("users").get(0);
+		// user = (Tag_User) SQL.queryTagList("users").get(0);
 
 		// ControlP5
 		cp5_Promt = new ControlP5(this);
@@ -52,29 +54,30 @@ public class TagExplorer extends PApplet {
 
 		// User registration
 		// user = (Tag_User) SQL.queryTagList("users").get(0);
-		
-		updateShowFiles();
-		
+
 		// toxi VerletPhysics
 		physics = new VerletPhysics();
-		GravityBehavior g = new GravityBehavior(new Vec3D(0, 0, -0.01f));
-		physics.addBehavior(g);
+//		GravityBehavior g = new GravityBehavior(new Vec3D(0, 0, -0.01f));
+//		physics.addBehavior(g);
+		
+		updateShowFiles();
+		updateTags();
 
 		// Display settings
 		textFont(font, 14);
-		
+
 		// test SQL Join
-//		SQL.msql.query("SELECT files.* FROM files INNER JOIN tag_binding ON (files.ID = tag_binding.file_ID) WHERE tag_binding.type = 'users' AND tag_binding.tag_ID = '1' ");
-//		while(SQL.msql.next()){
-//			System.out.println(SQL.msql.getString("name"));
-//		}
-		
+		// SQL.msql.query("SELECT files.* FROM files INNER JOIN tag_binding ON (files.ID = tag_binding.file_ID) WHERE tag_binding.type = 'users' AND tag_binding.tag_ID = '1' ");
+		// while(SQL.msql.next()){
+		// System.out.println(SQL.msql.getString("name"));
+		// }
+
 		// UNION!
-//		SQL.msql.query("SELECT files.* FROM files INNER JOIN tag_binding ON (files.ID = tag_binding.file_ID) WHERE tag_binding.type = 'users' AND tag_binding.tag_ID = '1' ");
-//		while(SQL.msql.next()){
-//			//System.out.println(SQL.msql.getString("name"));
-//		}
-		
+		// SQL.msql.query("SELECT files.* FROM files INNER JOIN tag_binding ON (files.ID = tag_binding.file_ID) WHERE tag_binding.type = 'users' AND tag_binding.tag_ID = '1' ");
+		// while(SQL.msql.next()){
+		// //System.out.println(SQL.msql.getString("name"));
+		// }
+
 	}
 
 	// /////////// draw ////////////////////
@@ -89,17 +92,18 @@ public class TagExplorer extends PApplet {
 		}
 
 		fill(150);
-		if(user != null){
+		if (user != null) {
 			text("User: " + user.name, 5, 16);
 		}
-		
-		if(location != null){
+
+		if (location != null) {
 			text("Location: " + location.name, 150, 16);
 		}
-		
+
 		showFiles();
-		
-		
+
+		showTags();
+
 		// Promt Messages
 		if (p != null) {
 			p.showMessages();
@@ -115,29 +119,84 @@ public class TagExplorer extends PApplet {
 	public void showFiles() {
 		if (showFiles != null) {
 			for (int i = 0; i < showFiles.size(); i++) {
-				text(((Tag_File)showFiles.get(i)).viewName, 10, 40 + i * 16);
+				text(((Tag_File) showFiles.get(i)).viewName, 10, 40 + i * 16);
 			}
 		}
 	}
+
+	public void showTags() {
+		if (tags != null) {
+			drawParticles();
+		}
+	}
 	
-	public void updateShowFiles(){
-		if(filters.size() > 0){
-			showFiles = SQL.queryTagListFiltered("files", filters.get(0));
+	
+	
+	public void drawParticles(){
+		for (int i = 0; i<physics.particles.size(); i++){
+			VerletParticleTag vp = (VerletParticleTag) physics.particles.get(i);
+			vp.draw();
+			// point(vp.x, vp.y, vp.z);
+		}
+	}
+	
+	public void drawSprings(){
+		for(int i = 0; i< physics.springs.size(); i++){
+			VerletSpring sp = (VerletSpring) physics.springs.get(i);
 			
-			//showFiles = SQL.queryTagListFiltered("files", filters);
+			stroke(255);
+			strokeWeight(1);
+			line(sp.a.x, sp.a.y, sp.a.z, sp.b.x, sp.b.y, sp.b.z);	
+		}
+	}
+	
+	
+	
+	
+
+	public void updateShowFiles() {
+		if (filters.size() > 0) {
+			showFiles = SQL.queryTagListFiltered("files", filters.get(0));
+
+			// showFiles = SQL.queryTagListFiltered("files", filters);
 		} else {
 			showFiles = SQL.queryTagList("files");
 		}
-		
+
 		// Add Tagattribute zu showFiles
-		for(Tag t : showFiles){
+		for (Tag t : showFiles) {
 			Tag_File fileTag = (Tag_File) t;
-			
+
 			fileTag.setAttributes(SQL.getBindedTagList(fileTag));
 			fileTag.updateViewName();
 		}
 	}
+
+	public void updateTags() {
+		tags = SQL.queryTagList("keywords");
+		tags.addAll(SQL.queryTagList("locations"));
+		tags.addAll(SQL.queryTagList("projects"));
+		tags.addAll(SQL.queryTagList("users"));
+		
+		//physics.clear();
+		if(physics.particles.size() > 0)
+			physics.particles.clear();
+		
+		int count = tags.size();
+		float dist = ((float)height-40)/(count-1);
+		
+		for(int i = 0; i<tags.size(); i++){
+			dropParticles(width - 150, i * dist + 20, 0, tags.get(i));
+		}
+	}
 	
+	private void dropParticles(float x, float y, float z, Tag t) {
+		VerletParticleTag p = new VerletParticleTag(this, x, y, z, t);
+		if(z == 0){
+			p.lock();
+		}
+		physics.addParticle(p);
+	}
 
 	// ///////// INPUT ///////////////////
 	public void keyPressed() {
@@ -148,9 +207,9 @@ public class TagExplorer extends PApplet {
 			if (url != null) {
 				println("Create new File: url: " + url);
 				Tag_File file = createNewFile("files", url);
-				
-				if(file != null && user != null){
-//					System.out.println(file.toString());
+
+				if (file != null && user != null) {
+					// System.out.println(file.toString());
 					SQL.bindTag(file, user);
 				}
 			}
@@ -190,8 +249,6 @@ public class TagExplorer extends PApplet {
 	}
 
 	// ///////////// Tag handling /////////////////////
-	
-
 
 	// ////////// Tag Creation /////////////////////
 	public Tag_File createNewFile(String tableName, String s) {
@@ -220,7 +277,7 @@ public class TagExplorer extends PApplet {
 			removeController();
 		}
 	}
-	
+
 	public void projectInput(String theText) {
 		// System.out.println("function locationInput");
 		theText = theText.trim();
@@ -233,6 +290,7 @@ public class TagExplorer extends PApplet {
 		} else {
 			SQL.createDbTag(tableName, theText);
 			removeController();
+			updateTags();
 		}
 	}
 
@@ -249,6 +307,7 @@ public class TagExplorer extends PApplet {
 		} else {
 			SQL.createDbTag(tableName, theText);
 			removeController();
+			updateTags();
 		}
 	}
 
@@ -319,11 +378,6 @@ public class TagExplorer extends PApplet {
 		p = null;
 		System.out.println("removed Controller");
 	}
-
-	// public enum Tables
-	// {
-	// FILES, LOCATIONS, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY
-	// }
 
 	public static void main(String _args[]) {
 		PApplet.main(new String[] { tagexplorer.TagExplorer.class.getName() });
