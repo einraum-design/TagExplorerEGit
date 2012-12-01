@@ -3,6 +3,8 @@ package tagexplorer;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.text.StyledEditorKit.ForegroundAction;
+
 import controlP5.ControlP5;
 import controlP5.Controller;
 import controlP5.Textfield;
@@ -37,7 +39,7 @@ public class TagExplorer extends PApplet {
 	VerletPhysics filePhysics;
 
 	public void setup() {
-		size(800, 400);
+		size(800, 400, P3D);
 		font = createFont("arial", 20);
 
 		SQL = new SQLhelper(this);
@@ -102,7 +104,6 @@ public class TagExplorer extends PApplet {
 		if (location != null) {
 			text("Location: " + location.name, 150, 16);
 		}
-
 		drawFiles();
 
 		drawTags();
@@ -122,10 +123,14 @@ public class TagExplorer extends PApplet {
 
 	// ///////// display Files ////////////////////
 	public void drawFiles() {
-		if (showFiles != null) {
-			for (int i = 0; i < showFiles.size(); i++) {
-				text(((Tag_File) showFiles.get(i)).viewName, 10, 40 + i * 16);
+		if (filePhysics.particles != null) {
+			for (int i = 0; i < filePhysics.particles.size(); i++) {
+				VerletParticleTag vp = (VerletParticleTag) filePhysics.particles.get(i);
+				vp.draw();
 			}
+//			for (int i = 0; i < showFiles.size(); i++) {
+//				text(((Tag_File) showFiles.get(i)).viewName, 10, 40 + i * 16);
+//			}
 		}
 	}
 
@@ -161,9 +166,22 @@ public class TagExplorer extends PApplet {
 
 			fileTag.setAttributes(SQL.getBindedTagList(fileTag));
 			fileTag.updateViewName();
-			
-			
 		}
+		
+		filePhysics.particles.clear();
+		// drop Particles
+		int count = showFiles.size();
+		
+		float dist;
+		if(count > 1){
+			dist = ((float) height - 40) / (count - 1);
+		} else {
+			dist = 0;
+		}
+		
+		for (int i = 0; i < showFiles.size(); i++) {
+			dropParticles(filePhysics, 250, i * dist + 20, 0, showFiles.get(i));
+		}	
 	}
 
 	public void updateTags() {
@@ -172,51 +190,62 @@ public class TagExplorer extends PApplet {
 		tags.addAll(SQL.queryTagList("projects"));
 		tags.addAll(SQL.queryTagList("users"));
 
-		// physics.clear();
-//		if (physics.particles.size() > 0)
-			physics.particles.clear();
+
+		physics.particles.clear();
 
 		int count = tags.size();
-		float dist = ((float) height - 40) / (count - 1);
+		float dist;
+		if(count > 1){
+			dist = ((float) height - 40) / (count - 1);
+		} else {
+			dist = 0;
+		}
 
 		for (int i = 0; i < tags.size(); i++) {
-			dropParticles(width - 150, i * dist + 20, 0, tags.get(i));
+			dropParticles(physics, width - 150, i * dist + 20, 0, tags.get(i));
 		}
 	}
 
 	public void updateSprings() {
 		
-		filePhysics.particles.clear();
-		println("updateSprings noch nicht fertig");
-		// noch nicht fertig
-		for (Tag t : showFiles) {
-			Tag_File file = (Tag_File) t;
+		physics.springs.clear();
+		
+		for (int i = 0; i<showFiles.size(); i++) {
+			Tag_File file = (Tag_File) showFiles.get(i);
 			if (file.attributes.size() > 0) {
-				for(Tag tag : file.attributes){
-					dropSpring();
+				for (int j = 0; j < file.attributes.size(); j++) {
+					// get particle of file
+					VerletParticle fileParticle = filePhysics.particles.get(i);
+					// get particle of attribute
+					VerletParticle tagParticle = null;
+					
+					for(VerletParticle p : physics.particles){
+						VerletParticleTag pt = (VerletParticleTag) p;
+						if(pt.getTag().id == file.attributes.get(j).id && pt.getTag().type == file.attributes.get(j).type ){
+							tagParticle = pt;
+						}
+					}
+					
+//					println("dropSpring(" + fileParticle + ", " + tagParticle);
+					dropSpring(fileParticle, tagParticle);
 				}
 			}
 		}
 	}
 
-	public void dropParticles(float x, float y, float z, Tag t) {
+	public void dropParticles(VerletPhysics physics, float x, float y, float z, Tag t) {
 		VerletParticleTag p = new VerletParticleTag(this, x, y, z, t);
 		if (z == 0) {
 			p.lock();
 		}
 		physics.addParticle(p);
 	}
-	float LEN = 10; 			// 10
+	
+	float LEN = 400; 			// 10
 	float STR = 0.01f; 	// 0.01f
 	
-	public void dropSpring() {
-
-			VerletParticle p0 = (VerletParticle) physics.particles
-					.get(1);
-			VerletParticle p1 = (VerletParticle) physics.particles
-					.get(2);
-			
-			VerletSpring sp = new VerletSpring(p0, p1, LEN, STR);
+	public void dropSpring(VerletParticle fileParticle, VerletParticle attributeParticle) {
+			VerletSpring sp = new VerletSpring(fileParticle, attributeParticle, LEN, STR);
 			physics.addSpring(sp);
 	}
 
@@ -243,6 +272,7 @@ public class TagExplorer extends PApplet {
 			filters.clear();
 			filters.add(new Filter(user, true));
 			updateShowFiles();
+			updateSprings();
 			break;
 		case 'I':
 			// Set User
@@ -250,6 +280,7 @@ public class TagExplorer extends PApplet {
 			filters.clear();
 			filters.add(new Filter(user, true));
 			updateShowFiles();
+			updateSprings();
 			break;
 		case 'L':
 			createPromt("locations");

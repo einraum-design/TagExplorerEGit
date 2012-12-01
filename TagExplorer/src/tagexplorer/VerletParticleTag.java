@@ -64,4 +64,10 @@ public class VerletParticleTag extends VerletParticle {
 		}
 		return over;
 	}
+
+	@Override
+	public String toString() {
+		return "VerletParticleTag [p5=" + p5 + ", boundTag=" + boundTag
+				+ ", x=" + x + ", y=" + y + ", z=" + z + "]";
+	}
 }
