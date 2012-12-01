@@ -125,8 +125,22 @@ public class TagExplorer extends PApplet {
 	public void drawFiles() {
 		if (filePhysics.particles != null) {
 			for (int i = 0; i < filePhysics.particles.size(); i++) {
-				VerletParticleTag vp = (VerletParticleTag) filePhysics.particles.get(i);
-				vp.draw();
+				Tag vp = (Tag) filePhysics.particles.get(i);
+				
+				strokeWeight(5);
+
+				if (vp.isLocked()) {
+					stroke(255, 0, 0);
+				} else {
+					stroke(0, 255, 200);
+				}
+				point(vp.x, vp.y);
+				if (mouseOver(vp, 30, 30)) {
+					textAlign(LEFT);
+					text(vp.name, vp.x + 10, vp.y);
+				}
+				
+				
 			}
 //			for (int i = 0; i < showFiles.size(); i++) {
 //				text(((Tag_File) showFiles.get(i)).viewName, 10, 40 + i * 16);
@@ -136,14 +150,25 @@ public class TagExplorer extends PApplet {
 
 	public void drawTags() {
 		for (int i = 0; i < physics.particles.size(); i++) {
-			VerletParticleTag vp = (VerletParticleTag) physics.particles.get(i);
-			vp.draw();
+			Tag vp = (Tag) physics.particles.get(i);
+			strokeWeight(5);
+
+			if (vp.isLocked()) {
+				stroke(255, 0, 0);
+			} else {
+				stroke(0, 255, 200);
+			}
+			point(vp.x, vp.y);
+			if (mouseOver(vp, 30, 30)) {
+				textAlign(LEFT);
+				text(vp.name, vp.x + 10, vp.y);
+			}
 		}
 	}
 
 	public void drawSprings() {
 		for (int i = 0; i < physics.springs.size(); i++) {
-			VerletSpring sp = (VerletSpring) physics.springs.get(i);
+			VerletSpring sp = physics.springs.get(i);
 
 			stroke(255);
 			strokeWeight(1);
@@ -168,8 +193,9 @@ public class TagExplorer extends PApplet {
 			fileTag.updateViewName();
 		}
 		
-		filePhysics.particles.clear();
+		
 		// drop Particles
+		filePhysics.particles.clear();
 		int count = showFiles.size();
 		
 		float dist;
@@ -210,35 +236,40 @@ public class TagExplorer extends PApplet {
 		
 		physics.springs.clear();
 		
-		for (int i = 0; i<showFiles.size(); i++) {
-			Tag_File file = (Tag_File) showFiles.get(i);
+		for (Tag tf : showFiles) {
+			Tag_File file = (Tag_File) tf;
 			if (file.attributes.size() > 0) {
-				for (int j = 0; j < file.attributes.size(); j++) {
-					// get particle of file
-					VerletParticle fileParticle = filePhysics.particles.get(i);
-					// get particle of attribute
-					VerletParticle tagParticle = null;
+				for (Tag t : file.attributes) {
+					dropSpring(file, t);
 					
-					for(VerletParticle p : physics.particles){
-						VerletParticleTag pt = (VerletParticleTag) p;
-						if(pt.getTag().id == file.attributes.get(j).id && pt.getTag().type == file.attributes.get(j).type ){
-							tagParticle = pt;
-						}
-					}
+					// get particle of file
+//					VerletParticle fileParticle = filePhysics.particles.get(i);
+					// get particle of attribute
+//					VerletParticle tagParticle = null;
+					
+//					for(VerletParticle p : physics.particles){
+//						VerletParticleTag pt = (VerletParticleTag) p;
+//						if(pt.getTag().id == file.attributes.get(j).id && pt.getTag().type == file.attributes.get(j).type ){
+//							tagParticle = pt;
+//						}
+//					}
 					
 //					println("dropSpring(" + fileParticle + ", " + tagParticle);
-					dropSpring(fileParticle, tagParticle);
+//					dropSpring(fileParticle, tagParticle);
 				}
 			}
 		}
 	}
 
 	public void dropParticles(VerletPhysics physics, float x, float y, float z, Tag t) {
-		VerletParticleTag p = new VerletParticleTag(this, x, y, z, t);
-		if (z == 0) {
-			p.lock();
+		t.x = x;
+		t.y = y;
+		t.z = z;
+		if (t.z == 0) {
+			t.lock();
 		}
-		physics.addParticle(p);
+		physics.addParticle(t);
+		println(t.x + " " + t.y + " " + t.z);
 	}
 	
 	float LEN = 400; 			// 10
@@ -432,6 +463,26 @@ public class TagExplorer extends PApplet {
 		System.out.println("removed Controller");
 	}
 
+	
+	boolean mouseOver(float x, float y, int w, int h) {
+		boolean over = false;
+		if (mouseX > x - w / 2.0f && mouseX < x + w / 2.0f
+				&& mouseY > y - h / 2.0f && mouseY < y + h / 2.0f) {
+			over = true;
+		}
+		return over;
+	}
+
+	boolean mouseOver(Tag t, int w, int h) {
+		boolean over = false;
+		if (mouseX > t.x - w / 2.0f && mouseX < t.x + w / 2.0f
+				&& mouseY > t.y - h / 2.0f && mouseY < t.y + h / 2.0f) {
+			over = true;
+		}
+		return over;
+	}
+	
+	
 	public static void main(String _args[]) {
 		PApplet.main(new String[] { tagexplorer.TagExplorer.class.getName() });
 	}
