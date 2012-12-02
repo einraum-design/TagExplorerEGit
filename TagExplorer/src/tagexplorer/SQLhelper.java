@@ -279,10 +279,12 @@ public class SQLhelper {
 		if(p5.tags != null){
 		for(Tag _tag : p5.tags){
 			if(tableName.equals(_tag.type) && msql.getInt("ID") == _tag.id){
+				System.out.println("Ÿbergabe");
 				return _tag;
 			}
 		}
 		}
+		System.out.println("create New");
 		
 		// ansonsten erstellen neuen Tag
 		if (tableName.equals("files")) {
