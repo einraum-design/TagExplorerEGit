@@ -279,10 +279,12 @@ public class SQLhelper {
 		if(p5.tags != null){
 		for(Tag _tag : p5.tags){
 			if(tableName.equals(_tag.type) && msql.getInt("ID") == _tag.id){
+				System.out.println("Ÿbergabe " + _tag.name + " " + _tag.type);
 				return _tag;
 			}
 		}
 		}
+
 		
 		// ansonsten erstellen neuen Tag
 		if (tableName.equals("files")) {
@@ -307,6 +309,7 @@ public class SQLhelper {
 		} else {
 			System.out.println(tableName + " not yet Listed in queryTagList");
 		}
+		System.out.println("neu erstellen: " + t.name + " " + t.type);
 		return t;
 	}
 
@@ -435,6 +438,11 @@ public class SQLhelper {
 				// path!
 				if (((Tag_File) t).path.trim().toLowerCase()
 						.equals(theText.trim().toLowerCase())) {
+					isInDB = true;
+					return isInDB;
+				}
+			} else if (t instanceof Tag) {
+				if (t.name.trim().toLowerCase().equals(theText.trim().toLowerCase())) {
 					isInDB = true;
 					return isInDB;
 				}
