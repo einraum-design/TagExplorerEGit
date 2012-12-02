@@ -13,7 +13,7 @@ import processing.core.PApplet;
 import de.bezier.data.sql.MySQL;
 
 public class SQLhelper {
-	PApplet p5;
+	TagExplorer p5;
 
 	MySQL msql;
 	String user = "root";
@@ -25,13 +25,13 @@ public class SQLhelper {
 	// queries.put("files",
 	// "ID, name, size, path, creation_time, expiration_time, origin_ID, score");
 
-	public SQLhelper(PApplet p5) {
+	public SQLhelper(TagExplorer p5) {
 		this.p5 = p5;
 		msql = new MySQL(p5, host, database, user, pass);
 		System.out.println("SQL connection: " + checkConnection());
 	}
 
-	public SQLhelper(PApplet p5, String user, String pass, String database,
+	public SQLhelper(TagExplorer p5, String user, String pass, String database,
 			String host) {
 		this.user = user;
 		this.pass = pass;
@@ -274,6 +274,17 @@ public class SQLhelper {
 	//
 	public Tag getSpecificTags(String tableName) {
 		Tag t = null;
+		
+		// existiert das Attribute in p5.tags? - Dann gib existierends Attribut zurück
+		if(p5.tags != null){
+		for(Tag _tag : p5.tags){
+			if(tableName.equals(_tag.type) && msql.getInt("ID") == _tag.id){
+				return _tag;
+			}
+		}
+		}
+		
+		// ansonsten erstellen neuen Tag
 		if (tableName.equals("files")) {
 			Tag tag = new Tag_File(tableName, msql.getInt("ID"),
 					msql.getString("name"), msql.getFloat("size"),

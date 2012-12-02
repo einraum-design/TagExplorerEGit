@@ -185,12 +185,13 @@ public class TagExplorer extends PApplet {
 	}
 
 	public void updateTags() {
-		tags = SQL.queryTagList("keywords");
+		ArrayList tags = SQL.queryTagList("keywords");
 		tags.addAll(SQL.queryTagList("locations"));
 		tags.addAll(SQL.queryTagList("projects"));
 		tags.addAll(SQL.queryTagList("users"));
 
-
+		this.tags = tags;
+		
 		physics.particles.clear();
 
 		int count = tags.size();
@@ -202,7 +203,7 @@ public class TagExplorer extends PApplet {
 		}
 
 		for (int i = 0; i < tags.size(); i++) {
-			dropParticles(physics, width - 150, i * dist + 20, 0, tags.get(i));
+			dropParticles(physics, width - 150, i * dist + 20, 0, (Tag) tags.get(i));
 		}
 	}
 
@@ -272,6 +273,7 @@ public class TagExplorer extends PApplet {
 			filters.clear();
 			filters.add(new Filter(user, true));
 			updateShowFiles();
+			updateTags();
 			updateSprings();
 			break;
 		case 'I':
@@ -280,6 +282,7 @@ public class TagExplorer extends PApplet {
 			filters.clear();
 			filters.add(new Filter(user, true));
 			updateShowFiles();
+			updateTags();
 			updateSprings();
 			break;
 		case 'L':
@@ -296,7 +299,8 @@ public class TagExplorer extends PApplet {
 			Tag_File file = (Tag_File) showFiles.get(0);
 			Tag tag = new Tag_Location("locations", 5, "Ort", "coordinaten");
 			SQL.bindTag(file, tag);
-			updateShowFiles();
+			updateTags();
+			updateSprings();
 			break;
 		}
 	}
@@ -327,6 +331,10 @@ public class TagExplorer extends PApplet {
 			p.message = "Location " + theText + " already exists";
 		} else {
 			SQL.createDbTag(tableName, theText);
+			//update Tags & Springs
+			updateTags();
+			updateSprings();
+			
 			removeController();
 		}
 	}
@@ -342,8 +350,11 @@ public class TagExplorer extends PApplet {
 			p.message = "Project " + theText + " already exists";
 		} else {
 			SQL.createDbTag(tableName, theText);
-			removeController();
+			//update Tags & Springs
 			updateTags();
+			updateSprings();
+			
+			removeController();
 		}
 	}
 
@@ -359,8 +370,11 @@ public class TagExplorer extends PApplet {
 			p.message = "Keyword " + theText + " already exists";
 		} else {
 			SQL.createDbTag(tableName, theText);
-			removeController();
+			//update Tags & Springs
 			updateTags();
+			updateSprings();
+			
+			removeController();
 		}
 	}
 
