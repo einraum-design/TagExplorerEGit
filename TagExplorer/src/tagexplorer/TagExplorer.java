@@ -27,7 +27,8 @@ public class TagExplorer extends PApplet {
 	ControlP5 cp5_Promt;
 	ControlP5 cp5_Menu;
 
-	ArrayList<Tag> tags = null;
+	ArrayList<Tag> attributes = null;
+	ArrayList<Tag> files = null;
 	ArrayList<Tag> showFiles = null;
 
 	ArrayList<Filter> filters = new ArrayList<Filter>();
@@ -62,9 +63,11 @@ public class TagExplorer extends PApplet {
 		physics = new VerletPhysics();
 		// GravityBehavior g = new GravityBehavior(new Vec3D(0, 0, -0.01f));
 		// physics.addBehavior(g);
-		filePhysics = new VerletPhysics();
-
+		filePhysics = new VerletPhysics();	
+		
+		// erst Tags, dann Files!
 		updateTags();
+		initFiles();
 		updateShowFiles();
 		updateSprings();
 
@@ -176,12 +179,14 @@ public class TagExplorer extends PApplet {
 	}
 
 	public void updateShowFiles() {
+		System.out.println("updateShowFiles()");
 		if (filters.size() > 0) {
-			showFiles = SQL.queryTagListFiltered("files", filters.get(0));
-
+			ArrayList<Tag> files = SQL.queryTagListFiltered("files", filters.get(0));
+			showFiles = files;
 			// showFiles = SQL.queryTagListFiltered("files", filters);
 		} else {
-			showFiles = SQL.queryTagList("files");
+			// alle files
+			showFiles = files;
 		}
 
 		// Add Tagattribute zu showFiles
@@ -207,6 +212,19 @@ public class TagExplorer extends PApplet {
 			dropParticles(filePhysics, 250, i * dist + 20, 0, showFiles.get(i));
 		}
 	}
+	
+	public void initFiles(){
+		ArrayList<Tag> files = new ArrayList<Tag>();
+		files = SQL.queryTagList("files");
+		this.files = files;
+		
+		for (Tag t : this.files) {
+			Tag_File fileTag = (Tag_File) t;
+
+			fileTag.setAttributes(SQL.getBindedTagList(fileTag));
+			fileTag.updateViewName();
+		}
+	}
 
 	public void updateTags() {
 		ArrayList<Tag> tags = new ArrayList<Tag>();
@@ -215,8 +233,9 @@ public class TagExplorer extends PApplet {
 		tags.addAll(SQL.queryTagList("locations"));
 		tags.addAll(SQL.queryTagList("projects"));
 		tags.addAll(SQL.queryTagList("users"));
+		//tags.addAll(SQL.queryTagList("files"));
 		// tags nicht Ÿberscheiben, sondern nur abgleichen!
-		this.tags = tags;
+		this.attributes = tags;
 
 		physics.particles.clear();
 
@@ -229,7 +248,9 @@ public class TagExplorer extends PApplet {
 		}
 
 		for (int i = 0; i < tags.size(); i++) {
-			dropParticles(physics, width - 150, i * dist + 20, 0, tags.get(i));
+//			if(!(tags.get(i) instanceof Tag_File)){
+				dropParticles(physics, width - 150, i * dist + 20, 0, tags.get(i));
+//			}
 		}
 	}
 
@@ -242,24 +263,6 @@ public class TagExplorer extends PApplet {
 			if (file.attributes.size() > 0) {
 				for (Tag t : file.attributes) {
 					dropSpring(file, t);
-
-					// get particle of file
-					// VerletParticle fileParticle =
-					// filePhysics.particles.get(i);
-					// get particle of attribute
-					// VerletParticle tagParticle = null;
-
-					// for(VerletParticle p : physics.particles){
-					// VerletParticleTag pt = (VerletParticleTag) p;
-					// if(pt.getTag().id == file.attributes.get(j).id &&
-					// pt.getTag().type == file.attributes.get(j).type ){
-					// tagParticle = pt;
-					// }
-					// }
-
-					// println("dropSpring(" + fileParticle + ", " +
-					// tagParticle);
-					// dropSpring(fileParticle, tagParticle);
 				}
 			}
 		}
@@ -295,12 +298,18 @@ public class TagExplorer extends PApplet {
 			String url = selectInput("Select a file to process:");
 			if (url != null) {
 				println("Create new File: url: " + url);
-				Tag_File file = createNewFile("files", url);
 
+				Tag_File file = createNewFile("files", url);
+				
 				if (file != null && user != null) {
 					// System.out.println(file.toString());
 					SQL.bindTag(file, user);
 				}
+				
+				// update File
+				file.setAttributes(SQL.getBindedTagList(file));
+				file.updateViewName();
+				
 			}
 			updateShowFiles();
 			break;

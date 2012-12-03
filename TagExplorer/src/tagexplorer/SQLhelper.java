@@ -429,10 +429,20 @@ public class SQLhelper {
 	public Tag getSpecificTags(String tableName) {
 		Tag t = null;
 
-		// existiert das Attribute in p5.tags? - Dann gib existierends Attribut
+		// existiert das Attribute in p5.attributes? - Dann gib existierends Attribut
 		// zurück
-		if (p5.tags != null) {
-			for (Tag _tag : p5.tags) {
+		if (tableName != "files" && p5.attributes != null) {
+			for (Tag _tag : p5.attributes) {
+				if (tableName.trim().equals(_tag.type.trim()) && msql.getInt("ID") == _tag.id) {
+					System.out.println("übergabe " + _tag.name + " " + _tag.type);
+					return _tag;
+				} 
+			}
+		}
+		// existiert die Datei in p5.files? - Dann gib existierends Attribut
+				// zurück
+		if(tableName == "files" &&  p5.files != null){
+			for (Tag _tag : p5.files) {
 				if (tableName.trim().equals(_tag.type.trim()) && msql.getInt("ID") == _tag.id) {
 					System.out.println("übergabe " + _tag.name + " " + _tag.type);
 					return _tag;
