@@ -209,10 +209,14 @@ public class TagExplorer extends PApplet {
 	}
 
 	public void updateTags() {
+		ArrayList<Tag> tags = new ArrayList<Tag>();
+		
 		tags = SQL.queryTagList("keywords");
 		tags.addAll(SQL.queryTagList("locations"));
 		tags.addAll(SQL.queryTagList("projects"));
 		tags.addAll(SQL.queryTagList("users"));
+		// tags nicht Ÿberscheiben, sondern nur abgleichen!
+		this.tags = tags;
 
 		physics.particles.clear();
 
@@ -270,7 +274,7 @@ public class TagExplorer extends PApplet {
 			t.lock();
 		}
 		physics.addParticle(t);
-		println(t.x + " " + t.y + " " + t.z);
+		//println(t.x + " " + t.y + " " + t.z);
 	}
 
 	float LEN = 400; // 10
@@ -328,6 +332,8 @@ public class TagExplorer extends PApplet {
 		case 'T':
 			// Bind File - Tag
 			Tag_File file = (Tag_File) showFiles.get(0);
+			
+			// beispiel tag lšschen!
 			Tag tag = new Tag_Location("locations", 5, "Ort", "coordinaten");
 			SQL.bindTag(file, tag);
 			updateShowFiles();
