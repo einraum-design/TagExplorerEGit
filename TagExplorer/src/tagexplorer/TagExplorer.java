@@ -32,6 +32,10 @@ public class TagExplorer extends PApplet {
 	ArrayList<Tag> showFiles = null;
 
 	ArrayList<Filter> filters = new ArrayList<Filter>();
+	
+	
+	// Interaction
+	Tag startTag = null;
 
 	// PFrame f;
 
@@ -107,18 +111,22 @@ public class TagExplorer extends PApplet {
 		if (location != null) {
 			text("Location: " + location.name, 150, 16);
 		}
+		
 		drawFiles();
-
 		drawTags();
 		drawSprings();
 
+		// draw interaction
+		stroke(255, 0, 0);
+		if(startTag != null){
+			line(startTag.x, startTag.y, mouseX, mouseY);
+		}
+		
 		// Promt Messages
 		if (p != null) {
 			p.showMessages();
 		}
-		// List l = cp5.getAll();
-		// text("pc5 List.size()" + l.size(), 5, 30);
-		// text("Location: " + user.getName(), 5, 16);
+		
 
 		physics.update();
 		filePhysics.update();
@@ -290,6 +298,67 @@ public class TagExplorer extends PApplet {
 	}
 
 	// ///////// INPUT ///////////////////
+	public void mousePressed(){
+		for(Tag t : showFiles){
+			if(mouseOver(t, 10, 10)){
+				startTag = t;
+			}
+		}
+		for(Tag t : attributes){
+			if(mouseOver(t, 10, 10)){
+				startTag = t;
+			}
+		}
+	}
+	
+	public void mouseReleased(){
+		if(startTag != null){
+			if(startTag instanceof Tag_File){
+				for(Tag t : attributes){
+					if(mouseOver(t, 10, 10)){
+						Tag_File file = (Tag_File) startTag;
+						SQL.bindTag(file, t);
+						file.setAttributes(SQL.getBindedTagList(file));
+						file.updateViewName();
+						updateTags();
+						updateSprings();
+					}
+				}
+			} else{
+				for(Tag t : files){
+					if(mouseOver(t, 10, 10)){
+						Tag_File file = (Tag_File) t;
+						SQL.bindTag(file, startTag);
+						file.setAttributes(SQL.getBindedTagList(file));
+						file.updateViewName();
+						updateTags();
+						updateSprings();
+					}
+				}
+			}
+		}
+		startTag = null;
+	}
+	
+	boolean mouseOver(float x, float y, int w, int h) {
+		boolean over = false;
+		if (mouseX > x - w / 2.0f && mouseX < x + w / 2.0f
+				&& mouseY > y - h / 2.0f && mouseY < y + h / 2.0f) {
+			over = true;
+		}
+		return over;
+	}
+
+	boolean mouseOver(Tag t, int w, int h) {
+		boolean over = false;
+		if (mouseX > t.x - w / 2.0f && mouseX < t.x + w / 2.0f
+				&& mouseY > t.y - h / 2.0f && mouseY < t.y + h / 2.0f) {
+			over = true;
+		}
+		return over;
+	}
+	
+	
 	public void keyPressed() {
 
 		switch (key) {
@@ -497,24 +566,6 @@ public class TagExplorer extends PApplet {
 		bCancelActive = false;
 		p = null;
 		System.out.println("removed Controller");
-	}
-
-	boolean mouseOver(float x, float y, int w, int h) {
-		boolean over = false;
-		if (mouseX > x - w / 2.0f && mouseX < x + w / 2.0f
-				&& mouseY > y - h / 2.0f && mouseY < y + h / 2.0f) {
-			over = true;
-		}
-		return over;
-	}
-
-	boolean mouseOver(Tag t, int w, int h) {
-		boolean over = false;
-		if (mouseX > t.x - w / 2.0f && mouseX < t.x + w / 2.0f
-				&& mouseY > t.y - h / 2.0f && mouseY < t.y + h / 2.0f) {
-			over = true;
-		}
-		return over;
 	}
 
 	public static void main(String _args[]) {
