@@ -91,7 +91,7 @@ public class SQLhelper {
 
 			while (msql.next()) {
 				Tag t = getSpecificTags(tableName);
-				if(t != null){
+				if (t != null) {
 					tags.add(t);
 				}
 			}
@@ -143,7 +143,7 @@ public class SQLhelper {
 			}
 			while (msql.next()) {
 				Tag t = getSpecificTags(tableName);
-				if(t != null){
+				if (t != null) {
 					tags.add(t);
 				}
 			}
@@ -229,9 +229,9 @@ public class SQLhelper {
 			// }
 			// while (msql.next()) {
 			// Tag t = getSpecificTags(tableName);
-			//			if(t != null){
-			//				tags.add(t);
-			//			}
+			// if(t != null){
+			// tags.add(t);
+			// }
 			// }
 		} else {
 			System.out.println("not Connected queryTagListFiltered()");
@@ -245,7 +245,8 @@ public class SQLhelper {
 
 		if (checkConnection()) {
 
-			msql.query("SELECT type, tag_ID FROM tag_binding WHERE file_ID = " + file.id);
+			msql.query("SELECT type, tag_ID FROM tag_binding WHERE file_ID = "
+					+ file.id);
 			ArrayList<String> types = new ArrayList<String>();
 			ArrayList tagIds = new ArrayList();
 			while (msql.next()) {
@@ -258,7 +259,7 @@ public class SQLhelper {
 						+ tagIds.get(i));
 				while (msql.next()) {
 					Tag t = getSpecificTags(types.get(i));
-					if(t != null){
+					if (t != null) {
 						tagList.add(t);
 					}
 				}
@@ -271,46 +272,6 @@ public class SQLhelper {
 		return tagList;
 	}
 
-	//
-	public Tag getSpecificTags(String tableName) {
-		Tag t = null;
-		
-		// existiert das Attribute in p5.tags? - Dann gib existierends Attribut zurück
-		if(p5.tags != null){
-		for(Tag _tag : p5.tags){
-			if(tableName.equals(_tag.type) && msql.getInt("ID") == _tag.id){
-				System.out.println("übergabe");
-				return _tag;
-			}
-		}
-		}
-		System.out.println("create New");
-		
-		// ansonsten erstellen neuen Tag
-		if (tableName.equals("files")) {
-			Tag tag = new Tag_File(tableName, msql.getInt("ID"),
-					msql.getString("name"), msql.getFloat("size"),
-					msql.getString("path"), msql.getTimestamp("creation_time"),
-					msql.getTimestamp("expiration_time"),
-					msql.getInt("origin_ID"), msql.getInt("score"));
-			t = tag;
-		} else if (tableName.equals("locations")) {
-			Tag tag = new Tag_Location(tableName, msql.getInt("ID"),
-					msql.getString("name"), msql.getString("coordinates"));
-			t = tag;
-		} else if (tableName.equals("users")) {
-			Tag_User tag = new Tag_User("users", msql.getInt("ID"),
-					msql.getString("name"), msql.getString("password"));
-			t = tag;
-		} else if (tableName.equals("projects") || tableName.equals("keywords")) {
-			Tag tag = new Tag(tableName, msql.getInt("ID"),
-					msql.getString("name"));
-			t = tag;
-		} else {
-			System.out.println(tableName + " not yet Listed in queryTagList");
-		}
-		return t;
-	}
 
 	// not finished, get Ids and types
 	public ArrayList<Tag> queryConnectedTagList(String tableName, Tag_File t) {
@@ -390,18 +351,11 @@ public class SQLhelper {
 	public void bindTag(Tag_File file, Tag tag) {
 		if (checkConnection()) {
 			// files
-
-//			System.out.println("SELECT COUNT(*) FROM tag_binding WHERE file_ID = \""
-//							+ file.id
-//							+ "\" AND type = \""
-//							+ tag.type
-//							+ "\" AND tag_ID = \"" + tag.id + "\"");
-			// ask if COUNT der connection == 0 -> binding exists
 			msql.query("SELECT COUNT(*) FROM tag_binding WHERE file_ID = \""
 					+ file.id + "\" AND type = \"" + tag.type
 					+ "\" AND tag_ID = \"" + tag.id + "\"");
 			msql.next();
-//			System.out.println("number of rows: " + msql.getInt(1));
+			// System.out.println("number of rows: " + msql.getInt(1));
 
 			if (msql.getInt(1) == 0) {
 
@@ -440,6 +394,12 @@ public class SQLhelper {
 					isInDB = true;
 					return isInDB;
 				}
+			} else if (t instanceof Tag) {
+				if (t.name.trim().toLowerCase()
+						.equals(theText.trim().toLowerCase())) {
+					isInDB = true;
+					return isInDB;
+				}
 			} else {
 				System.out.println("What kind of Tag is it? in inDataBase()");
 			}
@@ -461,40 +421,60 @@ public class SQLhelper {
 				+ "\"");
 		msql.next();
 
-		// files
+		tag = getSpecificTags(tableName);
+
+		return tag;
+	}
+
+	//
+	public Tag getSpecificTags(String tableName) {
+		Tag t = null;
+
+		// existiert das Attribute in p5.attributes? - Dann gib existierends Attribut
+		// zurück
+		if (tableName != "files" && p5.attributes != null) {
+			for (Tag _tag : p5.attributes) {
+				if (tableName.trim().equals(_tag.type.trim()) && msql.getInt("ID") == _tag.id) {
+					System.out.println("übergabe " + _tag.name + " " + _tag.type);
+					return _tag;
+				} 
+			}
+		}
+		// existiert die Datei in p5.files? - Dann gib existierends Attribut
+				// zurück
+		if(tableName == "files" &&  p5.files != null){
+			for (Tag _tag : p5.files) {
+				if (tableName.trim().equals(_tag.type.trim()) && msql.getInt("ID") == _tag.id) {
+					System.out.println("übergabe " + _tag.name + " " + _tag.type);
+					return _tag;
+				} 
+			}
+		}
+
+		// ansonsten erstellen neuen Tag
 		if (tableName.equals("files")) {
-			tag = new Tag_File(tableName, msql.getInt("ID"),
+			Tag tag = new Tag_File(tableName, msql.getInt("ID"),
 					msql.getString("name"), msql.getFloat("size"),
 					msql.getString("path"), msql.getTimestamp("creation_time"),
 					msql.getTimestamp("expiration_time"),
 					msql.getInt("origin_ID"), msql.getInt("score"));
-
-			System.out.println("TAG: " + tag.toString());
-		}
-		// users
-		else if (tableName.equals("users")) {
-			tag = new Tag_User(tableName, msql.getInt("ID"),
-					msql.getString("name"), msql.getString("password"));
-
-			System.out.println("TAG: " + tag.toString());
-		}
-		// locations
-		else if (tableName.equals("locations")) {
-			tag = new Tag_Location(tableName, msql.getInt("ID"),
+			t = tag;
+		} else if (tableName.equals("locations")) {
+			Tag tag = new Tag_Location(tableName, msql.getInt("ID"),
 					msql.getString("name"), msql.getString("coordinates"));
-		}
-		// keywords
-		else if (tableName.equals("keywords")) {
-			tag = new Tag(tableName, msql.getInt("ID"), msql.getString("name"));
-		}
-		// projects
-		else if (tableName.equals("projects")) {
-			tag = new Tag(tableName, msql.getInt("ID"), msql.getString("name"));
+			t = tag;
+		} else if (tableName.equals("users")) {
+			Tag_User tag = new Tag_User("users", msql.getInt("ID"),
+					msql.getString("name"), msql.getString("password"));
+			t = tag;
+		} else if (tableName.equals("projects") || tableName.equals("keywords")) {
+			Tag tag = new Tag(tableName, msql.getInt("ID"),
+					msql.getString("name"));
+			t = tag;
 		} else {
-			System.out.println("SQL.getLastCreatedTag noch nicht fertig für "
-					+ tableName);
+			System.out.println(tableName + " not yet Listed in queryTagList");
 		}
-
-		return tag;
+		System.out.println("neu erstellen: " + t.name + " " + t.type);
+		return t;
 	}
 }

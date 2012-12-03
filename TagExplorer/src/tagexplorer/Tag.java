@@ -1,6 +1,8 @@
 package tagexplorer;
 
-public class Tag {
+import toxi.physics.VerletParticle;
+
+public class Tag extends VerletParticle{
 	
 	int id;
 	String name;
@@ -8,9 +10,11 @@ public class Tag {
 //	TagField tagField;
 	
 	public Tag(){
+		super(0, 0, 0);
 	}
 	
 	public Tag(String tableName, int id, String name){
+		this();
 		this.id = id;
 		this.name = name;
 		type = tableName;
@@ -20,6 +24,7 @@ public class Tag {
 
 	@Override
 	public String toString() {
-		return "Tag [id=" + id + ", name=" + name + ", type=" + type + "]";
+		return "Tag [id=" + id + ", name=" + name + ", type=" + type + ", x="
+				+ x + ", y=" + y + ", z=" + z + "]";
 	}
 }
