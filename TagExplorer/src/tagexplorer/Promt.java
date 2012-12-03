@@ -29,7 +29,18 @@ public class Promt {
 		createButton("cancel", 1, 300, 100);
 		
 		// nur ein Textfield erlaubt, sonst unterscheidung bei save function nštig!
-		createTextField(label, "Type Location name here");
+		String inputMessage;
+		if(label.equals("locationInput")){
+			inputMessage = "Type Location name here";
+		} else if(label.equals("keywordInput")){
+			inputMessage = "Type Keyword name here";
+		} else if(label.equals("projectInput")){
+			inputMessage = "Type Project name here";
+		} else {
+			inputMessage = "Type in here";
+			System.out.println("no message Text in Promt yet!");
+		}
+		createTextField(label, inputMessage);
 		
 		System.out.println("new Promt");
 	}
