@@ -1,5 +1,6 @@
 package tagexplorerprocessing2;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,8 +30,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	ArrayList<Tag> showFiles = null;
 
 	ArrayList<Filter> filters = new ArrayList<Filter>();
-	
-	
+
 	// Interaction
 	Tag startTag = null;
 
@@ -64,8 +64,8 @@ public class TagExplorerProcessing2 extends PApplet {
 		physics = new VerletPhysics();
 		// GravityBehavior g = new GravityBehavior(new Vec3D(0, 0, -0.01f));
 		// physics.addBehavior(g);
-		filePhysics = new VerletPhysics();	
-		
+		filePhysics = new VerletPhysics();
+
 		// erst Tags, dann Files!
 		updateTags();
 		initFiles();
@@ -108,22 +108,21 @@ public class TagExplorerProcessing2 extends PApplet {
 		if (location != null) {
 			text("Location: " + location.name, 150, 16);
 		}
-		
+
 		drawFiles();
 		drawTags();
 		drawSprings();
 
 		// draw interaction
 		stroke(255, 0, 0);
-		if(startTag != null){
+		if (startTag != null) {
 			line(startTag.x, startTag.y, mouseX, mouseY);
 		}
-		
+
 		// Promt Messages
 		if (p != null) {
 			p.showMessages();
 		}
-		
 
 		physics.update();
 		filePhysics.update();
@@ -186,7 +185,8 @@ public class TagExplorerProcessing2 extends PApplet {
 	public void updateShowFiles() {
 		System.out.println("updateShowFiles()");
 		if (filters.size() > 0) {
-			ArrayList<Tag> files = SQL.queryTagListFiltered("files", filters.get(0));
+			ArrayList<Tag> files = SQL.queryTagListFiltered("files",
+					filters.get(0));
 			showFiles = files;
 			// showFiles = SQL.queryTagListFiltered("files", filters);
 		} else {
@@ -217,12 +217,12 @@ public class TagExplorerProcessing2 extends PApplet {
 			dropParticles(filePhysics, 250, i * dist + 20, 0, showFiles.get(i));
 		}
 	}
-	
-	public void initFiles(){
+
+	public void initFiles() {
 		ArrayList<Tag> files = new ArrayList<Tag>();
 		files = SQL.queryTagList("files");
 		this.files = files;
-		
+
 		for (Tag t : this.files) {
 			Tag_File fileTag = (Tag_File) t;
 
@@ -233,13 +233,13 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	public void updateTags() {
 		ArrayList<Tag> tags = new ArrayList<Tag>();
-		
+
 		tags = SQL.queryTagList("keywords");
 		tags.addAll(SQL.queryTagList("locations"));
 		tags.addAll(SQL.queryTagList("projects"));
 		tags.addAll(SQL.queryTagList("users"));
 
-		//tags.addAll(SQL.queryTagList("files"));
+		// tags.addAll(SQL.queryTagList("files"));
 		// tags nicht Ÿberscheiben, sondern nur abgleichen!
 		this.attributes = tags;
 
@@ -281,7 +281,7 @@ public class TagExplorerProcessing2 extends PApplet {
 			t.lock();
 		}
 		physics.addParticle(t);
-		//println(t.x + " " + t.y + " " + t.z);
+		// println(t.x + " " + t.y + " " + t.z);
 	}
 
 	float LEN = 400; // 10
@@ -295,24 +295,24 @@ public class TagExplorerProcessing2 extends PApplet {
 	}
 
 	// ///////// INPUT ///////////////////
-	public void mousePressed(){
-		for(Tag t : showFiles){
-			if(mouseOver(t, 10, 10)){
+	public void mousePressed() {
+		for (Tag t : showFiles) {
+			if (mouseOver(t, 10, 10)) {
 				startTag = t;
 			}
 		}
-		for(Tag t : attributes){
-			if(mouseOver(t, 10, 10)){
+		for (Tag t : attributes) {
+			if (mouseOver(t, 10, 10)) {
 				startTag = t;
 			}
 		}
 	}
-	
-	public void mouseReleased(){
-		if(startTag != null){
-			if(startTag instanceof Tag_File){
-				for(Tag t : attributes){
-					if(mouseOver(t, 10, 10)){
+
+	public void mouseReleased() {
+		if (startTag != null) {
+			if (startTag instanceof Tag_File) {
+				for (Tag t : attributes) {
+					if (mouseOver(t, 10, 10)) {
 						Tag_File file = (Tag_File) startTag;
 						SQL.bindTag(file, t);
 						file.setAttributes(SQL.getBindedTagList(file));
@@ -321,9 +321,9 @@ public class TagExplorerProcessing2 extends PApplet {
 						updateSprings();
 					}
 				}
-			} else{
-				for(Tag t : files){
-					if(mouseOver(t, 10, 10)){
+			} else {
+				for (Tag t : files) {
+					if (mouseOver(t, 10, 10)) {
 						Tag_File file = (Tag_File) t;
 						SQL.bindTag(file, startTag);
 						file.setAttributes(SQL.getBindedTagList(file));
@@ -336,7 +336,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 		startTag = null;
 	}
-	
+
 	boolean mouseOver(float x, float y, int w, int h) {
 		boolean over = false;
 		if (mouseX > x - w / 2.0f && mouseX < x + w / 2.0f
@@ -354,30 +354,13 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 		return over;
 	}
-	
-	
+
 	public void keyPressed() {
 
 		switch (key) {
-//		case 'O':
-//			String url = selectInput("Select a file to process:");
-//			if (url != null) {
-//				println("Create new File: url: " + url);
-//
-//				Tag_File file = createNewFile("files", url);
-//				
-//				if (file != null && user != null) {
-//					// System.out.println(file.toString());
-//					SQL.bindTag(file, user);
-//				}
-//				
-//				// update File
-//				file.setAttributes(SQL.getBindedTagList(file));
-//				file.updateViewName();
-//				
-//			}
-//			updateShowFiles();
-//			break;
+		case 'O':
+			selectInput("Select a file to process:", "fileSelected");
+			break;
 		case 'U':
 			// Set User
 			user = (Tag_User) SQL.queryTagList("users").get(1);
@@ -408,7 +391,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		case 'T':
 			// Bind File - Tag
 			Tag_File file = (Tag_File) showFiles.get(0);
-			
+
 			// beispiel tag lšschen!
 			Tag tag = new Tag_Location("locations", 5, "Ort", "coordinaten");
 			SQL.bindTag(file, tag);
@@ -421,9 +404,9 @@ public class TagExplorerProcessing2 extends PApplet {
 	// ///////////// Tag handling /////////////////////
 
 	// ////////// Tag Creation /////////////////////
-	public Tag_File createNewFile(String tableName, String s) {
+	public Tag_File createNewFile(String tableName, File inputFile) {
 		Tag_File file = null;
-		s = s.trim();
+		String s = inputFile.getAbsolutePath().trim();
 		if (SQL.inDataBase(tableName, s)) {
 			System.out.println("Tag " + s + " is already imported in "
 					+ tableName);
@@ -431,6 +414,30 @@ public class TagExplorerProcessing2 extends PApplet {
 			file = (Tag_File) SQL.createDbTag(tableName, s);
 		}
 		return file;
+	}
+
+	public void fileSelected(File selection) {
+
+		if (selection == null) {
+			println("Window was closed or the user hit cancel.");
+		} else {
+			// println("Create new File: url: " + url);
+
+			Tag_File file = createNewFile("files", selection);
+
+			if (file != null && user != null) {
+				// System.out.println(file.toString());
+				SQL.bindTag(file, user);
+			}
+
+			// update File
+			file.setAttributes(SQL.getBindedTagList(file));
+			file.updateViewName();
+			files.add(file);
+
+			updateShowFiles();
+		}
+
 	}
 
 	public void locationInput(String theText) {
@@ -444,10 +451,10 @@ public class TagExplorerProcessing2 extends PApplet {
 			p.message = "Location " + theText + " already exists";
 		} else {
 			SQL.createDbTag(tableName, theText);
-			//update Tags & Springs
+			// update Tags & Springs
 			updateTags();
 			updateSprings();
-			
+
 			removeController();
 
 			// update
@@ -471,7 +478,7 @@ public class TagExplorerProcessing2 extends PApplet {
 			// update
 			updateTags();
 			updateSprings();
-			
+
 			removeController();
 		}
 	}
@@ -564,8 +571,9 @@ public class TagExplorerProcessing2 extends PApplet {
 		p = null;
 		System.out.println("removed Controller");
 	}
-	
+
 	public static void main(String _args[]) {
-		PApplet.main(new String[] { tagexplorerprocessing2.TagExplorerProcessing2.class.getName() });
+		PApplet.main(new String[] { tagexplorerprocessing2.TagExplorerProcessing2.class
+				.getName() });
 	}
 }
