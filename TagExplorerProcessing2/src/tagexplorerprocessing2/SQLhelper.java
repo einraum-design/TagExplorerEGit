@@ -313,7 +313,6 @@ public class SQLhelper {
 		// files
 		else if (tableName.equals("files")) {
 			int index = s.lastIndexOf("/");
-			String fileName = s.substring(index + 1);
 			Path file = FileSystems.getDefault().getPath(s);
 			BasicFileAttributes attr;
 			try {
@@ -323,15 +322,15 @@ public class SQLhelper {
 					msql.execute("INSERT INTO "
 							+ tableName
 							+ " (name, path, size, creation_time, expiration_time) VALUES (\""
-							+ fileName.trim() + "\", \"" + s.trim() + "\", \""
+							+ file.getFileName().toString().trim() + "\", \"" + s.trim() + "\", \""
 							+ attr.size() + "\", \""
 							+ new Timestamp(attr.creationTime().toMillis())
 							+ "\", \""
 							+ new Timestamp(attr.lastAccessTime().toMillis())
 							+ "\")");
-					System.out.println("File " + fileName + " registered");
+					System.out.println("File " + file.getFileName().toString() + " registered");
 				} else {
-					System.out.println("File " + fileName
+					System.out.println("File " + file.getFileName().toString()
 							+ " ist keine Datei, sondern ein Link!");
 				}
 				return getLastCreatedTag(tableName);

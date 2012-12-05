@@ -18,6 +18,7 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -151,7 +152,7 @@ public class WatchDir extends Thread {
 
 				// EVENTS to do's
 				if (event.kind() == ENTRY_MODIFY) {
-					createNewTagFile(child);
+					createNewTagFileVersion(child);
 				} else if (event.kind() == ENTRY_CREATE) {
 					createNewTagFile(child);
 				} else if (event.kind() == ENTRY_DELETE) {
@@ -183,7 +184,9 @@ public class WatchDir extends Thread {
 			}
 		}
 	}
-
+	
+	ArrayList<VersionBuilder> vbList = new ArrayList<VersionBuilder>();
+	
 	public void createNewTagFile(Path path) {
 
 		String fileName = path.getFileName().toString();
@@ -197,8 +200,50 @@ public class WatchDir extends Thread {
 		Tag_File file = p5.createNewFile("files", path);
 
 		if (file != null) {
-			VersionBuilder.createVersion(path.toString(), file.id);
+			vbList.add(new VersionBuilder(path.toString(), file.id));
+			for(VersionBuilder vb : vbList){
+				vb.start();
+			}
 			
+			//VersionBuilder.createVersion(path.toString(), file.id);
+			
+			if (p5.user != null) {
+				// System.out.println(file.toString());
+				SQL.bindTag(file, p5.user);
+			}
+
+			// update File
+			file.setAttributes(SQL.getBindedTagList(file));
+			file.updateViewName();
+			p5.files.add(file);
+			p5.updateShowFiles();
+			p5.updateSprings();
+		}
+	}
+	
+	
+	public void createNewTagFileVersion(Path path) {
+
+		String fileName = path.getFileName().toString();
+
+		if (fileName.startsWith(".")) {
+			System.out.println("ignore " + fileName
+					+ " in WatchDir.createNewTagFile(). Not a file.");
+			return;
+		}
+
+		String s = path.toString().trim();
+		Tag_File file  = (Tag_File) SQL.createDbTag("files", s);
+		// set Origin get origin ID und setzes sie als origin
+		// origin File SQL.inDataBase(tableName, s)
+		
+
+		if (file != null) {
+			vbList.add(new VersionBuilder(path.toString(), file.id));
+			for(VersionBuilder vb : vbList){
+				vb.start();
+			}
+						
 			if (p5.user != null) {
 				// System.out.println(file.toString());
 				SQL.bindTag(file, p5.user);

@@ -6,26 +6,44 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class VersionBuilder{
+public class VersionBuilder extends Thread {
 
 	static String versionsVerzeichnis = "/Users/manuel/Documents/Testumgebung/Sicherung/";
 
 	public VersionBuilder() {
-		
+
 	}
 
-	public VersionBuilder(String versionsVerzeichnis) {
-		this.versionsVerzeichnis = versionsVerzeichnis;
+	String path;
+	int nr;
+	boolean started = false;
+
+	public VersionBuilder(String path, int nr) {
+		this.nr = nr;
+		this.path = path;
 	}
 
-	public static void createVersion(String path, int nr) {
+	public void start() {
+		if (!started) {
+			// Print messages
+			System.out.println("start run method");
+			// Do whatever start does in Thread, don't forget this!
+			super.start();
+		}
+	}
+
+	public void run() {
+		createVersion(path, nr);
+	}
+
+	public void createVersion(String path, int nr) {
 		File file = new File(path);
-			String target = versionsVerzeichnis + String.format("%04d", nr)
-					+ file.getName();
-			copy(file, target);
+		String target = versionsVerzeichnis + String.format("%04d", nr)
+				+ file.getName();
+		copy(file, target);
 	}
 
-	public static void copy(File source, String target) {
+	public void copy(File source, String target) {
 		File inputFile = source;
 
 		if (inputFile.isFile()) {
@@ -51,5 +69,14 @@ public class VersionBuilder{
 				e.printStackTrace();
 			}
 		}
+
+		quit();
+	}
+
+	// Our method that quits the thread
+	public void quit() {
+		System.out.println("Quitting.");
+		// IUn case the thread is waiting. . .
+		interrupt();
 	}
 }
