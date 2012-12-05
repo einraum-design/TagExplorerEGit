@@ -1,6 +1,9 @@
 package tagexplorerprocessing2;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +18,8 @@ import toxi.physics.VerletPhysics;
 import toxi.physics.VerletSpring;
 
 public class TagExplorerProcessing2 extends PApplet {
+	
+	WatchDir watcher;
 
 	// Tag_User user = new Tag_User("users", 0, "noname", "no Password");
 	Tag_User user = null;
@@ -42,6 +47,17 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	public void setup() {
 		size(800, 400, P3D);
+		smooth(4);
+		
+		Path p = FileSystems.getDefault().getPath("/Users/manuel/Documents/Testumgebung/Test");
+        try {
+			watcher = new WatchDir(p, true);
+			watcher.start();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		font = createFont("arial", 20);
 
 		SQL = new SQLhelper(this);
