@@ -16,6 +16,7 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,6 +26,8 @@ public class WatchDir extends Thread {
     private final Map<WatchKey,Path> keys;
     private final boolean recursive;
     private boolean trace = false;
+    
+    TagExplorerProcessing2 p5;
 
     @SuppressWarnings("unchecked")
     static <T> WatchEvent<T> cast(WatchEvent<?> event) {
@@ -86,7 +89,11 @@ public class WatchDir extends Thread {
     /**
      * Creates a WatchService and registers the given directory
      */
-    WatchDir(Path dir, boolean recursive) throws IOException {
+    SQLhelper SQL;
+    
+    WatchDir(TagExplorerProcessing2 p5, Path dir, boolean recursive) throws IOException {
+    	this.p5 = p5;
+    	SQL = new SQLhelper(p5);
         this.watcher = FileSystems.getDefault().newWatchService();
         this.keys = new HashMap<WatchKey,Path>();
         this.recursive = recursive;
@@ -139,6 +146,20 @@ public class WatchDir extends Thread {
 
                 // print out event
                 System.out.format("%s: %s\n", event.kind().name(), child);
+                //System.out.println(event.kind().type().toString());
+                
+                
+                // EVENTS to do's
+                if (event.kind() == ENTRY_MODIFY){
+                	createNewTagFile(child);
+                } else if(event.kind() == ENTRY_CREATE){
+                	createNewTagFile(child);
+                } else if(event.kind() == ENTRY_DELETE){
+                	setTagFileDead(child);
+                }
+                
+                
+                
 
                 // if directory is created, and watching recursively, then
                 // register it and its sub-directories
@@ -164,6 +185,45 @@ public class WatchDir extends Thread {
                 }
             }
         }
+    }
+    
+    public void createNewTagFile(Path path){
+
+		String fileName = path.getFileName().toString();
+		
+		if(fileName.startsWith(".")){
+			System.out.println("ignore " + fileName + " in WatchDir.createNewTagFile(). Not a file.");
+			return;
+		}
+
+    				Tag_File file = p5.createNewFile("files", path);
+
+    				if (file != null){
+    					if(p5.user != null) {
+    					// System.out.println(file.toString());
+    					SQL.bindTag(file, p5.user);
+    					}
+    					
+    					// update File
+        				file.setAttributes(SQL.getBindedTagList(file));
+        				file.updateViewName();
+        				p5.files.add(file);
+        				p5.updateShowFiles();
+        				p5.updateSprings();
+    				}			
+    }
+    
+    public void setTagFileDead(Path path){
+    	for(Tag f : p5.files){
+    		Tag_File file = (Tag_File) f;
+    		
+    		if(file.path.equals(path.toString())){
+    			System.out.println("file.name: " + file.name);
+    			file.setDeletTime(new Timestamp(System.currentTimeMillis()));
+    			SQL.modifyFile(file);
+    		}
+    		
+    	}
     }
 
     /*

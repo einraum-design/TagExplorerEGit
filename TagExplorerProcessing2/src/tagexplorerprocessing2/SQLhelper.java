@@ -481,4 +481,14 @@ public class SQLhelper {
 		System.out.println("neu erstellen: " + t.name + " " + t.type);
 		return t;
 	}
+	
+	
+	public void modifyFile(Tag_File file){
+		if(checkConnection()){
+			String s = "UPDATE files SET delete_time = '" + file.delete_time + "' WHERE ID = "+ file.id;
+			msql.execute(s);
+		} else {
+			System.out.println("not Connected queryTagListFiltered()");
+		}
+	}
 }

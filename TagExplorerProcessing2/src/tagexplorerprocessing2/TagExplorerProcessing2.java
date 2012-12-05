@@ -51,7 +51,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		
 		Path p = FileSystems.getDefault().getPath("/Users/manuel/Documents/Testumgebung/Test");
         try {
-			watcher = new WatchDir(p, true);
+			watcher = new WatchDir(this, p, true);
 			watcher.start();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -431,6 +431,18 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 		return file;
 	}
+	
+	public Tag_File createNewFile(String tableName, Path path) {
+		Tag_File file = null;
+		String s = path.toString().trim();
+		if (SQL.inDataBase(tableName, s)) {
+			System.out.println("Tag " + s + " is already imported in "
+					+ tableName);
+		} else {
+			file = (Tag_File) SQL.createDbTag(tableName, s);
+		}
+		return file;
+	}
 
 	public void fileSelected(File selection) {
 
@@ -441,17 +453,19 @@ public class TagExplorerProcessing2 extends PApplet {
 
 			Tag_File file = createNewFile("files", selection);
 
-			if (file != null && user != null) {
+			if (file != null){
+				if(user != null) {
 				// System.out.println(file.toString());
-				SQL.bindTag(file, user);
-			}
-
-			// update File
-			file.setAttributes(SQL.getBindedTagList(file));
-			file.updateViewName();
-			files.add(file);
-
-			updateShowFiles();
+					SQL.bindTag(file, user);
+				}
+				
+				// update File
+				file.setAttributes(SQL.getBindedTagList(file));
+				file.updateViewName();
+				files.add(file);
+				updateShowFiles();
+				updateSprings();
+			}		
 		}
 
 	}
