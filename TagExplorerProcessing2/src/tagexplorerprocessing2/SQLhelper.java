@@ -322,13 +322,14 @@ public class SQLhelper {
 					msql.execute("INSERT INTO "
 							+ tableName
 							+ " (name, path, size, creation_time, expiration_time) VALUES (\""
-							+ file.getFileName().toString().trim() + "\", \"" + s.trim() + "\", \""
-							+ attr.size() + "\", \""
+							+ file.getFileName().toString().trim() + "\", \""
+							+ s.trim() + "\", \"" + attr.size() + "\", \""
 							+ new Timestamp(attr.creationTime().toMillis())
 							+ "\", \""
 							+ new Timestamp(attr.lastAccessTime().toMillis())
 							+ "\")");
-					System.out.println("File " + file.getFileName().toString() + " registered");
+					System.out.println("File " + file.getFileName().toString()
+							+ " registered");
 				} else {
 					System.out.println("File " + file.getFileName().toString()
 							+ " ist keine Datei, sondern ein Link!");
@@ -371,6 +372,21 @@ public class SQLhelper {
 				System.out.println("File-Tag binding exists already");
 			}
 		}
+	}
+
+	public Tag_File getParent(Tag_File file) {
+		Tag_File parent = null;
+
+		for (Tag t : p5.files) {
+			if (t instanceof Tag_File) {
+				// path!
+				if (((Tag_File) t).path.trim().toLowerCase()
+						.equals(file.path.trim().toLowerCase())) {
+					parent = (Tag_File)t;
+				}
+			}
+		}
+		return parent;
 	}
 
 	public boolean inDataBase(String tableName, String theText) {
@@ -435,8 +451,8 @@ public class SQLhelper {
 			for (Tag _tag : p5.attributes) {
 				if (tableName.trim().equals(_tag.type.trim())
 						&& msql.getInt("ID") == _tag.id) {
-					System.out.println("Ÿbergabe " + _tag.name + " "
-							+ _tag.type);
+//					System.out.println("Ÿbergabe " + _tag.name + " "
+//							+ _tag.type);
 					return _tag;
 				}
 			}
@@ -447,8 +463,8 @@ public class SQLhelper {
 			for (Tag _tag : p5.files) {
 				if (tableName.trim().equals(_tag.type.trim())
 						&& msql.getInt("ID") == _tag.id) {
-					System.out.println("Ÿbergabe " + _tag.name + " "
-							+ _tag.type);
+//					System.out.println("Ÿbergabe " + _tag.name + " "
+//							+ _tag.type);
 					return _tag;
 				}
 			}
@@ -460,7 +476,7 @@ public class SQLhelper {
 					msql.getString("name"), msql.getFloat("size"),
 					msql.getString("path"), msql.getTimestamp("creation_time"),
 					msql.getTimestamp("expiration_time"),
-					msql.getInt("origin_ID"), msql.getInt("score"));
+					msql.getInt("parent_ID"), msql.getInt("origin_ID"), msql.getInt("score"));
 			t = tag;
 		} else if (tableName.equals("locations")) {
 			Tag tag = new Tag_Location(tableName, msql.getInt("ID"),
@@ -480,14 +496,34 @@ public class SQLhelper {
 		System.out.println("neu erstellen: " + t.name + " " + t.type);
 		return t;
 	}
-	
-	
-	public void modifyFile(Tag_File file){
-		if(checkConnection()){
-			String s = "UPDATE files SET delete_time = '" + file.delete_time + "' WHERE ID = "+ file.id;
+
+	public void setDBDeletTime(Tag_File file) {
+		if (checkConnection()) {
+			String s = "UPDATE files SET delete_time = '" + file.delete_time
+					+ "' WHERE ID = " + file.id;
 			msql.execute(s);
 		} else {
-			System.out.println("not Connected queryTagListFiltered()");
+			System.out.println("not Connected setDBDeletTime()");
+		}
+	}
+	
+	public void setDBOrigin(Tag_File file) {
+		if (checkConnection()) {
+			String s = "UPDATE files SET origin_ID = '" + file.origin_ID
+					+ "' WHERE ID = " + file.id;
+			msql.execute(s);
+		} else {
+			System.out.println("not Connected setDBOrigin()");
+		}
+	}
+	
+	public void setDBParent(Tag_File file) {
+		if (checkConnection()) {
+			String s = "UPDATE files SET parent_ID = '" + file.parent_ID
+					+ "' WHERE ID = " + file.id;
+			msql.execute(s);
+		} else {
+			System.out.println("not Connected setDBParent()");
 		}
 	}
 }

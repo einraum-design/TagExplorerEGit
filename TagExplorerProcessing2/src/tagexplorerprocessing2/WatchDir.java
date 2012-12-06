@@ -234,15 +234,36 @@ public class WatchDir extends Thread {
 
 		String s = path.toString().trim();
 		Tag_File file  = (Tag_File) SQL.createDbTag("files", s);
+		
+		
 		// set Origin get origin ID und setzes sie als origin
 		// origin File SQL.inDataBase(tableName, s)
 		
+		Tag_File parent = SQL.getParent(file);
+		
+		for(Tag t : parent.attributes){
+			SQL.bindTag(file, t);			
+		}
+		file.setAttributes(SQL.getBindedTagList(file));
+		file.updateViewName();
+		
+		file.parent_ID = parent.id;
+		
+		if(parent.origin_ID == 0){
+			file.origin_ID = parent.id;
+		}
+		
+		SQL.setDBOrigin(file);
+		SQL.setDBParent(file);
+
 
 		if (file != null) {
-			vbList.add(new VersionBuilder(path.toString(), file.id));
-			for(VersionBuilder vb : vbList){
-				vb.start();
-			}
+			new VersionBuilder(path.toString(), file.id).start();
+//			for(VersionBuilder vb : vbList){
+//				if(!vb.started){
+//					vb.start();
+//				}
+//			}
 						
 			if (p5.user != null) {
 				// System.out.println(file.toString());
@@ -265,7 +286,7 @@ public class WatchDir extends Thread {
 			if (file.path.equals(path.toString())) {
 				System.out.println("file.name: " + file.name);
 				file.setDeletTime(new Timestamp(System.currentTimeMillis()));
-				SQL.modifyFile(file);
+				SQL.setDBDeletTime(file);
 			}
 
 		}

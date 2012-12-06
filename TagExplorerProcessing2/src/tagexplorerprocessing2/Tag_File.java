@@ -11,7 +11,8 @@ public class Tag_File extends Tag {
 		Timestamp creation_time;
 		Timestamp expiration_time;
 		Timestamp delete_time;
-		int origin_ID;
+		int parent_ID = 0;
+		int origin_ID = 0;
 		int score;
 		
 		ArrayList<Tag> attributes = new ArrayList<Tag>();
@@ -19,7 +20,7 @@ public class Tag_File extends Tag {
 		String viewName;
 
 		public Tag_File(String tableName, int id, String name, float size,
-				String path, Timestamp creation_time, Timestamp expiration_time, int origin_ID,
+				String path, Timestamp creation_time, Timestamp expiration_time, int parent_ID, int origin_ID,
 				int score) {
 			super(tableName, id, name);
 			this.type = "files";
@@ -27,6 +28,7 @@ public class Tag_File extends Tag {
 			this.path = path;
 			this.creation_time = creation_time;
 			this.expiration_time = expiration_time;
+			this.parent_ID = parent_ID;
 			this.origin_ID = origin_ID;
 			this.score = score;
 			

@@ -24,12 +24,10 @@ public class VersionBuilder extends Thread {
 	}
 
 	public void start() {
-		if (!started) {
 			// Print messages
 			System.out.println("start run method");
 			// Do whatever start does in Thread, don't forget this!
 			super.start();
-		}
 	}
 
 	public void run() {
