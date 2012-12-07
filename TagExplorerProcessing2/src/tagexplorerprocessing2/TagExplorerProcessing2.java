@@ -10,6 +10,7 @@ import java.util.List;
 import controlP5.ControlP5;
 import controlP5.Controller;
 import controlP5.Textfield;
+//import peasy.PeasyCam;
 import processing.core.PApplet;
 import processing.core.PFont;
 
@@ -44,6 +45,8 @@ public class TagExplorerProcessing2 extends PApplet {
 	// toxi VerletPhysics
 	VerletPhysics physics;
 	VerletPhysics filePhysics;
+	
+	//PeasyCam cam;
 
 	public void setup() {
 		size(800, 400, P3D);
@@ -61,6 +64,8 @@ public class TagExplorerProcessing2 extends PApplet {
 		font = createFont("arial", 20);
 
 		SQL = new SQLhelper(this);
+		
+		//cam = new PeasyCam(this, 100);
 
 		// Standartuser: …ffentlich
 		// user = (Tag_User) SQL.queryTagList("users").get(0);
@@ -191,8 +196,14 @@ public class TagExplorerProcessing2 extends PApplet {
 	public void drawSprings() {
 		for (int i = 0; i < physics.springs.size(); i++) {
 			VerletSpring sp = physics.springs.get(i);
-
 			stroke(255);
+			strokeWeight(1);
+			line(sp.a.x, sp.a.y, sp.a.z, sp.b.x, sp.b.y, sp.b.z);
+		}
+		
+		for (int i = 0; i < filePhysics.springs.size(); i++) {
+			VerletSpring sp = filePhysics.springs.get(i);
+			stroke(0, 255, 0);
 			strokeWeight(1);
 			line(sp.a.x, sp.a.y, sp.a.z, sp.b.x, sp.b.y, sp.b.z);
 		}
@@ -213,6 +224,8 @@ public class TagExplorerProcessing2 extends PApplet {
 	// ///////// update Methods ////////////////////
 	public void updateShowFiles() {
 		System.out.println("updateShowFiles()");
+		
+		// filter files
 		if (filters.size() > 0) {
 			ArrayList<Tag> files = SQL.queryTagListFiltered("files",
 					filters.get(0));
@@ -224,9 +237,12 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 
 		// drop Particles
+		// set Position
 		filePhysics.particles.clear();
-		int count = showFiles.size();
-
+		
+		int count = getSizeWithoutVersion(showFiles);
+		//int count = showFiles.size();
+		
 		float dist;
 		if (count > 1) {
 			dist = ((float) height - 40) / (count - 1);
@@ -235,11 +251,56 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 
 		for (int i = 0; i < showFiles.size(); i++) {
-			dropParticles(filePhysics, 250, i * dist + 20, 0, showFiles.get(i));
+			
+			
+			// ist alte File Version
+			if(((Tag_File)showFiles.get(i)).parent_ID != 0){
+				Tag_File parent = (Tag_File)getTagByID(showFiles.get(i).type, ((Tag_File)showFiles.get(i)).parent_ID);
+				
+				dropParticles(filePhysics, parent.x, parent.y, -20, showFiles.get(i));
+				
+				dropSpring(filePhysics, (Tag_File)showFiles.get(i), parent);
+			} 
+			// ist aktuelle File Version
+			else {
+				dropParticles(filePhysics, 250, i * dist + 20, 0, showFiles.get(i));
+			}
 		}
 	}
 	
 	
+	private Tag getTagByID(String tableName, int id) {
+		Tag tag = null;
+		// files:
+		if (tableName == "files" && files != null) {
+			for (Tag _tag : files) {
+				if (_tag.id == id){
+					tag = _tag;
+				}
+			}
+		}
+		// attributes
+		else if(tableName != "files" && attributes != null) {
+			for (Tag _tag : attributes) {
+				if (_tag.id == id && _tag.type.equals(tableName)){
+					tag = _tag;
+				}
+			}
+		}
+		return tag;
+	}
+
+	private int getSizeWithoutVersion(ArrayList<Tag> files) {
+		int count = 0;
+		for(Tag t : files){
+			Tag_File file = (Tag_File) t;
+			if(file.parent_ID == 0){
+				count ++;
+			}
+		}
+		return count;
+	}
+
 	void updateFileTags(Tag_File fileTag){
 		fileTag.setAttributes(SQL.getBindedTagList(fileTag));
 		fileTag.updateViewName();
@@ -283,7 +344,7 @@ public class TagExplorerProcessing2 extends PApplet {
 			Tag_File file = (Tag_File) tf;
 			if (file.attributes.size() > 0) {
 				for (Tag t : file.attributes) {
-					dropSpring(file, t);
+					dropSpring(physics, file, t);
 				}
 			}
 		}
@@ -294,9 +355,9 @@ public class TagExplorerProcessing2 extends PApplet {
 		t.x = x;
 		t.y = y;
 		t.z = z;
-		if (t.z == 0) {
+//		if (t.z == 0) {
 			t.lock();
-		}
+//		}
 		physics.addParticle(t);
 		// println(t.x + " " + t.y + " " + t.z);
 	}
@@ -304,7 +365,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	float LEN = 400; // 10
 	float STR = 0.01f; // 0.01f
 
-	public void dropSpring(VerletParticle fileParticle,
+	public void dropSpring(VerletPhysics physics, VerletParticle fileParticle,
 			VerletParticle attributeParticle) {
 		VerletSpring sp = new VerletSpring(fileParticle, attributeParticle,
 				LEN, STR);

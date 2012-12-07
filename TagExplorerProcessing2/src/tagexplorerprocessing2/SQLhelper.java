@@ -7,9 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashMap;
 
-import processing.core.PApplet;
 import de.bezier.data.sql.MySQL;
 
 public class SQLhelper {
@@ -248,7 +246,7 @@ public class SQLhelper {
 			msql.query("SELECT type, tag_ID FROM tag_binding WHERE file_ID = "
 					+ file.id);
 			ArrayList<String> types = new ArrayList<String>();
-			ArrayList tagIds = new ArrayList();
+			ArrayList<Integer> tagIds = new ArrayList<Integer>();
 			while (msql.next()) {
 				types.add(msql.getString("type"));
 				tagIds.add(msql.getInt("tag_ID"));
@@ -312,7 +310,6 @@ public class SQLhelper {
 		}
 		// files
 		else if (tableName.equals("files")) {
-			int index = s.lastIndexOf("/");
 			Path file = FileSystems.getDefault().getPath(s);
 			BasicFileAttributes attr;
 			try {
