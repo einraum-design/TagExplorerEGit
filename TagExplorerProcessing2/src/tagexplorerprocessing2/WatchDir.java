@@ -6,6 +6,7 @@ import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
@@ -184,14 +185,16 @@ public class WatchDir extends Thread {
 			}
 		}
 	}
-	
+
 	ArrayList<VersionBuilder> vbList = new ArrayList<VersionBuilder>();
-	
+
 	public void createNewTagFile(Path path) {
+		// check if isFile and not Directory, dann recursive durchsuchen.
+		ifDirectoryRecursive(path);
 
 		String fileName = path.getFileName().toString();
 
-		if (fileName.startsWith(".")) {
+		if (!isRegularFile(path)) {
 			System.out.println("ignore " + fileName
 					+ " in WatchDir.createNewTagFile(). Not a file.");
 			return;
@@ -200,13 +203,16 @@ public class WatchDir extends Thread {
 		Tag_File file = p5.createNewFile("files", path);
 
 		if (file != null) {
-			vbList.add(new VersionBuilder(path.toString(), file.id));
-			for(VersionBuilder vb : vbList){
-				vb.start();
-			}
-			
-			//VersionBuilder.createVersion(path.toString(), file.id);
-			
+			new VersionBuilder(path.toString(), file.id).start();
+			// vbList.add(new VersionBuilder(path.toString(), file.id));
+			// for (VersionBuilder vb : vbList) {
+			// if(vb.started){
+			// vb.start();
+			// }
+			// }
+
+			// VersionBuilder.createVersion(path.toString(), file.id);
+
 			if (p5.user != null) {
 				// System.out.println(file.toString());
 				SQL.bindTag(file, p5.user);
@@ -219,51 +225,51 @@ public class WatchDir extends Thread {
 			p5.updateSprings();
 		}
 	}
-	
-	
+
 	public void createNewTagFileVersion(Path path) {
+		// check if isFile and not Directory, dann rekursiv durchsuchen.
+		// ifDirectoryRecursive(path);
 
 		String fileName = path.getFileName().toString();
-
-		if (fileName.startsWith(".")) {
+		if (!isRegularFile(path)) {
 			System.out.println("ignore " + fileName
 					+ " in WatchDir.createNewTagFile(). Not a file.");
 			return;
 		}
 
 		String s = path.toString().trim();
-		Tag_File file  = (Tag_File) SQL.createDbTag("files", s);
-		
-		
+		Tag_File file = (Tag_File) SQL.createDbTag("files", s);
+
 		// set Origin get origin ID und setzes sie als origin
 		// origin File SQL.inDataBase(tableName, s)
-		
+
 		Tag_File parent = SQL.getParent(file);
-		
-		for(Tag t : parent.attributes){
-			SQL.bindTag(file, t);			
+
+		for (Tag t : parent.attributes) {
+			SQL.bindTag(file, t);
 		}
 		file.setAttributes(SQL.getBindedTagList(file));
 		file.updateViewName();
-		
+
 		file.parent_ID = parent.id;
-		
-		if(parent.origin_ID == 0){
+
+		if (parent.origin_ID == 0) {
 			file.origin_ID = parent.id;
+		} else {
+			file.origin_ID = parent.origin_ID;
 		}
-		
+
 		SQL.setDBOrigin(file);
 		SQL.setDBParent(file);
 
-
 		if (file != null) {
 			new VersionBuilder(path.toString(), file.id).start();
-//			for(VersionBuilder vb : vbList){
-//				if(!vb.started){
-//					vb.start();
-//				}
-//			}
-						
+			// for(VersionBuilder vb : vbList){
+			// if(!vb.started){
+			// vb.start();
+			// }
+			// }
+
 			if (p5.user != null) {
 				// System.out.println(file.toString());
 				SQL.bindTag(file, p5.user);
@@ -277,13 +283,41 @@ public class WatchDir extends Thread {
 			p5.updateSprings();
 		}
 	}
+	
+	private void ifDirectoryRecursive(Path path){
+		File f = new File(path.toString());
+
+		if (f.isDirectory()) {
+			File[] file_ref = f.listFiles();
+			for (int i = 0; i < file_ref.length; i++) {
+				createNewTagFile(file_ref[i].toPath());
+			}
+		}
+	}
+
+	private boolean isRegularFile(File file_ref) {
+		boolean regularFile = false;
+		if (file_ref.isFile()) {
+			String temp = file_ref.getName();
+			// check if link or unvisible File
+			if (temp.lastIndexOf(".") >= 0 && !temp.startsWith(".")) {
+				regularFile = true;
+			}
+		}
+		return regularFile;
+	}
+
+	private boolean isRegularFile(Path path) {
+		File file_ref = new File(path.toString());
+		return isRegularFile(file_ref);
+	}
 
 	public void setTagFileDead(Path path) {
 		for (Tag f : p5.files) {
 			Tag_File file = (Tag_File) f;
 
 			if (file.path.equals(path.toString())) {
-				System.out.println("file.name: " + file.name);
+				//System.out.println("file.name: " + file.name);
 				file.setDeletTime(new Timestamp(System.currentTimeMillis()));
 				SQL.setDBDeletTime(file);
 			}

@@ -277,15 +277,14 @@ public class TagExplorerProcessing2 extends PApplet {
 		for (int i = 0; i < showFiles.size(); i++) {
 
 			// ist alte File Version
-			if (((Tag_File) showFiles.get(i)).parent_ID != 0) {
-				Tag_File parent = (Tag_File) getTagByID(showFiles.get(i).type,
-						((Tag_File) showFiles.get(i)).parent_ID);
+			if(((Tag_File)showFiles.get(i)).parent_ID != 0){
+				Tag_File parent = (Tag_File)getTagByID(showFiles.get(i).type, ((Tag_File)showFiles.get(i)).parent_ID);
+				
+				dropParticles(filePhysics, parent.x, parent.y, parent.z-20, showFiles.get(i));
+				
+				dropSpring(filePhysics, (Tag_File)showFiles.get(i), parent);
+			} 
 
-				dropParticles(filePhysics, parent.x, parent.y, -20,
-						showFiles.get(i));
-
-				dropSpring(filePhysics, (Tag_File) showFiles.get(i), parent);
-			}
 			// ist aktuelle File Version
 			else {
 				dropParticles(filePhysics, 250, i * dist + 20, 0,
