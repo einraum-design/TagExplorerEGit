@@ -164,7 +164,7 @@ public class TagExplorerProcessing2 extends PApplet {
 				} else {
 					stroke(0, 255, 200);
 				}
-				point(vp.x, vp.y);
+				point(vp.x, vp.y, vp.z);
 				if (mouseOver(vp, 30, 30)) {
 					textAlign(LEFT);
 
@@ -197,7 +197,7 @@ public class TagExplorerProcessing2 extends PApplet {
 			} else {
 				stroke(0, 255, 200);
 			}
-			point(vp.x, vp.y);
+			point(vp.x, vp.y, vp.z);
 			if (mouseOver(vp, 30, 30)) {
 				textAlign(LEFT);
 				if (_3d) {
@@ -277,6 +277,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		for (int i = 0; i < showFiles.size(); i++) {
 
 			// ist alte File Version
+
 			if(((Tag_File)showFiles.get(i)).parent_ID != 0){
 				Tag_File parent = (Tag_File)getTagByID(showFiles.get(i).type, ((Tag_File)showFiles.get(i)).parent_ID);
 				

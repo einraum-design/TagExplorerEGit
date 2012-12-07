@@ -502,7 +502,7 @@ public class SQLhelper {
 		} else {
 			System.out.println(tableName + " not yet Listed in queryTagList");
 		}
-		System.out.println("neu erstellen: " + t.name + " " + t.type);
+//		System.out.println("neu erstellen: " + t.name + " " + t.type);
 		return t;
 	}
 
