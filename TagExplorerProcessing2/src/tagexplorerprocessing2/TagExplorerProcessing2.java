@@ -162,7 +162,7 @@ public class TagExplorerProcessing2 extends PApplet {
 				} else {
 					stroke(0, 255, 200);
 				}
-				point(vp.x, vp.y);
+				point(vp.x, vp.y, vp.z);
 				if (mouseOver(vp, 30, 30)) {
 					textAlign(LEFT);
 					text(vp.viewName, vp.x + 10, vp.y);
@@ -185,7 +185,7 @@ public class TagExplorerProcessing2 extends PApplet {
 			} else {
 				stroke(0, 255, 200);
 			}
-			point(vp.x, vp.y);
+			point(vp.x, vp.y, vp.z);
 			if (mouseOver(vp, 30, 30)) {
 				textAlign(LEFT);
 				text(vp.name, vp.x + 10, vp.y);
@@ -422,13 +422,21 @@ public class TagExplorerProcessing2 extends PApplet {
 		return over;
 	}
 
-	boolean mouseOver(Tag t, int w, int h) {
+	boolean mouseOver(float x, float y, float z, int w, int h) {
 		boolean over = false;
-		if (mouseX > t.x - w / 2.0f && mouseX < t.x + w / 2.0f
-				&& mouseY > t.y - h / 2.0f && mouseY < t.y + h / 2.0f) {
+
+		float screenX = screenX(x, y, z);
+		float screenY = screenY(x, y, z);
+
+		if (mouseX > screenX - w / 2.0f && mouseX < screenX + w / 2.0f
+				&& mouseY > screenY - h / 2.0f && mouseY < screenY + h / 2.0f) {
 			over = true;
 		}
 		return over;
+	}
+
+	boolean mouseOver(Tag t, int w, int h) {
+		return mouseOver(t.x, t.y, t.z, w, h);
 	}
 
 	public void keyPressed() {
