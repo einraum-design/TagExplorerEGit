@@ -242,12 +242,15 @@ public class WatchDir extends Thread {
 
 		// set Origin get origin ID und setzes sie als origin
 		// origin File SQL.inDataBase(tableName, s)
-
-		Tag_File parent = SQL.getParent(file);
-
+		
+		Tag_File parent = getParent(file);
+		
+		System.out.println("get parent: " + parent.name + " " + parent.attributes.toString() + " " + parent.id);
 		for (Tag t : parent.attributes) {
 			SQL.bindTag(file, t);
 		}
+		
+		
 		file.setAttributes(SQL.getBindedTagList(file));
 		file.updateViewName();
 
@@ -323,6 +326,31 @@ public class WatchDir extends Thread {
 			}
 
 		}
+	}
+	
+	public Tag_File getParent(Tag_File file) {
+		Tag_File parent = null;
+
+		ArrayList<Tag_File> parents = new ArrayList<Tag_File>();
+		for (Tag t : p5.files) {
+			if (t instanceof Tag_File) {
+				// path!
+				if (((Tag_File) t).path.trim().toLowerCase()
+						.equals(file.path.trim().toLowerCase())) {
+					parents.add((Tag_File) t);
+				}
+			}
+		}
+
+		parent = parents.get(0);
+		if (parents.size() > 1) {
+			for (Tag_File tag : parents) {
+				if(tag.creation_time.after(parent.creation_time)){
+					parent = tag;
+				}			
+			}
+		}
+		return parent;
 	}
 
 	/*
