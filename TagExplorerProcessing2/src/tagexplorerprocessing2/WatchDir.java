@@ -213,8 +213,7 @@ public class WatchDir extends Thread {
 			}
 
 			// update File
-			file.setAttributes(SQL.getBindedTagList(file));
-			file.updateViewName();
+			p5.updateFileTags(file);
 			p5.files.add(file);
 			p5.updateShowFiles();
 			p5.updateSprings();

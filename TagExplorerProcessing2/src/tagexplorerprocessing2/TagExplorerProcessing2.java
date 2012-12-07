@@ -144,12 +144,12 @@ public class TagExplorerProcessing2 extends PApplet {
 		filePhysics.update();
 	}
 
-	// ///////// display Files ////////////////////
+	// ///////// display Methods ////////////////////
 	public void drawFiles() {
 		if (filePhysics.particles != null) {
 			for (int i = 0; i < filePhysics.particles.size(); i++) {
-				Tag vp = (Tag) filePhysics.particles.get(i);
-
+				Tag_File vp = (Tag_File) filePhysics.particles.get(i);
+				
 				strokeWeight(5);
 
 				if (vp.isLocked()) {
@@ -160,7 +160,7 @@ public class TagExplorerProcessing2 extends PApplet {
 				point(vp.x, vp.y);
 				if (mouseOver(vp, 30, 30)) {
 					textAlign(LEFT);
-					text(vp.name, vp.x + 10, vp.y);
+					text(vp.viewName, vp.x + 10, vp.y);
 				}
 
 			}
@@ -197,7 +197,20 @@ public class TagExplorerProcessing2 extends PApplet {
 			line(sp.a.x, sp.a.y, sp.a.z, sp.b.x, sp.b.y, sp.b.z);
 		}
 	}
+	
+	// ///////// init Methods //////////////////////
+	public void initFiles() {
+		ArrayList<Tag> files = new ArrayList<Tag>();
+		files = SQL.queryTagList("files");
+		this.files = files;
 
+		// set Attributes
+		for (Tag t : this.files) {
+			updateFileTags((Tag_File) t);
+		}
+	}
+
+	// ///////// update Methods ////////////////////
 	public void updateShowFiles() {
 		System.out.println("updateShowFiles()");
 		if (filters.size() > 0) {
@@ -208,14 +221,6 @@ public class TagExplorerProcessing2 extends PApplet {
 		} else {
 			// alle files
 			showFiles = files;
-		}
-
-		// Add Tagattribute zu showFiles
-		for (Tag t : showFiles) {
-			Tag_File fileTag = (Tag_File) t;
-
-			fileTag.setAttributes(SQL.getBindedTagList(fileTag));
-			fileTag.updateViewName();
 		}
 
 		// drop Particles
@@ -233,19 +238,15 @@ public class TagExplorerProcessing2 extends PApplet {
 			dropParticles(filePhysics, 250, i * dist + 20, 0, showFiles.get(i));
 		}
 	}
-
-	public void initFiles() {
-		ArrayList<Tag> files = new ArrayList<Tag>();
-		files = SQL.queryTagList("files");
-		this.files = files;
-
-		for (Tag t : this.files) {
-			Tag_File fileTag = (Tag_File) t;
-
-			fileTag.setAttributes(SQL.getBindedTagList(fileTag));
-			fileTag.updateViewName();
-		}
+	
+	
+	void updateFileTags(Tag_File fileTag){
+		fileTag.setAttributes(SQL.getBindedTagList(fileTag));
+		fileTag.updateViewName();
 	}
+	
+	
+
 
 	public void updateTags() {
 		ArrayList<Tag> tags = new ArrayList<Tag>();
@@ -331,8 +332,7 @@ public class TagExplorerProcessing2 extends PApplet {
 					if (mouseOver(t, 10, 10)) {
 						Tag_File file = (Tag_File) startTag;
 						SQL.bindTag(file, t);
-						file.setAttributes(SQL.getBindedTagList(file));
-						file.updateViewName();
+						updateFileTags(file);
 						updateTags();
 						updateSprings();
 					}
@@ -342,8 +342,7 @@ public class TagExplorerProcessing2 extends PApplet {
 					if (mouseOver(t, 10, 10)) {
 						Tag_File file = (Tag_File) t;
 						SQL.bindTag(file, startTag);
-						file.setAttributes(SQL.getBindedTagList(file));
-						file.updateViewName();
+						updateFileTags(file);
 						updateTags();
 						updateSprings();
 					}
@@ -460,8 +459,7 @@ public class TagExplorerProcessing2 extends PApplet {
 				}
 				
 				// update File
-				file.setAttributes(SQL.getBindedTagList(file));
-				file.updateViewName();
+				updateFileTags(file);
 				files.add(file);
 				updateShowFiles();
 				updateSprings();

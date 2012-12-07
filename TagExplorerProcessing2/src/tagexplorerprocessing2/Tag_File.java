@@ -17,7 +17,7 @@ public class Tag_File extends Tag {
 		
 		ArrayList<Tag> attributes = new ArrayList<Tag>();
 		
-		String viewName;
+		public String viewName;
 
 		public Tag_File(String tableName, int id, String name, float size,
 				String path, Timestamp creation_time, Timestamp expiration_time, int parent_ID, int origin_ID,
@@ -32,7 +32,7 @@ public class Tag_File extends Tag {
 			this.origin_ID = origin_ID;
 			this.score = score;
 			
-			viewName = name;
+			this.viewName = name;
 		}
 		
 		public void setDeletTime(Timestamp time){
