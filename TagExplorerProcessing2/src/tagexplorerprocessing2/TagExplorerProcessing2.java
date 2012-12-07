@@ -10,7 +10,7 @@ import java.util.List;
 import controlP5.ControlP5;
 import controlP5.Controller;
 import controlP5.Textfield;
-//import peasy.PeasyCam;
+import peasy.PeasyCam;
 import processing.core.PApplet;
 import processing.core.PFont;
 
@@ -19,7 +19,7 @@ import toxi.physics.VerletPhysics;
 import toxi.physics.VerletSpring;
 
 public class TagExplorerProcessing2 extends PApplet {
-	
+
 	WatchDir watcher;
 
 	// Tag_User user = new Tag_User("users", 0, "noname", "no Password");
@@ -45,27 +45,29 @@ public class TagExplorerProcessing2 extends PApplet {
 	// toxi VerletPhysics
 	VerletPhysics physics;
 	VerletPhysics filePhysics;
-	
-	//PeasyCam cam;
+
+	PeasyCam cam;
+	boolean _3d = true;
 
 	public void setup() {
 		size(800, 400, P3D);
 		smooth(4);
-		
-		Path p = FileSystems.getDefault().getPath("/Users/manuel/Documents/Testumgebung/Test");
-        try {
+
+		Path p = FileSystems.getDefault().getPath(
+				"/Users/manuel/Documents/Testumgebung/Test");
+		try {
 			watcher = new WatchDir(this, p, true);
 			watcher.start();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		font = createFont("arial", 20);
 
 		SQL = new SQLhelper(this);
-		
-		//cam = new PeasyCam(this, 100);
+
+		cam = new PeasyCam(this, width / 2, height / 2, 0, 100);
 
 		// Standartuser: …ffentlich
 		// user = (Tag_User) SQL.queryTagList("users").get(0);
@@ -154,7 +156,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		if (filePhysics.particles != null) {
 			for (int i = 0; i < filePhysics.particles.size(); i++) {
 				Tag_File vp = (Tag_File) filePhysics.particles.get(i);
-				
+
 				strokeWeight(5);
 
 				if (vp.isLocked()) {
@@ -165,13 +167,23 @@ public class TagExplorerProcessing2 extends PApplet {
 				point(vp.x, vp.y);
 				if (mouseOver(vp, 30, 30)) {
 					textAlign(LEFT);
-					text(vp.viewName, vp.x + 10, vp.y);
+
+					if (_3d) {
+						pushMatrix();
+						translate(vp.x, vp.y, vp.z);
+						float[] rota = cam.getRotations();
+						rotateX(rota[0]);
+						rotateY(rota[1]);
+						rotateZ(rota[2]);
+					}
+
+					text(vp.viewName, 10, 0);
+					if (_3d) {
+						popMatrix();
+					}
 				}
 
 			}
-			// for (int i = 0; i < showFiles.size(); i++) {
-			// text(((Tag_File) showFiles.get(i)).viewName, 10, 40 + i * 16);
-			// }
 		}
 	}
 
@@ -188,7 +200,19 @@ public class TagExplorerProcessing2 extends PApplet {
 			point(vp.x, vp.y);
 			if (mouseOver(vp, 30, 30)) {
 				textAlign(LEFT);
-				text(vp.name, vp.x + 10, vp.y);
+				if (_3d) {
+					pushMatrix();
+					translate(vp.x, vp.y, vp.z);
+					float[] rota = cam.getRotations();
+					rotateX(rota[0]);
+					rotateY(rota[1]);
+					rotateZ(rota[2]);
+				}
+
+				text(vp.name, 10, 0);
+				if (_3d) {
+					popMatrix();
+				}
 			}
 		}
 	}
@@ -200,7 +224,7 @@ public class TagExplorerProcessing2 extends PApplet {
 			strokeWeight(1);
 			line(sp.a.x, sp.a.y, sp.a.z, sp.b.x, sp.b.y, sp.b.z);
 		}
-		
+
 		for (int i = 0; i < filePhysics.springs.size(); i++) {
 			VerletSpring sp = filePhysics.springs.get(i);
 			stroke(0, 255, 0);
@@ -208,7 +232,7 @@ public class TagExplorerProcessing2 extends PApplet {
 			line(sp.a.x, sp.a.y, sp.a.z, sp.b.x, sp.b.y, sp.b.z);
 		}
 	}
-	
+
 	// ///////// init Methods //////////////////////
 	public void initFiles() {
 		ArrayList<Tag> files = new ArrayList<Tag>();
@@ -224,7 +248,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	// ///////// update Methods ////////////////////
 	public void updateShowFiles() {
 		System.out.println("updateShowFiles()");
-		
+
 		// filter files
 		if (filters.size() > 0) {
 			ArrayList<Tag> files = SQL.queryTagListFiltered("files",
@@ -239,10 +263,10 @@ public class TagExplorerProcessing2 extends PApplet {
 		// drop Particles
 		// set Position
 		filePhysics.particles.clear();
-		
+
 		int count = getSizeWithoutVersion(showFiles);
-		//int count = showFiles.size();
-		
+		// int count = showFiles.size();
+
 		float dist;
 		if (count > 1) {
 			dist = ((float) height - 40) / (count - 1);
@@ -251,38 +275,39 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 
 		for (int i = 0; i < showFiles.size(); i++) {
-			
-			
+
 			// ist alte File Version
-			if(((Tag_File)showFiles.get(i)).parent_ID != 0){
-				Tag_File parent = (Tag_File)getTagByID(showFiles.get(i).type, ((Tag_File)showFiles.get(i)).parent_ID);
-				
-				dropParticles(filePhysics, parent.x, parent.y, -20, showFiles.get(i));
-				
-				dropSpring(filePhysics, (Tag_File)showFiles.get(i), parent);
-			} 
+			if (((Tag_File) showFiles.get(i)).parent_ID != 0) {
+				Tag_File parent = (Tag_File) getTagByID(showFiles.get(i).type,
+						((Tag_File) showFiles.get(i)).parent_ID);
+
+				dropParticles(filePhysics, parent.x, parent.y, -20,
+						showFiles.get(i));
+
+				dropSpring(filePhysics, (Tag_File) showFiles.get(i), parent);
+			}
 			// ist aktuelle File Version
 			else {
-				dropParticles(filePhysics, 250, i * dist + 20, 0, showFiles.get(i));
+				dropParticles(filePhysics, 250, i * dist + 20, 0,
+						showFiles.get(i));
 			}
 		}
 	}
-	
-	
+
 	private Tag getTagByID(String tableName, int id) {
 		Tag tag = null;
 		// files:
 		if (tableName == "files" && files != null) {
 			for (Tag _tag : files) {
-				if (_tag.id == id){
+				if (_tag.id == id) {
 					tag = _tag;
 				}
 			}
 		}
 		// attributes
-		else if(tableName != "files" && attributes != null) {
+		else if (tableName != "files" && attributes != null) {
 			for (Tag _tag : attributes) {
-				if (_tag.id == id && _tag.type.equals(tableName)){
+				if (_tag.id == id && _tag.type.equals(tableName)) {
 					tag = _tag;
 				}
 			}
@@ -292,22 +317,19 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	private int getSizeWithoutVersion(ArrayList<Tag> files) {
 		int count = 0;
-		for(Tag t : files){
+		for (Tag t : files) {
 			Tag_File file = (Tag_File) t;
-			if(file.parent_ID == 0){
-				count ++;
+			if (file.parent_ID == 0) {
+				count++;
 			}
 		}
 		return count;
 	}
 
-	void updateFileTags(Tag_File fileTag){
+	void updateFileTags(Tag_File fileTag) {
 		fileTag.setAttributes(SQL.getBindedTagList(fileTag));
 		fileTag.updateViewName();
 	}
-	
-	
-
 
 	public void updateTags() {
 		ArrayList<Tag> tags = new ArrayList<Tag>();
@@ -355,9 +377,9 @@ public class TagExplorerProcessing2 extends PApplet {
 		t.x = x;
 		t.y = y;
 		t.z = z;
-//		if (t.z == 0) {
-			t.lock();
-//		}
+		// if (t.z == 0) {
+		t.lock();
+		// }
 		physics.addParticle(t);
 		// println(t.x + " " + t.y + " " + t.z);
 	}
@@ -422,13 +444,21 @@ public class TagExplorerProcessing2 extends PApplet {
 		return over;
 	}
 
-	boolean mouseOver(Tag t, int w, int h) {
+	boolean mouseOver(float x, float y, float z, int w, int h) {
 		boolean over = false;
-		if (mouseX > t.x - w / 2.0f && mouseX < t.x + w / 2.0f
-				&& mouseY > t.y - h / 2.0f && mouseY < t.y + h / 2.0f) {
+
+		float screenX = screenX(x, y, z);
+		float screenY = screenY(x, y, z);
+
+		if (mouseX > screenX - w / 2.0f && mouseX < screenX + w / 2.0f
+				&& mouseY > screenY - h / 2.0f && mouseY < screenY + h / 2.0f) {
 			over = true;
 		}
 		return over;
+	}
+
+	boolean mouseOver(Tag t, int w, int h) {
+		return mouseOver(t.x, t.y, t.z, w, h);
 	}
 
 	public void keyPressed() {
@@ -491,7 +521,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 		return file;
 	}
-	
+
 	public Tag_File createNewFile(String tableName, Path path) {
 		Tag_File file = null;
 		String s = path.toString().trim();
@@ -513,18 +543,18 @@ public class TagExplorerProcessing2 extends PApplet {
 
 			Tag_File file = createNewFile("files", selection);
 
-			if (file != null){
-				if(user != null) {
-				// System.out.println(file.toString());
+			if (file != null) {
+				if (user != null) {
+					// System.out.println(file.toString());
 					SQL.bindTag(file, user);
 				}
-				
+
 				// update File
 				updateFileTags(file);
 				files.add(file);
 				updateShowFiles();
 				updateSprings();
-			}		
+			}
 		}
 
 	}

@@ -15,5 +15,6 @@
 	<classpathentry kind="lib" path="lib/user/SQLLibrary/postgresql-8.3-604.jdbc3.jar"/>
 	<classpathentry kind="lib" path="lib/user/SQLLibrary/mysql-connector-java-3.1.14-bin.jar"/>
 	<classpathentry kind="lib" path="lib/user/SQLLibrary/sqlitejdbc-v053-pure.jar"/>
+	<classpathentry kind="lib" path="lib/user/peasycam/peasycam.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
