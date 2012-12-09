@@ -279,6 +279,7 @@ public class TagExplorerProcessing2 extends PApplet {
 			// set z wert nach versionsnummer.
 
 			if(((Tag_File)showFiles.get(i)).parent_ID != 0){
+				// get parent
 				Tag_File parent = (Tag_File)getTagByID(showFiles.get(i).type, ((Tag_File)showFiles.get(i)).parent_ID);
 				
 				dropParticles(filePhysics, parent.x, parent.y, 0, showFiles.get(i));
@@ -314,6 +315,19 @@ public class TagExplorerProcessing2 extends PApplet {
 			}
 		}
 		return tag;
+	}
+	
+	private ArrayList<Tag> getAllVersions(int originId){
+		ArrayList<Tag> files = new ArrayList<Tag>();
+		
+		for(Tag t : files){
+			Tag_File file = (Tag_File) t;
+			if(file.id == originId || file.origin_ID == originId){
+				files.add(file);				
+			}
+		}
+		
+		return files;
 	}
 
 	private int getSizeWithoutVersion(ArrayList<Tag> files) {
@@ -505,6 +519,8 @@ public class TagExplorerProcessing2 extends PApplet {
 			updateTags();
 			updateSprings();
 			break;
+		case 'C':
+			cam.setActive(!cam.isActive());
 		}
 	}
 
