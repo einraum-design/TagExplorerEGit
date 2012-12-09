@@ -371,31 +371,6 @@ public class SQLhelper {
 		}
 	}
 
-	public Tag_File getParent(Tag_File file) {
-		Tag_File parent = null;
-
-		ArrayList<Tag_File> parents = new ArrayList<Tag_File>();
-		for (Tag t : p5.files) {
-			if (t instanceof Tag_File) {
-				// path!
-				if (((Tag_File) t).path.trim().toLowerCase()
-						.equals(file.path.trim().toLowerCase())) {
-					parents.add((Tag_File) t);
-				}
-			}
-		}
-
-		parent = parents.get(0);
-		if (parents.size() > 1) {
-			for (Tag_File tag : parents) {
-				if(tag.creation_time.after(parent.creation_time)){
-					parent = tag;
-				}			
-			}
-		}
-
-		return parent;
-	}
 
 	public boolean inDataBase(String tableName, String theText) {
 		boolean isInDB = false;
@@ -502,7 +477,7 @@ public class SQLhelper {
 		} else {
 			System.out.println(tableName + " not yet Listed in queryTagList");
 		}
-		System.out.println("neu erstellen: " + t.name + " " + t.type);
+//		System.out.println("neu erstellen: " + t.name + " " + t.type);
 		return t;
 	}
 
