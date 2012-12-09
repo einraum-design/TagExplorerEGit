@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +14,9 @@ import controlP5.Textfield;
 import peasy.PeasyCam;
 import processing.core.PApplet;
 import processing.core.PFont;
+import processing.core.PVector;
 
+import toxi.geom.Vec3D;
 import toxi.physics.VerletParticle;
 import toxi.physics.VerletPhysics;
 import toxi.physics.VerletSpring;
@@ -21,6 +24,7 @@ import toxi.physics.VerletSpring;
 public class TagExplorerProcessing2 extends PApplet {
 
 	WatchDir watcher;
+	Timeline timeline;
 
 	// Tag_User user = new Tag_User("users", 0, "noname", "no Password");
 	Tag_User user = null;
@@ -34,6 +38,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	ArrayList<Tag> attributes = null;
 	ArrayList<Tag> files = null;
 	ArrayList<Tag> showFiles = null;
+	Tag_File oldest_File = null;
 
 	ArrayList<Filter> filters = new ArrayList<Filter>();
 
@@ -68,6 +73,8 @@ public class TagExplorerProcessing2 extends PApplet {
 		SQL = new SQLhelper(this);
 
 		cam = new PeasyCam(this, width / 2, height / 2, 0, 100);
+		
+		timeline = new Timeline(this);
 
 		// Standartuser: …ffentlich
 		// user = (Tag_User) SQL.queryTagList("users").get(0);
@@ -135,21 +142,112 @@ public class TagExplorerProcessing2 extends PApplet {
 		drawFiles();
 		drawTags();
 		drawSprings();
+		
+		timeline.draw();
+		image(timeline.pg, width -100, 0);
+		
+		
 
 		// draw interaction
 		stroke(255, 0, 0);
 		if (startTag != null) {
-			line(startTag.x, startTag.y, mouseX, mouseY);
+//			Vec3D mouseVec = getScreenGroundPlaneIntersection(cam.getPosition()[0], cam.getPosition()[1], cam.getPosition()[2], 0, 0, 0, 0, 1, 0, mouseX, mouseY);
+//			line(startTag.x, startTag.y,startTag.z, mouseVec.x, mouseVec.y, mouseVec.z);
+			strokeWeight(15);
+			point(startTag.x, startTag.y,startTag.z);
+			if(hoverPoint != null){
+				strokeWeight(3);
+				line(startTag.x, startTag.y, startTag.z, hoverPoint.x, hoverPoint.y, hoverPoint.z);
+			}
 		}
 
 		// Promt Messages
 		if (p != null) {
 			p.showMessages();
 		}
+		
+		if(interaction || startTag != null){
+			cam.setActive(false);
+		} else{
+			cam.setActive(true);
+		}
+		
+		// reset mouseHover & interation status
+		interaction = false;
+		hoverPoint = null;
 
 		physics.update();
 		filePhysics.update();
 	}
+
+	// mouse to 3d
+	// originally created by david huebner (aka myT) (2005|05|01)
+	// edited by markavian (2005|06|07) - Two new method variables offsetX and
+	// offsetY added (would normally be mouseX and mouseY)
+	
+//	Vec3D getScreenGroundPlaneIntersection(float eyeX, float eyeY, float eyeZ,
+//			float centerX, float centerY, float centerZ, 
+//			float upX, float upY, float upZ, 
+//			float offsetX, float offsetY) {
+//		// generate the required vectors
+//		Vec3D eye = new Vec3D(eyeX, eyeY, eyeZ);
+//		Vec3D center = new Vec3D(centerX, centerY, centerZ);
+//		Vec3D look = (center.subSelf(eye)).normalize();
+//		Vec3D up = new Vec3D(upX, upY, upZ).normalize();
+//		Vec3D left = up.crossSelf(look.normalize());
+//
+//		// calculate the distance between the mouseplane and the eye
+//		float distanceEyeMousePlane = (height / 2) / tan(PI / 6);
+//
+//		// calculate the vector, that points from the eye
+//		// to the clicked point, the mouse is on
+//		Vec3D mousePoint = look.scaleSelf(distanceEyeMousePlane);
+//		mousePoint = mousePoint.add(left.scaleSelf((float) ((offsetX) * -1)));
+//		mousePoint = mousePoint.add(up.scaleSelf((float) (offsetY)));
+//
+//		Vec3D intersection = new Vec3D();
+//		if (mousePoint.z != 0) { // avoid zero division
+//			// calculate the value, the vector that points to the mouse
+//			// must be multiplied with to reach the XY-plane
+//			float multiplier = -eye.z / mousePoint.z;
+//			// do not calculate intersections behind the camera
+//			if (multiplier > 0) {
+//				// add the multiplied mouse point vector
+//				intersection = eye.add(mousePoint.scaleSelf(multiplier));
+//			}
+//		}
+//		return intersection;
+//	}
+//	
+//	void updateUp() {
+//		if(look != null){
+//		  Vec3D helper = new Vec3D();
+//		  //if z > length of xy
+//		  if ( look.x[2]  >  (sqrt ( camLook.x[0] * camLook.x[0]  +  camLook.x[1] * camLook.x[1] ) ) ) {
+//		    camUp.x[0] = 0;
+//		    camUp.x[1] = 1;
+//		    camUp.x[2] = 0;
+//		    helper = new Vec3D(camLook);
+//		    helper.x[1] = 0;
+//		  }
+//		  else {
+//		    camUp.x[0] = 0;
+//		    camUp.x[1] = 0;
+//		    camUp.x[2] = 1;
+//		    helper = new Vec3D(camLook);
+//		    helper.x[2] = 0;
+//		  }
+//		  helper.normalize()();
+//		  helper = (helper.crossProduct(camUp)).normalize();
+//		  camUp  = (camLook.crossProduct(helper)).normalize();
+//
+//		// Calculate the roll if there is one
+//		//if (roll != 0.0) {
+//		//camUp = camUp.multiply(cos(roll));
+//		// camUp = camUp.add(helper.multiply(sin(roll))); 
+//		//}
+//		} 
+//	}
 
 	// ///////// display Methods ////////////////////
 	public void drawFiles() {
@@ -176,8 +274,9 @@ public class TagExplorerProcessing2 extends PApplet {
 						rotateY(rota[1]);
 						rotateZ(rota[2]);
 					}
-
+					
 					text(vp.viewName, 10, 0);
+					text(vp.creation_time.toGMTString(), 10, 20);
 					if (_3d) {
 						popMatrix();
 					}
@@ -198,6 +297,8 @@ public class TagExplorerProcessing2 extends PApplet {
 				stroke(0, 255, 200);
 			}
 			point(vp.x, vp.y, vp.z);
+			
+			
 			if (mouseOver(vp, 30, 30)) {
 				textAlign(LEFT);
 				if (_3d) {
@@ -259,6 +360,8 @@ public class TagExplorerProcessing2 extends PApplet {
 			// alle files
 			showFiles = files;
 		}
+		
+		oldest_File = (Tag_File)getOldestTagFile(showFiles);
 
 		// drop Particles
 		// set Position
@@ -278,20 +381,20 @@ public class TagExplorerProcessing2 extends PApplet {
 
 			// set z wert nach versionsnummer.
 
-			if(((Tag_File)showFiles.get(i)).parent_ID != 0){
+			if (((Tag_File) showFiles.get(i)).parent_ID != 0) {
 				// get parent
-				Tag_File parent = (Tag_File)getTagByID(showFiles.get(i).type, ((Tag_File)showFiles.get(i)).parent_ID);
-				
-				dropParticles(filePhysics, parent.x, parent.y, 0, showFiles.get(i));
-				
-				
-				dropSpring(filePhysics, (Tag_File)showFiles.get(i), parent);
-			} 
+				Tag_File parent = (Tag_File) getTagByID(showFiles.get(i).type,
+						((Tag_File) showFiles.get(i)).parent_ID);
+
+				dropParticles(filePhysics, parent.x, parent.y, 0,
+						showFiles.get(i));
+
+				dropSpring(filePhysics, (Tag_File) showFiles.get(i), parent);
+			}
 
 			// ist origin File Version
 			else {
-				dropParticles(filePhysics, 250, i * dist, 0,
-						showFiles.get(i));
+				dropParticles(filePhysics, 250, i * dist, 0, showFiles.get(i));
 			}
 		}
 	}
@@ -316,17 +419,17 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 		return tag;
 	}
-	
-	private ArrayList<Tag> getAllVersions(int originId){
+
+	private ArrayList<Tag> getAllVersions(int originId) {
 		ArrayList<Tag> files = new ArrayList<Tag>();
-		
-		for(Tag t : files){
+
+		for (Tag t : files) {
 			Tag_File file = (Tag_File) t;
-			if(file.id == originId || file.origin_ID == originId){
-				files.add(file);				
+			if (file.id == originId || file.origin_ID == originId) {
+				files.add(file);
 			}
 		}
-		
+
 		return files;
 	}
 
@@ -339,6 +442,18 @@ public class TagExplorerProcessing2 extends PApplet {
 			}
 		}
 		return count;
+	}
+	
+	private Tag getOldestTagFile(ArrayList<Tag> files){
+		Tag oldest = null;
+		Timestamp comp = new Timestamp(System.currentTimeMillis());
+		for(Tag file : files){
+			if(((Tag_File)file).creation_time.before(comp)){
+				comp = ((Tag_File)file).creation_time;
+				oldest = file;
+			}
+		}
+		return oldest;
 	}
 
 	void updateFileTags(Tag_File fileTag) {
@@ -450,15 +565,17 @@ public class TagExplorerProcessing2 extends PApplet {
 		startTag = null;
 	}
 
-	boolean mouseOver(float x, float y, int w, int h) {
-		boolean over = false;
-		if (mouseX > x - w / 2.0f && mouseX < x + w / 2.0f
-				&& mouseY > y - h / 2.0f && mouseY < y + h / 2.0f) {
-			over = true;
-		}
-		return over;
-	}
+//	boolean mouseOver(float x, float y, int w, int h) {
+//		boolean over = false;
+//		if (mouseX > x - w / 2.0f && mouseX < x + w / 2.0f
+//				&& mouseY > y - h / 2.0f && mouseY < y + h / 2.0f) {
+//			over = true;
+//		}
+//		return over;
+//	}
 
+	boolean interaction = false;
+	Vec3D hoverPoint = null;
 	boolean mouseOver(float x, float y, float z, int w, int h) {
 		boolean over = false;
 
@@ -468,6 +585,8 @@ public class TagExplorerProcessing2 extends PApplet {
 		if (mouseX > screenX - w / 2.0f && mouseX < screenX + w / 2.0f
 				&& mouseY > screenY - h / 2.0f && mouseY < screenY + h / 2.0f) {
 			over = true;
+			interaction = true;
+			hoverPoint = new Vec3D(x, y, z);
 		}
 		return over;
 	}
