@@ -27,7 +27,7 @@ import toxi.physics.VerletSpring;
 public class TagExplorerProcessing2 extends PApplet {
 
 	WatchDir watcher;
-	
+
 	PGraphics mainscreen;
 	Timeline timeline;
 
@@ -49,9 +49,8 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	// Interaction
 	Tag startTag = null;
-	
-	
-	//Camera
+
+	// Camera
 	Vec3D cam_eye;
 	Vec3D cam_target;
 	Vec3D cam_up;
@@ -62,7 +61,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	VerletPhysics physics;
 	VerletPhysics filePhysics;
 
-//	PeasyCam cam;
+	// PeasyCam cam;
 	boolean _3d = true;
 
 	public void setup() {
@@ -81,19 +80,19 @@ public class TagExplorerProcessing2 extends PApplet {
 		font = createFont("arial", 20);
 
 		SQL = new SQLhelper(this);
-		
-		
-		mainscreen = createGraphics(width-100, height, P3D);
+
+		mainscreen = createGraphics(width - 100, height, P3D);
 		mainscreen.smooth(4);
-		// camera 
-				cam_eye = new Vec3D(mainscreen.width/2.0f, mainscreen.height/2.0f, (mainscreen.height/2.0f) / tan(PI*30.0f / 180.0f));
-				cam_target = new Vec3D(mainscreen.width/2.0f, mainscreen.height/2.0f, 0);
-				cam_up = new Vec3D(0, 1, 0);
-		mainscreen.camera(cam_eye.x, cam_eye.y, cam_eye.z, cam_target.x, cam_target.y, cam_target.z, cam_up.x, cam_up.y, cam_up.z);
-		//cam = new PeasyCam(this, width / 2, height / 2, 0, 100);
-		
-		
-		
+		// camera
+		cam_eye = new Vec3D(mainscreen.width / 2.0f, mainscreen.height / 2.0f,
+				(mainscreen.height / 2.0f) / tan(PI * 30.0f / 180.0f));
+		cam_target = new Vec3D(mainscreen.width / 2.0f,
+				mainscreen.height / 2.0f, 0);
+		cam_up = new Vec3D(0, 1, 0);
+		mainscreen.camera(cam_eye.x, cam_eye.y, cam_eye.z, cam_target.x,
+				cam_target.y, cam_target.z, cam_up.x, cam_up.y, cam_up.z);
+		// cam = new PeasyCam(this, width / 2, height / 2, 0, 100);
+
 		timeline = new Timeline(this);
 
 		// Standartuser: …ffentlich
@@ -124,13 +123,12 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		// Display settings
 		textFont(font, 14);
-		
-		addMouseWheelListener(new MouseWheelListener() { 
-		    public void mouseWheelMoved(MouseWheelEvent mwe) { 
-		      mouseWheel(mwe.getWheelRotation());
-		    }
-		  }
-		  );
+
+		addMouseWheelListener(new MouseWheelListener() {
+			public void mouseWheelMoved(MouseWheelEvent mwe) {
+				mouseWheel(mwe.getWheelRotation());
+			}
+		});
 
 		// test SQL Join
 		// SQL.msql.query("SELECT files.* FROM files INNER JOIN tag_binding ON (files.ID = tag_binding.file_ID) WHERE tag_binding.type = 'users' AND tag_binding.tag_ID = '1' ");
@@ -143,55 +141,27 @@ public class TagExplorerProcessing2 extends PApplet {
 		// while(SQL.msql.next()){
 		// //System.out.println(SQL.msql.getString("name"));
 		// }
-		
-		
+
 		// Writing to the depth buffer is disabled to avoid rendering
-		  // artifacts due to the fact that the particles are semi-transparent
-		  // but not z-sorted.
-		  hint(DISABLE_DEPTH_MASK);
+		// artifacts due to the fact that the particles are semi-transparent
+		// but not z-sorted.
+		hint(DISABLE_DEPTH_MASK);
 	}
 
 	// /////////// draw ////////////////////
 
 	public void draw() {
-		mainscreen.beginDraw();
-		mainscreen.camera(cam_eye.x, cam_eye.y, cam_eye.z, cam_target.x, cam_target.y, cam_target.z, cam_up.x, cam_up.y, cam_up.z);
-		mainscreen.background(0);
 
 		// removeController by Button cancel
 		if (removeController) {
 			removeController();
 			removeController = !removeController;
 		}
-
+		
+		
+		drawMainscreen(mainscreen);
 		
 
-		drawFiles();
-		drawTags();
-		drawSprings();
-		
-//		timeline.draw();
-//		image(timeline.pg, width -100, 0);
-		
-		
-
-		// draw interaction
-		stroke(255, 0, 0);
-		if (startTag != null) {
-//			Vec3D mouseVec = getScreenGroundPlaneIntersection(cam.getPosition()[0], cam.getPosition()[1], cam.getPosition()[2], 0, 0, 0, 0, 1, 0, mouseX, mouseY);
-//			line(startTag.x, startTag.y,startTag.z, mouseVec.x, mouseVec.y, mouseVec.z);
-			mainscreen.strokeWeight(15);
-			mainscreen.point(startTag.x, startTag.y,startTag.z);
-			if(hoverPoint != null){
-				mainscreen.strokeWeight(3);
-				mainscreen.line(startTag.x, startTag.y, startTag.z, hoverPoint.x, hoverPoint.y, hoverPoint.z);
-			}
-		}
-		
-		mainscreen.endDraw();
-		
-		image(mainscreen, 0, 0);
-		
 		fill(150);
 		if (user != null) {
 			text("User: " + user.name, 5, 16);
@@ -200,127 +170,163 @@ public class TagExplorerProcessing2 extends PApplet {
 		if (location != null) {
 			text("Location: " + location.name, 150, 16);
 		}
+		
+		timeline.draw();
+		image(timeline.pg, width -100, 0);
 
 		// Promt Messages
 		if (p != null) {
 			p.showMessages();
 		}
-		
-//		if(interaction || startTag != null){
-//			cam.setActive(false);
-//		} else{
-//			cam.setActive(true);
-//		}
-		
+
+		// if(interaction || startTag != null){
+		// cam.setActive(false);
+		// } else{
+		// cam.setActive(true);
+		// }
+
 		// reset mouseHover & interation status
 		interaction = false;
 		hoverPoint = null;
 
 		physics.update();
 		filePhysics.update();
-		
-		
+
 	}
 
 	// mouse to 3d
 	// originally created by david huebner (aka myT) (2005|05|01)
 	// edited by markavian (2005|06|07) - Two new method variables offsetX and
 	// offsetY added (would normally be mouseX and mouseY)
-	
-//	Vec3D getScreenGroundPlaneIntersection(float eyeX, float eyeY, float eyeZ,
-//			float centerX, float centerY, float centerZ, 
-//			float upX, float upY, float upZ, 
-//			float offsetX, float offsetY) {
-//		// generate the required vectors
-//		Vec3D eye = new Vec3D(eyeX, eyeY, eyeZ);
-//		Vec3D center = new Vec3D(centerX, centerY, centerZ);
-//		Vec3D look = (center.subSelf(eye)).normalize();
-//		Vec3D up = new Vec3D(upX, upY, upZ).normalize();
-//		Vec3D left = up.crossSelf(look.normalize());
-//
-//		// calculate the distance between the mouseplane and the eye
-//		float distanceEyeMousePlane = (height / 2) / tan(PI / 6);
-//
-//		// calculate the vector, that points from the eye
-//		// to the clicked point, the mouse is on
-//		Vec3D mousePoint = look.scaleSelf(distanceEyeMousePlane);
-//		mousePoint = mousePoint.add(left.scaleSelf((float) ((offsetX) * -1)));
-//		mousePoint = mousePoint.add(up.scaleSelf((float) (offsetY)));
-//
-//		Vec3D intersection = new Vec3D();
-//		if (mousePoint.z != 0) { // avoid zero division
-//			// calculate the value, the vector that points to the mouse
-//			// must be multiplied with to reach the XY-plane
-//			float multiplier = -eye.z / mousePoint.z;
-//			// do not calculate intersections behind the camera
-//			if (multiplier > 0) {
-//				// add the multiplied mouse point vector
-//				intersection = eye.add(mousePoint.scaleSelf(multiplier));
-//			}
-//		}
-//		return intersection;
-//	}
-//	
-//	void updateUp() {
-//		if(look != null){
-//		  Vec3D helper = new Vec3D();
-//		  //if z > length of xy
-//		  if ( look.x[2]  >  (sqrt ( camLook.x[0] * camLook.x[0]  +  camLook.x[1] * camLook.x[1] ) ) ) {
-//		    camUp.x[0] = 0;
-//		    camUp.x[1] = 1;
-//		    camUp.x[2] = 0;
-//		    helper = new Vec3D(camLook);
-//		    helper.x[1] = 0;
-//		  }
-//		  else {
-//		    camUp.x[0] = 0;
-//		    camUp.x[1] = 0;
-//		    camUp.x[2] = 1;
-//		    helper = new Vec3D(camLook);
-//		    helper.x[2] = 0;
-//		  }
-//		  helper.normalize()();
-//		  helper = (helper.crossProduct(camUp)).normalize();
-//		  camUp  = (camLook.crossProduct(helper)).normalize();
-//
-//		// Calculate the roll if there is one
-//		//if (roll != 0.0) {
-//		//camUp = camUp.multiply(cos(roll));
-//		// camUp = camUp.add(helper.multiply(sin(roll))); 
-//		//}
-//		} 
-//	}
+
+	// Vec3D getScreenGroundPlaneIntersection(float eyeX, float eyeY, float
+	// eyeZ,
+	// float centerX, float centerY, float centerZ,
+	// float upX, float upY, float upZ,
+	// float offsetX, float offsetY) {
+	// // generate the required vectors
+	// Vec3D eye = new Vec3D(eyeX, eyeY, eyeZ);
+	// Vec3D center = new Vec3D(centerX, centerY, centerZ);
+	// Vec3D look = (center.subSelf(eye)).normalize();
+	// Vec3D up = new Vec3D(upX, upY, upZ).normalize();
+	// Vec3D left = up.crossSelf(look.normalize());
+	//
+	// // calculate the distance between the mouseplane and the eye
+	// float distanceEyeMousePlane = (height / 2) / tan(PI / 6);
+	//
+	// // calculate the vector, that points from the eye
+	// // to the clicked point, the mouse is on
+	// Vec3D mousePoint = look.scaleSelf(distanceEyeMousePlane);
+	// mousePoint = mousePoint.add(left.scaleSelf((float) ((offsetX) * -1)));
+	// mousePoint = mousePoint.add(up.scaleSelf((float) (offsetY)));
+	//
+	// Vec3D intersection = new Vec3D();
+	// if (mousePoint.z != 0) { // avoid zero division
+	// // calculate the value, the vector that points to the mouse
+	// // must be multiplied with to reach the XY-plane
+	// float multiplier = -eye.z / mousePoint.z;
+	// // do not calculate intersections behind the camera
+	// if (multiplier > 0) {
+	// // add the multiplied mouse point vector
+	// intersection = eye.add(mousePoint.scaleSelf(multiplier));
+	// }
+	// }
+	// return intersection;
+	// }
+	//
+	// void updateUp() {
+	// if(look != null){
+	// Vec3D helper = new Vec3D();
+	// //if z > length of xy
+	// if ( look.x[2] > (sqrt ( camLook.x[0] * camLook.x[0] + camLook.x[1] *
+	// camLook.x[1] ) ) ) {
+	// camUp.x[0] = 0;
+	// camUp.x[1] = 1;
+	// camUp.x[2] = 0;
+	// helper = new Vec3D(camLook);
+	// helper.x[1] = 0;
+	// }
+	// else {
+	// camUp.x[0] = 0;
+	// camUp.x[1] = 0;
+	// camUp.x[2] = 1;
+	// helper = new Vec3D(camLook);
+	// helper.x[2] = 0;
+	// }
+	// helper.normalize()();
+	// helper = (helper.crossProduct(camUp)).normalize();
+	// camUp = (camLook.crossProduct(helper)).normalize();
+	//
+	// // Calculate the roll if there is one
+	// //if (roll != 0.0) {
+	// //camUp = camUp.multiply(cos(roll));
+	// // camUp = camUp.add(helper.multiply(sin(roll)));
+	// //}
+	// }
+	// }
+
+	private void drawMainscreen(PGraphics renderer) {
+		renderer.beginDraw();
+		renderer.camera(cam_eye.x, cam_eye.y, cam_eye.z, cam_target.x,
+				cam_target.y, cam_target.z, cam_up.x, cam_up.y, cam_up.z);
+		renderer.background(0);
+
+		drawFiles(renderer);
+		drawTags(renderer);
+		drawSprings(renderer);
+
+		// draw interaction
+		stroke(255, 0, 0);
+		if (startTag != null) {
+			// Vec3D mouseVec =
+			// getScreenGroundPlaneIntersection(cam.getPosition()[0],
+			// cam.getPosition()[1], cam.getPosition()[2], 0, 0, 0, 0, 1, 0,
+			// mouseX, mouseY);
+			// line(startTag.x, startTag.y,startTag.z, mouseVec.x, mouseVec.y,
+			// mouseVec.z);
+			renderer.strokeWeight(15);
+			renderer.point(startTag.x, startTag.y, startTag.z);
+			if (hoverPoint != null) {
+				renderer.strokeWeight(3);
+				renderer.line(startTag.x, startTag.y, startTag.z,
+						hoverPoint.x, hoverPoint.y, hoverPoint.z);
+			}
+		}
+
+		renderer.endDraw();
+		image(renderer, 0, 0);
+	}
 
 	// ///////// display Methods ////////////////////
-	public void drawFiles() {
+	public void drawFiles(PGraphics renderer) {
 		if (filePhysics.particles != null) {
 			for (int i = 0; i < filePhysics.particles.size(); i++) {
 				Tag_File vp = (Tag_File) filePhysics.particles.get(i);
 
-				mainscreen.strokeWeight(5);
+				renderer.strokeWeight(5);
 
 				if (vp.isLocked()) {
-					mainscreen.stroke(255, 0, 0);
+					renderer.stroke(255, 0, 0);
 				} else {
-					mainscreen.stroke(0, 255, 200);
+					renderer.stroke(0, 255, 200);
 				}
-				mainscreen.point(vp.x, vp.y, vp.z);
-				if (mouseOver(vp, 30, 30)) {
-					mainscreen.textAlign(LEFT);
+				renderer.point(vp.x, vp.y, vp.z);
+				if (mouseOver(renderer, vp, 30, 30)) {
+					renderer.textAlign(LEFT);
 
 					if (_3d) {
-						mainscreen.pushMatrix();
-						mainscreen.translate(vp.x, vp.y, vp.z);
-//						float[] rota = cam.getRotations();
-//						rotateX(rota[0]);
-//						rotateY(rota[1]);
-//						rotateZ(rota[2]);
+						renderer.pushMatrix();
+						renderer.translate(vp.x, vp.y, vp.z);
+						// float[] rota = cam.getRotations();
+						// rotateX(rota[0]);
+						// rotateY(rota[1]);
+						// rotateZ(rota[2]);
 					}
-					
-					mainscreen.text(vp.viewName, 10, 0);
-					mainscreen.text(vp.creation_time.toGMTString(), 10, 20);
+
+					renderer.text(vp.viewName, 10, 0);
+					renderer.text(vp.creation_time.toGMTString(), 10, 20);
 					if (_3d) {
-						mainscreen.popMatrix();
+						renderer.popMatrix();
 					}
 				}
 
@@ -328,51 +334,50 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 	}
 
-	public void drawTags() {
+	public void drawTags(PGraphics renderer) {
 		for (int i = 0; i < physics.particles.size(); i++) {
 			Tag vp = (Tag) physics.particles.get(i);
-			mainscreen.strokeWeight(5);
+			renderer.strokeWeight(5);
 
 			if (vp.isLocked()) {
-				mainscreen.stroke(255, 0, 0);
+				renderer.stroke(255, 0, 0);
 			} else {
-				mainscreen.stroke(0, 255, 200);
+				renderer.stroke(0, 255, 200);
 			}
-			mainscreen.point(vp.x, vp.y, vp.z);
-			
-			
-			if (mouseOver(vp, 30, 30)) {
-				textAlign(LEFT);
+			renderer.point(vp.x, vp.y, vp.z);
+
+			if (mouseOver(renderer, vp, 30, 30)) {
+				renderer.textAlign(LEFT);
 				if (_3d) {
-					mainscreen.pushMatrix();
-					mainscreen.translate(vp.x, vp.y, vp.z);
-//					float[] rota = cam.getRotations();
-//					rotateX(rota[0]);
-//					rotateY(rota[1]);
-//					rotateZ(rota[2]);
+					renderer.pushMatrix();
+					renderer.translate(vp.x, vp.y, vp.z);
+					// float[] rota = cam.getRotations();
+					// rotateX(rota[0]);
+					// rotateY(rota[1]);
+					// rotateZ(rota[2]);
 				}
 
-				mainscreen.text(vp.name, 10, 0);
+				renderer.text(vp.name, 10, 0);
 				if (_3d) {
-					mainscreen.popMatrix();
+					renderer.popMatrix();
 				}
 			}
 		}
 	}
 
-	public void drawSprings() {
+	public void drawSprings(PGraphics renderer) {
 		for (int i = 0; i < physics.springs.size(); i++) {
 			VerletSpring sp = physics.springs.get(i);
-			mainscreen.stroke(255);
-			mainscreen.strokeWeight(1);
-			mainscreen.line(sp.a.x, sp.a.y, sp.a.z, sp.b.x, sp.b.y, sp.b.z);
+			renderer.stroke(255);
+			renderer.strokeWeight(1);
+			renderer.line(sp.a.x, sp.a.y, sp.a.z, sp.b.x, sp.b.y, sp.b.z);
 		}
 
 		for (int i = 0; i < filePhysics.springs.size(); i++) {
 			VerletSpring sp = filePhysics.springs.get(i);
-			mainscreen.stroke(0, 255, 0);
-			mainscreen.strokeWeight(1);
-			mainscreen.line(sp.a.x, sp.a.y, sp.a.z, sp.b.x, sp.b.y, sp.b.z);
+			renderer.stroke(0, 255, 0);
+			renderer.strokeWeight(1);
+			renderer.line(sp.a.x, sp.a.y, sp.a.z, sp.b.x, sp.b.y, sp.b.z);
 		}
 	}
 
@@ -402,8 +407,8 @@ public class TagExplorerProcessing2 extends PApplet {
 			// alle files
 			showFiles = files;
 		}
-		
-		oldest_File = (Tag_File)getOldestTagFile(showFiles);
+
+		oldest_File = (Tag_File) getOldestTagFile(showFiles);
 
 		// drop Particles
 		// set Position
@@ -485,13 +490,13 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 		return count;
 	}
-	
-	private Tag getOldestTagFile(ArrayList<Tag> files){
+
+	private Tag getOldestTagFile(ArrayList<Tag> files) {
 		Tag oldest = null;
 		Timestamp comp = new Timestamp(System.currentTimeMillis());
-		for(Tag file : files){
-			if(((Tag_File)file).creation_time.before(comp)){
-				comp = ((Tag_File)file).creation_time;
+		for (Tag file : files) {
+			if (((Tag_File) file).creation_time.before(comp)) {
+				comp = ((Tag_File) file).creation_time;
 				oldest = file;
 			}
 		}
@@ -569,12 +574,12 @@ public class TagExplorerProcessing2 extends PApplet {
 	// ///////// INPUT ///////////////////
 	public void mousePressed() {
 		for (Tag t : showFiles) {
-			if (mouseOver(t, 10, 10)) {
+			if (mouseOver(mainscreen, t, 10, 10)) {
 				startTag = t;
 			}
 		}
 		for (Tag t : attributes) {
-			if (mouseOver(t, 10, 10)) {
+			if (mouseOver(mainscreen, t, 10, 10)) {
 				startTag = t;
 			}
 		}
@@ -584,7 +589,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		if (startTag != null) {
 			if (startTag instanceof Tag_File) {
 				for (Tag t : attributes) {
-					if (mouseOver(t, 10, 10)) {
+					if (mouseOver(mainscreen, t, 10, 10)) {
 						Tag_File file = (Tag_File) startTag;
 						SQL.bindTag(file, t);
 						updateFileTags(file);
@@ -594,7 +599,7 @@ public class TagExplorerProcessing2 extends PApplet {
 				}
 			} else {
 				for (Tag t : files) {
-					if (mouseOver(t, 10, 10)) {
+					if (mouseOver(mainscreen, t, 10, 10)) {
 						Tag_File file = (Tag_File) t;
 						SQL.bindTag(file, startTag);
 						updateFileTags(file);
@@ -607,23 +612,42 @@ public class TagExplorerProcessing2 extends PApplet {
 		startTag = null;
 	}
 
-//	boolean mouseOver(float x, float y, int w, int h) {
-//		boolean over = false;
-//		if (mouseX > x - w / 2.0f && mouseX < x + w / 2.0f
-//				&& mouseY > y - h / 2.0f && mouseY < y + h / 2.0f) {
-//			over = true;
-//		}
-//		return over;
-//	}
+	// boolean mouseOver(float x, float y, int w, int h) {
+	// boolean over = false;
+	// if (mouseX > x - w / 2.0f && mouseX < x + w / 2.0f
+	// && mouseY > y - h / 2.0f && mouseY < y + h / 2.0f) {
+	// over = true;
+	// }
+	// return over;
+	// }
 
 	boolean interaction = false;
 	Vec3D hoverPoint = null;
-	
+
 	boolean mouseOver(float x, float y, float z, int w, int h) {
 		boolean over = false;
 
-		float screenX = mainscreen.screenX(x, y, z);
-		float screenY = mainscreen.screenY(x, y, z);
+		float screenX = screenX(x, y, z);
+		float screenY = screenY(x, y, z);
+
+		if (mouseX > screenX - w / 2.0f && mouseX < screenX + w / 2.0f
+				&& mouseY > screenY - h / 2.0f && mouseY < screenY + h / 2.0f) {
+			over = true;
+			interaction = true;
+			hoverPoint = new Vec3D(x, y, z);
+		}
+		return over;
+	}
+	boolean mouseOver(Tag t, int w, int h) {
+		return mouseOver(t.x, t.y, t.z, w, h);
+	}
+
+	
+	boolean mouseOver(PGraphics renderer, float x, float y, float z, int w, int h) {
+		boolean over = false;
+
+		float screenX = renderer.screenX(x, y, z);
+		float screenY = renderer.screenY(x, y, z);
 
 		if (mouseX > screenX - w / 2.0f && mouseX < screenX + w / 2.0f
 				&& mouseY > screenY - h / 2.0f && mouseY < screenY + h / 2.0f) {
@@ -634,8 +658,8 @@ public class TagExplorerProcessing2 extends PApplet {
 		return over;
 	}
 
-	boolean mouseOver(Tag t, int w, int h) {
-		return mouseOver(t.x, t.y, t.z, w, h);
+	boolean mouseOver(PGraphics renderer, Tag t, int w, int h) {
+		return mouseOver(renderer, t.x, t.y, t.z, w, h);
 	}
 
 	public void keyPressed() {
@@ -681,9 +705,9 @@ public class TagExplorerProcessing2 extends PApplet {
 			updateTags();
 			updateSprings();
 			break;
-//		case 'C':
-//			cam.setActive(!cam.isActive());
-//			break;
+		// case 'C':
+		// cam.setActive(!cam.isActive());
+		// break;
 		}
 	}
 
@@ -870,12 +894,12 @@ public class TagExplorerProcessing2 extends PApplet {
 		p = null;
 		System.out.println("removed Controller");
 	}
-	
+
 	void mouseWheel(int delta) {
-//		  println("mousewheel: " + delta);
+		// println("mousewheel: " + delta);
 		cam_eye.z += delta;
 	}
-	
+
 	public static void main(String _args[]) {
 		PApplet.main(new String[] { tagexplorerprocessing2.TagExplorerProcessing2.class
 				.getName() });
