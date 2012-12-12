@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.TreeSet;
 
 import de.bezier.data.sql.MySQL;
 
@@ -151,89 +152,84 @@ public class SQLhelper {
 		return tags;
 	}
 
-	// Filter List on files
-	// not ready UNION ist falser WEG -> müssen IN sein
+	// funktioniert nur für filter.inOut = true
+	public ArrayList<Integer> queryIDsFiltered(String tableName, Filter filter) {
+		ArrayList<Integer> ids = new ArrayList<Integer>();
+
+		if (checkConnection()) {
+
+			String selectStringId = "SELECT "
+					+ tableName
+					+ ".ID FROM "
+					+ tableName
+					+ " INNER JOIN tag_binding ON ("
+					+ tableName
+					+ ".ID = tag_binding.file_ID) WHERE tag_binding.type LIKE '"
+					+ filter.tag.type + "' AND tag_binding.tag_ID LIKE '"
+					+ filter.tag.id + "'";
+
+			System.out.println(selectStringId);
+			msql.query(selectStringId);
+
+			while (msql.next()) {
+				ids.add(msql.getInt("ID"));
+			}
+		} else {
+			System.out.println("not Connected queryTagListFiltered()");
+		}
+		return ids;
+	}
+
+	// Filter List on files IDs der selected und nicht selected werden ge-merged
 	public ArrayList<Tag> queryTagListFiltered(String tableName,
 			ArrayList<Filter> filterList) {
+
 		ArrayList<Tag> tags = new ArrayList<Tag>();
 
 		if (checkConnection()) {
 
-			// built queryString
-
-			String inIdSelection = "";
-
-			ArrayList<String> inIdSelectionList = new ArrayList<String>();
-			ArrayList<String> outIdSelectionList = new ArrayList<String>();
+			TreeSet<Integer> selected = new TreeSet<Integer>();
+			TreeSet<Integer> deselected = new TreeSet<Integer>();
 
 			for (Filter f : filterList) {
-
-				String selection = "SELECT "
-						+ tableName
-						+ ".ID FROM "
-						+ tableName
-						+ " INNER JOIN tag_binding ON ("
-						+ tableName
-						+ ".ID = tag_binding.file_ID) WHERE tag_binding.type LIKE '"
-						+ f.tag.type + "' AND tag_binding.tag_ID LIKE '"
-						+ f.tag.id + "'";
 				if (f.inOut) {
-					inIdSelectionList.add(selection);
+					selected.addAll(queryIDsFiltered(tableName, f));
 				} else {
-					outIdSelectionList.add(selection);
+					deselected.addAll(queryIDsFiltered(tableName, f));
+				}
+			}
+			
+			// entferne die deselected
+			for (int i : deselected) {
+				selected.remove(i);
+			}			
+
+			String query = "SELECT * FROM " + tableName + " WHERE ";
+
+			boolean first = true;
+			for (int id : selected) {
+				if (!first) {
+					query += " OR ";
 				}
 
+				query += "ID = '" + id + "'";
+				first = false;
 			}
-
-			String inQuery = "";
-			for (int i = 0; i < inIdSelectionList.size(); i++) {
-				inQuery += "( " + inIdSelectionList.get(i) + " )";
-				if (i != inIdSelectionList.size() - 1)
-					inQuery += " UNION ";
+			
+			msql.query(query);
+			
+			// get Tags
+			while (msql.next()) {
+				Tag t = getSpecificTags(tableName);
+				if (t != null) {
+					tags.add(t);
+				}
 			}
-			System.out.println("inQuery: " + inQuery);
-
-			String outQuery = "";
-			for (int i = 0; i < outIdSelectionList.size(); i++) {
-				outQuery += "( " + outIdSelectionList.get(i) + " )";
-				if (i != outIdSelectionList.size() - 1)
-					outQuery += " UNION ";
-			}
-			System.out.println("outQuery: " + outQuery);
-			// msql.query()
-
-			// String selectString = "SELECT " + tableName + ".* FROM " +
-			// tableName + " INNER JOIN tag_binding ON (" + tableName +
-			// ".ID = tag_binding.file_ID) WHERE tag_binding.type LIKE '" +
-			// filter.tag.type + "' AND tag_binding.tag_ID LIKE '" +
-			// filter.tag.id + "'";
-			// String selectStringId = "SELECT " + tableName + ".ID FROM " +
-			// tableName + " INNER JOIN tag_binding ON (" + tableName +
-			// ".ID = tag_binding.file_ID) WHERE tag_binding.type LIKE '" +
-			// filter.tag.type + "' AND tag_binding.tag_ID LIKE '" +
-			// filter.tag.id + "'";
-			//
-			// if(filter.inOut){
-			// msql.query(selectString);
-			// } else{
-			// // Funktioniert noch nicht richtig! Es werden nur Dateien
-			// gewählt, die ein tag binding mit dem filtertyp haben. andere
-			// werden ignoriert
-			// msql.query("SELECT " + tableName + ".* FROM " + tableName +
-			// " WHERE " + tableName + ".ID NOT IN (" + selectStringId + ")");
-			// //+ "WHERE tag_binding.type NOT LIKE '" + filter.tag.type +
-			// "' OR (tag_binding.type LIKE '" + filter.tag.type +
-			// "' AND tag_binding.tag_ID NOT LIKE '" + filter.tag.id + "')");
-			// }
-			// while (msql.next()) {
-			// Tag t = getSpecificTags(tableName);
-			// if(t != null){
-			// tags.add(t);
-			// }
-			// }
 		} else {
 			System.out.println("not Connected queryTagListFiltered()");
 		}
+		
+		System.out.println("return " + tags.size() + " tags from queryTagListFiltered");
 		return tags;
 	}
 
@@ -371,7 +367,6 @@ public class SQLhelper {
 		}
 	}
 
-
 	public boolean inDataBase(String tableName, String theText) {
 		boolean isInDB = false;
 
@@ -477,7 +472,7 @@ public class SQLhelper {
 		} else {
 			System.out.println(tableName + " not yet Listed in queryTagList");
 		}
-//		System.out.println("neu erstellen: " + t.name + " " + t.type);
+		// System.out.println("neu erstellen: " + t.name + " " + t.type);
 		return t;
 	}
 
