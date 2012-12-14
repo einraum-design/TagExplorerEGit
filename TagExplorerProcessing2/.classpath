@@ -16,5 +16,6 @@
 	<classpathentry kind="lib" path="lib/user/SQLLibrary/sqlitejdbc-v053-pure.jar"/>
 	<classpathentry kind="lib" path="lib/user/peasycam/peasycam.jar"/>
 	<classpathentry kind="lib" path="lib/user/controlP5/controlP5.jar"/>
+	<classpathentry kind="lib" path="lib/user/G4P/G4P.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
