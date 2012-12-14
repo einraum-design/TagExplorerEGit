@@ -82,7 +82,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		SQL = new SQLhelper(this);
 
 		mainscreen = createGraphics(width - 200, height, P3D);
-		mainscreen.smooth(4);
+		// mainscreen.smooth(4);
 		// camera
 		cam_eye = new Vec3D(mainscreen.width / 2.0f, mainscreen.height / 2.0f,
 				(mainscreen.height / 2.0f) / tan(PI * 30.0f / 180.0f));
@@ -145,7 +145,9 @@ public class TagExplorerProcessing2 extends PApplet {
 		// Writing to the depth buffer is disabled to avoid rendering
 		// artifacts due to the fact that the particles are semi-transparent
 		// but not z-sorted.
-		hint(DISABLE_DEPTH_MASK);
+//		hint(DISABLE_DEPTH_MASK);
+//		hint(mainscreen.ENABLE_ACCURATE_2D);
+//		hint(mainscreen.DISABLE_DEPTH_TEST);
 	}
 
 	// /////////// draw ////////////////////
@@ -263,10 +265,24 @@ public class TagExplorerProcessing2 extends PApplet {
 	// }
 	// }
 
+	float mainScreenYRotation = 0;
 	private void drawMainscreen(PGraphics renderer) {
 		renderer.beginDraw();
-		renderer.camera(cam_eye.x, cam_eye.y, cam_eye.z, cam_target.x,
-				cam_target.y, cam_target.z, cam_up.x, cam_up.y, cam_up.z);
+		renderer.pushMatrix();
+		
+		renderer.translate(renderer.width/2, renderer.height/2);
+		
+		//renderer.rotateY(mainScreenYRotation);
+		//renderer.translate(-50, 0, 0);
+		
+//		renderer.camera(cam_eye.x, cam_eye.y, cam_eye.z, cam_target.x,
+//				cam_target.y, cam_target.z, cam_up.x, cam_up.y, cam_up.z);
+		
+		float dist = cam_eye.z;
+		renderer.camera(dist *  sin(mainScreenYRotation), dist * cos(mainScreenYRotation), cam_target.x, 0, cam_target.y, cam_target.z, cam_up.x, cam_up.y, cam_up.z);
+		
+		
+		
 		renderer.background(0);
 
 		drawFiles(renderer);
@@ -276,12 +292,6 @@ public class TagExplorerProcessing2 extends PApplet {
 		// draw interaction
 		stroke(255, 0, 0);
 		if (startTag != null) {
-			// Vec3D mouseVec =
-			// getScreenGroundPlaneIntersection(cam.getPosition()[0],
-			// cam.getPosition()[1], cam.getPosition()[2], 0, 0, 0, 0, 1, 0,
-			// mouseX, mouseY);
-			// line(startTag.x, startTag.y,startTag.z, mouseVec.x, mouseVec.y,
-			// mouseVec.z);
 			renderer.strokeWeight(15);
 			renderer.point(startTag.x, startTag.y, startTag.z);
 			if (hoverPoint != null) {
@@ -290,7 +300,17 @@ public class TagExplorerProcessing2 extends PApplet {
 						hoverPoint.y, hoverPoint.z);
 			}
 		}
-
+//		renderer.fill(100);
+//		renderer.noStroke();
+//		renderer.alpha(10);
+////		renderer.rect(0, 0, renderer.width, renderer.height);
+//		renderer.pushMatrix();
+////		renderer.rect(0, 0, renderer.width, renderer.height);
+//		renderer.translate(0, 0, -80);
+//		renderer.rect(0, 0, renderer.width, renderer.height);
+//		renderer.popMatrix();
+		
+		renderer.popMatrix();
 		renderer.endDraw();
 		image(renderer, 0, 0);
 	}
@@ -492,6 +512,10 @@ public class TagExplorerProcessing2 extends PApplet {
 				dropParticles(physics, 250, i * dist, 0, files.get(i));
 			}
 		}
+		
+		
+		// set z position creation time
+		setZAccessTime();
 	}
 
 	private Tag getTagByID(String tableName, int id) {
@@ -555,6 +579,13 @@ public class TagExplorerProcessing2 extends PApplet {
 		fileTag.setAttributes(SQL.getBindedTagList(fileTag));
 		fileTag.updateViewName();
 	}
+	
+	void setZAccessTime(){
+		for(Tag t : showFiles){
+			Tag_File file = (Tag_File) t;
+			file.z = -timeline.mapExp(file.creation_time, 150);
+		}
+	}
 
 	public void dropParticles(VerletPhysics physics, float x, float y, float z,
 			Tag t) {
@@ -589,6 +620,15 @@ public class TagExplorerProcessing2 extends PApplet {
 			if (mouseOver(mainscreen, t, 10, 10)) {
 				startTag = t;
 			}
+		}
+	}
+	
+	
+	
+	public void mouseDragged(){
+		if(mouseOver(50, 50, 100, 100)){
+			mainScreenYRotation += 0.01;
+			System.out.println("mainScreenYRotation: " + mainScreenYRotation);
 		}
 	}
 
@@ -630,6 +670,15 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	boolean interaction = false;
 	Vec3D hoverPoint = null;
+	
+	boolean mouseOver(int x, int y, int w, int h){
+		boolean over = false;
+		if(mouseX > x - w / 2.0f && mouseX < x + w / 2.0f
+				&& mouseY > y - h / 2.0f && mouseY < y + h / 2.0f){
+			over = true;
+		}
+		return over;
+	}
 
 	boolean mouseOver(float x, float y, float z, int w, int h) {
 		boolean over = false;
