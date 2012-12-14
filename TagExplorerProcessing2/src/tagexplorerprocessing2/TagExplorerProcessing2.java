@@ -38,7 +38,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	SQLhelper SQL;
 	PFont font;
 	ControlP5 cp5_Promt;
-	ControlP5 cp5_Menu;
+	//ControlP5 cp5_Menu;
 
 	ArrayList<Tag> attributes = null;
 	ArrayList<Tag> files = null;
@@ -100,7 +100,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		// ControlP5
 		cp5_Promt = new ControlP5(this);
-		cp5_Menu = new ControlP5(this);
+		//cp5_Menu = new ControlP5(this);
 
 		// cp5_Menu.addToggle("Location").setValue(0)
 		// .setPosition(200, 0).setSize(80, 40).getCaptionLabel()
@@ -176,7 +176,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		// Promt Messages
 		if (p != null) {
-			p.showMessages();
+			p.showPromt();
 		}
 
 		// if(interaction || startTag != null){
@@ -917,7 +917,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	// nur ein Textfield erlaubt, sonst unterscheidung beim submit!
 	public void save(float value) {
-		// System.out.println("trigger save!");
+		System.out.println("trigger save!");
 		if (bSaveActive) {
 			List l = cp5_Promt.getAll();
 			for (Object o : l) {
@@ -942,7 +942,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	boolean removeController = false;
 
 	public void cancel(float value) {
-		// System.out.println("trigger cancel!");
+		System.out.println("trigger cancel!");
 		if (bCancelActive) {
 			// remove all controller
 			removeController = true;

@@ -7,7 +7,6 @@
 	<classpathentry kind="lib" path="lib/base/core/library/gluegen-rt.jar"/>
 	<classpathentry kind="lib" path="lib/base/core/library/jogl-all-natives-macosx-universal.jar"/>
 	<classpathentry kind="lib" path="lib/base/core/library/jogl-all.jar"/>
-	<classpathentry kind="lib" path="lib/user/controlP5/controlP5.jar"/>
 	<classpathentry kind="lib" path="lib/user/SQLLibrary/SQLibrary.jar"/>
 	<classpathentry kind="lib" path="lib/user/toxiclibs_p5/toxiclibs_p5.jar"/>
 	<classpathentry kind="lib" path="lib/user/toxiclibscore/toxiclibscore.jar"/>
@@ -16,5 +15,6 @@
 	<classpathentry kind="lib" path="lib/user/SQLLibrary/mysql-connector-java-3.1.14-bin.jar"/>
 	<classpathentry kind="lib" path="lib/user/SQLLibrary/sqlitejdbc-v053-pure.jar"/>
 	<classpathentry kind="lib" path="lib/user/peasycam/peasycam.jar"/>
+	<classpathentry kind="lib" path="lib/user/controlP5/controlP5.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

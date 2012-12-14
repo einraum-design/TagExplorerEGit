@@ -2,12 +2,15 @@ package tagexplorerprocessing2;
 
 import processing.core.PApplet;
 import processing.core.PFont;
+import processing.core.PGraphics;
 import controlP5.ControlP5;
 
 public class Promt {
 	PApplet p5;
 	ControlP5 cp5;
 	PFont font;
+	
+	PGraphics overlay;
 	
 	String message = "";
 	
@@ -17,6 +20,8 @@ public class Promt {
 		this.cp5 = cp5;
 		
 		font = p5.createFont("arial", 20);
+		
+		overlay = p5.createGraphics(400, 200);
 
 		
 		createButton("save", 1, 240, 100);
@@ -53,9 +58,12 @@ public class Promt {
 				.align(ControlP5.CENTER, ControlP5.CENTER);
 	}
 	
-	public void showMessages(){
-		p5.fill(150);
-		p5.text(message, 20, 180);
+	public void showPromt(){
+		overlay.background(255);
+		overlay.fill(100);
+		overlay.text(message, 20, 180);
+		
+		p5.image(overlay, 30, 30);
 	}
 
 }
