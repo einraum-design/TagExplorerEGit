@@ -1,5 +1,11 @@
 package tagexplorerprocessing2;
 
+import g4p_controls.GButton;
+import g4p_controls.GEditableTextControl;
+import g4p_controls.GEvent;
+import g4p_controls.GPanel;
+import g4p_controls.GTextField;
+
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.io.File;
@@ -38,7 +44,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	SQLhelper SQL;
 	PFont font;
 	ControlP5 cp5_Promt;
-	//ControlP5 cp5_Menu;
+	// ControlP5 cp5_Menu;
 
 	ArrayList<Tag> attributes = null;
 	ArrayList<Tag> files = null;
@@ -66,9 +72,13 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	public void setup() {
 		size(800, 400, P3D);
+		
+		font = createFont("arial", 20);
 
 		Path p = FileSystems.getDefault().getPath(
 				"/Users/manuel/Documents/Testumgebung/Test");
+		
+		// FileSystem Watcher
 		try {
 			watcher = new WatchDir(this, p, true);
 			watcher.start();
@@ -76,13 +86,13 @@ public class TagExplorerProcessing2 extends PApplet {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		font = createFont("arial", 20);
-
+		
+		// SQL HELPER
 		SQL = new SQLhelper(this);
 
 		mainscreen = createGraphics(width - 200, height, P3D);
 		// mainscreen.smooth(4);
+		
 		// camera
 		cam_eye = new Vec3D(mainscreen.width / 2.0f, mainscreen.height / 2.0f,
 				(mainscreen.height / 2.0f) / tan(PI * 30.0f / 180.0f));
@@ -93,6 +103,8 @@ public class TagExplorerProcessing2 extends PApplet {
 				cam_target.y, cam_target.z, cam_up.x, cam_up.y, cam_up.z);
 		// cam = new PeasyCam(this, width / 2, height / 2, 0, 100);
 
+		
+		// TIMELINE
 		timeline = new Timeline(this);
 
 		// Standartuser: …ffentlich
@@ -100,14 +112,12 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		// ControlP5
 		cp5_Promt = new ControlP5(this);
-		//cp5_Menu = new ControlP5(this);
+		// cp5_Menu = new ControlP5(this);
 
 		// cp5_Menu.addToggle("Location").setValue(0)
 		// .setPosition(200, 0).setSize(80, 40).getCaptionLabel()
 		// .align(ControlP5.CENTER, ControlP5.CENTER);
 
-		// User registration
-		// user = (Tag_User) SQL.queryTagList("users").get(0);
 
 		// toxi VerletPhysics
 		physics = new VerletPhysics();
@@ -145,15 +155,16 @@ public class TagExplorerProcessing2 extends PApplet {
 		// Writing to the depth buffer is disabled to avoid rendering
 		// artifacts due to the fact that the particles are semi-transparent
 		// but not z-sorted.
-//		hint(DISABLE_DEPTH_MASK);
-//		hint(mainscreen.ENABLE_ACCURATE_2D);
-//		hint(mainscreen.DISABLE_DEPTH_TEST);
+		// hint(DISABLE_DEPTH_MASK);
+		// hint(mainscreen.ENABLE_ACCURATE_2D);
+		// hint(mainscreen.DISABLE_DEPTH_TEST);
 	}
 
 	// /////////// draw ////////////////////
 
 	public void draw() {
-
+		
+		// control p5
 		// removeController by Button cancel
 		if (removeController) {
 			removeController();
@@ -266,23 +277,24 @@ public class TagExplorerProcessing2 extends PApplet {
 	// }
 
 	float mainScreenYRotation = 0;
+
 	private void drawMainscreen(PGraphics renderer) {
 		renderer.beginDraw();
 		renderer.pushMatrix();
-		
-		renderer.translate(renderer.width/2, renderer.height/2);
-		
-		//renderer.rotateY(mainScreenYRotation);
-		//renderer.translate(-50, 0, 0);
-		
-//		renderer.camera(cam_eye.x, cam_eye.y, cam_eye.z, cam_target.x,
-//				cam_target.y, cam_target.z, cam_up.x, cam_up.y, cam_up.z);
-		
-		float dist = cam_eye.z;
-		renderer.camera(dist *  sin(mainScreenYRotation), dist * cos(mainScreenYRotation), cam_target.x, 0, cam_target.y, cam_target.z, cam_up.x, cam_up.y, cam_up.z);
-		
-		
-		
+
+		renderer.translate(renderer.width / 2, renderer.height / 2);
+
+		// renderer.rotateY(mainScreenYRotation);
+		// renderer.translate(-50, 0, 0);
+
+		renderer.camera(cam_eye.x, cam_eye.y, cam_eye.z, cam_target.x,
+				cam_target.y, cam_target.z, cam_up.x, cam_up.y, cam_up.z);
+
+		// float dist = cam_eye.z;
+		// renderer.camera(dist * sin(mainScreenYRotation), dist *
+		// cos(mainScreenYRotation), cam_target.x, 0, cam_target.y,
+		// cam_target.z, cam_up.x, cam_up.y, cam_up.z);
+
 		renderer.background(0);
 
 		drawFiles(renderer);
@@ -300,16 +312,16 @@ public class TagExplorerProcessing2 extends PApplet {
 						hoverPoint.y, hoverPoint.z);
 			}
 		}
-//		renderer.fill(100);
-//		renderer.noStroke();
-//		renderer.alpha(10);
-////		renderer.rect(0, 0, renderer.width, renderer.height);
-//		renderer.pushMatrix();
-////		renderer.rect(0, 0, renderer.width, renderer.height);
-//		renderer.translate(0, 0, -80);
-//		renderer.rect(0, 0, renderer.width, renderer.height);
-//		renderer.popMatrix();
-		
+		// renderer.fill(100);
+		// renderer.noStroke();
+		// renderer.alpha(10);
+		// // renderer.rect(0, 0, renderer.width, renderer.height);
+		// renderer.pushMatrix();
+		// // renderer.rect(0, 0, renderer.width, renderer.height);
+		// renderer.translate(0, 0, -80);
+		// renderer.rect(0, 0, renderer.width, renderer.height);
+		// renderer.popMatrix();
+
 		renderer.popMatrix();
 		renderer.endDraw();
 		image(renderer, 0, 0);
@@ -417,9 +429,9 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		// filter files
 		if (filters.size() > 0) {
-//			ArrayList<Tag> files = SQL.queryTagListFiltered("files",
-//					filters.get(0));
-//			showFiles = files;
+			// ArrayList<Tag> files = SQL.queryTagListFiltered("files",
+			// filters.get(0));
+			// showFiles = files;
 			// showFiles = SQL.queryTagListFiltered("files", filters);
 			showFiles = SQL.queryTagListFiltered("files", filters);
 		} else {
@@ -429,15 +441,15 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		oldest_File = (Tag_File) getOldestTagFile(showFiles);
 
-		if(oldest_File != null){
+		if (oldest_File != null) {
 			timeline.setWertebereich(oldest_File.creation_time);
-		} else{
+		} else {
 			timeline.oldest = null;
 		}
 
 		setParticlesPosition(filePhysics, showFiles);
 	}
-	
+
 	public void updateTags() {
 		ArrayList<Tag> tags = new ArrayList<Tag>();
 
@@ -479,7 +491,8 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 	}
 
-	private void setParticlesPosition(VerletPhysics physics, ArrayList<Tag> files) {
+	private void setParticlesPosition(VerletPhysics physics,
+			ArrayList<Tag> files) {
 		// drop Particles
 		// set Position
 		physics.particles.clear();
@@ -512,8 +525,7 @@ public class TagExplorerProcessing2 extends PApplet {
 				dropParticles(physics, 250, i * dist, 0, files.get(i));
 			}
 		}
-		
-		
+
 		// set z position creation time
 		setZAccessTime();
 	}
@@ -579,9 +591,9 @@ public class TagExplorerProcessing2 extends PApplet {
 		fileTag.setAttributes(SQL.getBindedTagList(fileTag));
 		fileTag.updateViewName();
 	}
-	
-	void setZAccessTime(){
-		for(Tag t : showFiles){
+
+	void setZAccessTime() {
+		for (Tag t : showFiles) {
 			Tag_File file = (Tag_File) t;
 			file.z = -timeline.mapExp(file.creation_time, 150);
 		}
@@ -621,12 +633,27 @@ public class TagExplorerProcessing2 extends PApplet {
 				startTag = t;
 			}
 		}
+		
+		if (b != null) {
+			println("dispose");
+			//PromtNewFile pro = promts.get(0);
+			b.dispose();
+			b = null;
+			
+
+		//	pro = null;
+//			pro.markForDisposal();
+			// promts.remove(p);
+		}
 	}
 	
-	
-	
-	public void mouseDragged(){
-		if(mouseOver(50, 50, 100, 100)){
+	public void handleTextEvents(GEditableTextControl textcontrol, GEvent event) { 
+		println("textEvent");
+	}
+
+
+	public void mouseDragged() {
+		if (mouseOver(50, 50, 100, 100)) {
 			mainScreenYRotation += 0.01;
 			System.out.println("mainScreenYRotation: " + mainScreenYRotation);
 		}
@@ -657,6 +684,13 @@ public class TagExplorerProcessing2 extends PApplet {
 			}
 		}
 		startTag = null;
+		
+//		if(b != null){
+//			b = null;
+//			b.markForDisposal();
+//			
+////			b.dispose();
+//		}
 	}
 
 	// boolean mouseOver(float x, float y, int w, int h) {
@@ -670,11 +704,11 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	boolean interaction = false;
 	Vec3D hoverPoint = null;
-	
-	boolean mouseOver(int x, int y, int w, int h){
+
+	boolean mouseOver(int x, int y, int w, int h) {
 		boolean over = false;
-		if(mouseX > x - w / 2.0f && mouseX < x + w / 2.0f
-				&& mouseY > y - h / 2.0f && mouseY < y + h / 2.0f){
+		if (mouseX > x - w / 2.0f && mouseX < x + w / 2.0f
+				&& mouseY > y - h / 2.0f && mouseY < y + h / 2.0f) {
 			over = true;
 		}
 		return over;
@@ -764,8 +798,10 @@ public class TagExplorerProcessing2 extends PApplet {
 			break;
 		case 'F':
 			filters.clear();
-			System.out.println(attributes.get(0).name + " " + attributes.get(0).type);
-			System.out.println(attributes.get(1).name + " " + attributes.get(1).type);
+			System.out.println(attributes.get(0).name + " "
+					+ attributes.get(0).type);
+			System.out.println(attributes.get(1).name + " "
+					+ attributes.get(1).type);
 			filters.add(new Filter(attributes.get(0), true));
 			filters.add(new Filter(attributes.get(1), false));
 
@@ -773,11 +809,30 @@ public class TagExplorerProcessing2 extends PApplet {
 			updateTags();
 			updateSprings();
 			break;
-		// case 'C':
-		// cam.setActive(!cam.isActive());
-		// break;
+		case 'C':
+			b = new GTextField(this, 0, 0, 100, 100);
+//			PromtNewFile p = new PromtNewFile(this);
+//			promts.add(p);
+			break;
+		case 'D':
+			
+			
+//			if (promts.size() > 0) {
+//				println("dispose");
+//				PromtNewFile pro = promts.get(0);
+//				pro.dispose();
+//				pro = null;
+//				
+//
+//			//	pro = null;
+////				pro.markForDisposal();
+//				// promts.remove(p);
+//			}
+			break;
 		}
 	}
+	GTextField b = null;
+	ArrayList<PromtNewFile> promts = new ArrayList<PromtNewFile>();
 
 	// ///////////// Tag handling /////////////////////
 
@@ -892,6 +947,28 @@ public class TagExplorerProcessing2 extends PApplet {
 			updateSprings();
 
 			removeController();
+		}
+	}
+
+	public void handleButtonEvents(GButton button, GEvent event) {
+		println("buttonEvent: " + event.toString());
+
+		for (PromtNewFile p : promts) {
+
+			if (button == p.btnCancel) {
+
+				return;
+			}
+		}
+	}
+
+	public void handlePanelEvents(GPanel panel, GEvent event) {
+		println("panelEvent: " + event.toString());
+		for (PromtNewFile p : promts) {
+
+			if (panel == p) {
+				println("hello p");
+			}
 		}
 	}
 
