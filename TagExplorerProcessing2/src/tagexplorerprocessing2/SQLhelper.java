@@ -30,8 +30,7 @@ public class SQLhelper {
 		System.out.println("SQL connection: " + checkConnection());
 	}
 
-	public SQLhelper(TagExplorerProcessing2 p5, String user, String pass,
-			String database, String host) {
+	public SQLhelper(TagExplorerProcessing2 p5, String user, String pass, String database, String host) {
 		this.user = user;
 		this.pass = pass;
 		this.database = database;
@@ -67,8 +66,7 @@ public class SQLhelper {
 		if (checkConnection()) {
 			msql.query(query);
 			while (msql.next()) {
-				tableInfo.add(new SQLTableInfo(msql.getString(1), msql
-						.getString(2)));
+				tableInfo.add(new SQLTableInfo(msql.getString(1), msql.getString(2)));
 				// System.out.println(msql.getString(1)); //COLUMN_NAME
 				// System.out.println(msql.getString(2)); //DATA_TYPE
 			}
@@ -107,24 +105,12 @@ public class SQLhelper {
 
 		if (checkConnection()) {
 
-			String selectString = "SELECT "
-					+ tableName
-					+ ".* FROM "
-					+ tableName
-					+ " INNER JOIN tag_binding ON ("
-					+ tableName
-					+ ".ID = tag_binding.file_ID) WHERE tag_binding.type LIKE '"
-					+ filter.tag.type + "' AND tag_binding.tag_ID LIKE '"
-					+ filter.tag.id + "'";
-			String selectStringId = "SELECT "
-					+ tableName
-					+ ".ID FROM "
-					+ tableName
-					+ " INNER JOIN tag_binding ON ("
-					+ tableName
-					+ ".ID = tag_binding.file_ID) WHERE tag_binding.type LIKE '"
-					+ filter.tag.type + "' AND tag_binding.tag_ID LIKE '"
-					+ filter.tag.id + "'";
+			String selectString = "SELECT " + tableName + ".* FROM " + tableName + " INNER JOIN tag_binding ON ("
+					+ tableName + ".ID = tag_binding.file_ID) WHERE tag_binding.type LIKE '" + filter.tag.type
+					+ "' AND tag_binding.tag_ID LIKE '" + filter.tag.id + "'";
+			String selectStringId = "SELECT " + tableName + ".ID FROM " + tableName + " INNER JOIN tag_binding ON ("
+					+ tableName + ".ID = tag_binding.file_ID) WHERE tag_binding.type LIKE '" + filter.tag.type
+					+ "' AND tag_binding.tag_ID LIKE '" + filter.tag.id + "'";
 
 			if (filter.inOut) {
 				msql.query(selectString);
@@ -132,8 +118,7 @@ public class SQLhelper {
 				// Funktioniert noch nicht richtig! Es werden nur Dateien
 				// gewählt, die ein tag binding mit dem filtertyp haben. andere
 				// werden ignoriert
-				msql.query("SELECT " + tableName + ".* FROM " + tableName
-						+ " WHERE " + tableName + ".ID NOT IN ("
+				msql.query("SELECT " + tableName + ".* FROM " + tableName + " WHERE " + tableName + ".ID NOT IN ("
 						+ selectStringId + ")");
 				// + "WHERE tag_binding.type NOT LIKE '" + filter.tag.type +
 				// "' OR (tag_binding.type LIKE '" + filter.tag.type +
@@ -158,15 +143,9 @@ public class SQLhelper {
 
 		if (checkConnection()) {
 
-			String selectStringId = "SELECT "
-					+ tableName
-					+ ".ID FROM "
-					+ tableName
-					+ " INNER JOIN tag_binding ON ("
-					+ tableName
-					+ ".ID = tag_binding.file_ID) WHERE tag_binding.type LIKE '"
-					+ filter.tag.type + "' AND tag_binding.tag_ID LIKE '"
-					+ filter.tag.id + "'";
+			String selectStringId = "SELECT " + tableName + ".ID FROM " + tableName + " INNER JOIN tag_binding ON ("
+					+ tableName + ".ID = tag_binding.file_ID) WHERE tag_binding.type LIKE '" + filter.tag.type
+					+ "' AND tag_binding.tag_ID LIKE '" + filter.tag.id + "'";
 
 			System.out.println(selectStringId);
 			msql.query(selectStringId);
@@ -181,8 +160,7 @@ public class SQLhelper {
 	}
 
 	// Filter List on files IDs der selected und nicht selected werden ge-merged
-	public ArrayList<Tag> queryTagListFiltered(String tableName,
-			ArrayList<Filter> filterList) {
+	public ArrayList<Tag> queryTagListFiltered(String tableName, ArrayList<Filter> filterList) {
 
 		ArrayList<Tag> tags = new ArrayList<Tag>();
 
@@ -198,11 +176,11 @@ public class SQLhelper {
 					deselected.addAll(queryIDsFiltered(tableName, f));
 				}
 			}
-			
+
 			// entferne die deselected
 			for (int i : deselected) {
 				selected.remove(i);
-			}			
+			}
 
 			String query = "SELECT * FROM " + tableName + " WHERE ";
 
@@ -215,9 +193,9 @@ public class SQLhelper {
 				query += "ID = '" + id + "'";
 				first = false;
 			}
-			
+
 			msql.query(query);
-			
+
 			// get Tags
 			while (msql.next()) {
 				Tag t = getSpecificTags(tableName);
@@ -228,7 +206,7 @@ public class SQLhelper {
 		} else {
 			System.out.println("not Connected queryTagListFiltered()");
 		}
-		
+
 		System.out.println("return " + tags.size() + " tags from queryTagListFiltered");
 		return tags;
 	}
@@ -239,8 +217,7 @@ public class SQLhelper {
 
 		if (checkConnection()) {
 
-			msql.query("SELECT type, tag_ID FROM tag_binding WHERE file_ID = "
-					+ file.id);
+			msql.query("SELECT type, tag_ID FROM tag_binding WHERE file_ID = " + file.id);
 			ArrayList<String> types = new ArrayList<String>();
 			ArrayList<Integer> tagIds = new ArrayList<Integer>();
 			while (msql.next()) {
@@ -249,8 +226,7 @@ public class SQLhelper {
 			}
 
 			for (int i = 0; i < types.size(); i++) {
-				msql.query("SELECT * FROM " + types.get(i) + " WHERE ID = "
-						+ tagIds.get(i));
+				msql.query("SELECT * FROM " + types.get(i) + " WHERE ID = " + tagIds.get(i));
 				while (msql.next()) {
 					Tag t = getSpecificTags(types.get(i));
 					if (t != null) {
@@ -265,14 +241,42 @@ public class SQLhelper {
 
 		return tagList;
 	}
+	
+	// alle verknüpften Files finden
+	public ArrayList<Tag_File> getBindedFileList(Tag_File file) {
+		ArrayList<Tag_File> fileList = new ArrayList<Tag_File>();
+
+		if (checkConnection()) {
+
+			msql.query("SELECT file2_ID FROM file_binding WHERE file1_ID = " + file.id);
+			ArrayList<Integer> fileIds = new ArrayList<Integer>();
+			while (msql.next()) {
+				fileIds.add(msql.getInt("file2_ID"));
+			}
+
+			for (int i = 0; i < fileIds.size(); i++) {
+				msql.query("SELECT * FROM files WHERE ID = " + fileIds.get(i));
+				while (msql.next()) {
+					Tag_File t = (Tag_File) getSpecificTags("files");
+					if (t != null) {
+						fileList.add(t);
+					}
+				}
+			}
+
+		} else {
+			System.out.println("not Connected getBindedTagList()");
+		}
+
+		return fileList;
+	}
 
 	// not finished, get Ids and types
 	public ArrayList<Tag> queryConnectedTagList(String tableName, Tag_File t) {
 		ArrayList<Tag> tags = new ArrayList<Tag>();
 
 		if (checkConnection()) {
-			msql.query("SELECT tag_ID, type FROM " + tableName
-					+ " WHERE file_ID = " + t.id);
+			msql.query("SELECT tag_ID, type FROM " + tableName + " WHERE file_ID = " + t.id);
 
 			ArrayList tagIds = new ArrayList();
 			while (msql.next()) {
@@ -289,8 +293,7 @@ public class SQLhelper {
 	public Tag createDbTag(String tableName, String s) {
 		// keywords or projects
 		if (tableName.equals("keywords") || tableName.equals("projects")) {
-			msql.execute("INSERT INTO " + tableName + " (name) VALUES (\"" + s
-					+ "\")");
+			msql.execute("INSERT INTO " + tableName + " (name) VALUES (\"" + s + "\")");
 			System.out.println("Keyword " + s + " registered");
 			return getLastCreatedTag(tableName);
 		}
@@ -298,9 +301,8 @@ public class SQLhelper {
 		else if (tableName.equals("locations")) {
 			String locationName = s;
 			String coordinates = "46.39342, 2.2134";
-			msql.execute("INSERT INTO " + tableName
-					+ " (name, coordinates) VALUES (\"" + locationName
-					+ "\", \" " + coordinates + "\")");
+			msql.execute("INSERT INTO " + tableName + " (name, coordinates) VALUES (\"" + locationName + "\", \" "
+					+ coordinates + "\")");
 			System.out.println("Location " + locationName + " registered");
 			return getLastCreatedTag(tableName);
 		}
@@ -312,20 +314,14 @@ public class SQLhelper {
 				attr = Files.readAttributes(file, BasicFileAttributes.class);
 
 				if (!attr.isSymbolicLink()) {
-					msql.execute("INSERT INTO "
-							+ tableName
+					msql.execute("INSERT INTO " + tableName
 							+ " (name, path, size, creation_time, expiration_time) VALUES (\""
-							+ file.getFileName().toString().trim() + "\", \""
-							+ s.trim() + "\", \"" + attr.size() + "\", \""
-							+ new Timestamp(attr.creationTime().toMillis())
-							+ "\", \""
-							+ new Timestamp(attr.lastAccessTime().toMillis())
-							+ "\")");
-					System.out.println("File " + file.getFileName().toString()
-							+ " registered in DB");
+							+ file.getFileName().toString().trim() + "\", \"" + s.trim() + "\", \"" + attr.size()
+							+ "\", \"" + new Timestamp(attr.creationTime().toMillis()) + "\", \""
+							+ new Timestamp(attr.lastAccessTime().toMillis()) + "\")");
+					System.out.println("File " + file.getFileName().toString() + " registered in DB");
 				} else {
-					System.out.println("File " + file.getFileName().toString()
-							+ " ist keine Datei, sondern ein Link!");
+					System.out.println("File " + file.getFileName().toString() + " ist keine Datei, sondern ein Link!");
 				}
 				return getLastCreatedTag(tableName);
 			} catch (IOException e) {
@@ -333,8 +329,7 @@ public class SQLhelper {
 				System.out.println("File not saved");
 			}
 		} else {
-			System.out.println(tableName
-					+ "wrong or not yet in SQL.createDBTag");
+			System.out.println(tableName + "wrong or not yet in SQL.createDBTag");
 		}
 		return null;
 	}
@@ -343,29 +338,43 @@ public class SQLhelper {
 	public void bindTag(Tag_File file, Tag tag) {
 		if (checkConnection()) {
 			// files
-			msql.query("SELECT COUNT(*) FROM tag_binding WHERE file_ID = \""
-					+ file.id + "\" AND type = \"" + tag.type
+			msql.query("SELECT COUNT(*) FROM tag_binding WHERE file_ID = \"" + file.id + "\" AND type = \"" + tag.type
 					+ "\" AND tag_ID = \"" + tag.id + "\"");
 			msql.next();
 			// System.out.println("number of rows: " + msql.getInt(1));
 
 			if (msql.getInt(1) == 0) {
 
-				msql.execute("INSERT INTO tag_binding (file_ID, type, tag_ID, time) VALUES (\""
-						+ file.id
-						+ "\", \""
-						+ tag.type
-						+ "\", \""
-						+ tag.id
-						+ "\", \""
-						+ new Timestamp(System.currentTimeMillis())
-						+ "\")");
+				msql.execute("INSERT INTO tag_binding (file_ID, type, tag_ID, time) VALUES (\"" + file.id + "\", \""
+						+ tag.type + "\", \"" + tag.id + "\", \"" + new Timestamp(System.currentTimeMillis()) + "\")");
 				System.out.println("Added Tag Binding");
 			} else {
 				System.out.println("File-Tag binding exists already");
 			}
 		}
 	}
+
+	public void bindFile(Tag_File file1, Tag_File file2) {
+		if (checkConnection()) {
+
+			// file1 older than file2!
+			msql.query("SELECT COUNT(*) FROM file_binding WHERE file1_ID = \"" + file1.id + "\" AND file2_ID = \""
+					+ file2.id + "\"");
+
+			msql.next();
+
+			if (msql.getInt(1) == 0) {
+
+				msql.execute("INSERT INTO file_binding (file1_ID, file2_ID, time) VALUES (\"" + file1.id + "\", \""
+						+ file2.id + "\", \"" + new Timestamp(System.currentTimeMillis()) + "\")");
+				System.out.println("Added File-File Binding");
+			} else {
+				System.out.println("File-File binding exists already");
+			}
+		}
+
+	}
+
 
 	public boolean inDataBase(String tableName, String theText) {
 		boolean isInDB = false;
@@ -374,21 +383,18 @@ public class SQLhelper {
 
 		for (Tag t : tagList) {
 			if (t instanceof Tag_Location) {
-				if (t.name.trim().toLowerCase()
-						.equals(theText.trim().toLowerCase())) {
+				if (t.name.trim().toLowerCase().equals(theText.trim().toLowerCase())) {
 					isInDB = true;
 					return isInDB;
 				}
 			} else if (t instanceof Tag_File) {
 				// path!
-				if (((Tag_File) t).path.trim().toLowerCase()
-						.equals(theText.trim().toLowerCase())) {
+				if (((Tag_File) t).path.trim().toLowerCase().equals(theText.trim().toLowerCase())) {
 					isInDB = true;
 					return isInDB;
 				}
 			} else if (t instanceof Tag) {
-				if (t.name.trim().toLowerCase()
-						.equals(theText.trim().toLowerCase())) {
+				if (t.name.trim().toLowerCase().equals(theText.trim().toLowerCase())) {
 					isInDB = true;
 					return isInDB;
 				}
@@ -409,8 +415,7 @@ public class SQLhelper {
 		msql.next();
 		int fileId = msql.getInt(1);
 
-		msql.query("SELECT * FROM " + tableName + " WHERE ID = \"" + fileId
-				+ "\"");
+		msql.query("SELECT * FROM " + tableName + " WHERE ID = \"" + fileId + "\"");
 		msql.next();
 
 		tag = getSpecificTags(tableName);
@@ -427,8 +432,7 @@ public class SQLhelper {
 		// zurück
 		if (tableName != "files" && p5.attributes != null) {
 			for (Tag _tag : p5.attributes) {
-				if (tableName.trim().equals(_tag.type.trim())
-						&& msql.getInt("ID") == _tag.id) {
+				if (tableName.trim().equals(_tag.type.trim()) && msql.getInt("ID") == _tag.id) {
 					// System.out.println("übergabe " + _tag.name + " "
 					// + _tag.type);
 					return _tag;
@@ -439,8 +443,7 @@ public class SQLhelper {
 		// zurück
 		if (tableName == "files" && p5.files != null) {
 			for (Tag _tag : p5.files) {
-				if (tableName.trim().equals(_tag.type.trim())
-						&& msql.getInt("ID") == _tag.id) {
+				if (tableName.trim().equals(_tag.type.trim()) && msql.getInt("ID") == _tag.id) {
 					// System.out.println("übergabe " + _tag.name + " "
 					// + _tag.type);
 					return _tag;
@@ -450,24 +453,23 @@ public class SQLhelper {
 
 		// ansonsten erstellen neuen Tag
 		if (tableName.equals("files")) {
-			Tag tag = new Tag_File(tableName, msql.getInt("ID"),
-					msql.getString("name"), msql.getFloat("size"),
-					msql.getString("path"), msql.getTimestamp("creation_time"),
-					msql.getTimestamp("expiration_time"),
-					msql.getInt("parent_ID"), msql.getInt("origin_ID"),
-					msql.getInt("score"));
+			Tag_File tag = new Tag_File(tableName, msql.getInt("ID"), msql.getString("name"), msql.getFloat("size"),
+					msql.getString("path"), msql.getTimestamp("creation_time"), msql.getTimestamp("expiration_time"),
+					msql.getInt("parent_ID"), msql.getInt("origin_ID"), msql.getInt("score"));
+
+			if (msql.getTimestamp("delete_time") != null) {
+				tag.setDeleteTime(msql.getTimestamp("delete_time"));
+			}
 			t = tag;
 		} else if (tableName.equals("locations")) {
-			Tag tag = new Tag_Location(tableName, msql.getInt("ID"),
-					msql.getString("name"), msql.getString("coordinates"));
+			Tag tag = new Tag_Location(tableName, msql.getInt("ID"), msql.getString("name"),
+					msql.getString("coordinates"));
 			t = tag;
 		} else if (tableName.equals("users")) {
-			Tag_User tag = new Tag_User("users", msql.getInt("ID"),
-					msql.getString("name"), msql.getString("password"));
+			Tag_User tag = new Tag_User("users", msql.getInt("ID"), msql.getString("name"), msql.getString("password"));
 			t = tag;
 		} else if (tableName.equals("projects") || tableName.equals("keywords")) {
-			Tag tag = new Tag(tableName, msql.getInt("ID"),
-					msql.getString("name"));
+			Tag tag = new Tag(tableName, msql.getInt("ID"), msql.getString("name"));
 			t = tag;
 		} else {
 			System.out.println(tableName + " not yet Listed in queryTagList");
@@ -478,8 +480,7 @@ public class SQLhelper {
 
 	public void setDBDeletTime(Tag_File file) {
 		if (checkConnection()) {
-			String s = "UPDATE files SET delete_time = '" + file.delete_time
-					+ "' WHERE ID = " + file.id;
+			String s = "UPDATE files SET delete_time = '" + file.delete_time + "' WHERE ID = " + file.id;
 			msql.execute(s);
 		} else {
 			System.out.println("not Connected setDBDeletTime()");
@@ -488,8 +489,7 @@ public class SQLhelper {
 
 	public void setDBOrigin(Tag_File file) {
 		if (checkConnection()) {
-			String s = "UPDATE files SET origin_ID = '" + file.origin_ID
-					+ "' WHERE ID = " + file.id;
+			String s = "UPDATE files SET origin_ID = '" + file.origin_ID + "' WHERE ID = " + file.id;
 			msql.execute(s);
 		} else {
 			System.out.println("not Connected setDBOrigin()");
@@ -498,8 +498,7 @@ public class SQLhelper {
 
 	public void setDBParent(Tag_File file) {
 		if (checkConnection()) {
-			String s = "UPDATE files SET parent_ID = '" + file.parent_ID
-					+ "' WHERE ID = " + file.id;
+			String s = "UPDATE files SET parent_ID = '" + file.parent_ID + "' WHERE ID = " + file.id;
 			msql.execute(s);
 		} else {
 			System.out.println("not Connected setDBParent()");

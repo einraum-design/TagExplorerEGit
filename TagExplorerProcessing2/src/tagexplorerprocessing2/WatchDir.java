@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import tagexplorerprocessing2.Connection.Type;
+
 public class WatchDir extends Thread {
 
 	private final WatchService watcher;
@@ -219,7 +221,7 @@ public class WatchDir extends Thread {
 			}
 
 			// update File
-			p5.updateFileTags(file);
+			p5.updateFileTagBinding(file);
 			p5.files.add(file);
 			p5.updateShowFiles();
 			p5.updateSprings();
@@ -245,13 +247,17 @@ public class WatchDir extends Thread {
 		
 		Tag_File parent = getParent(file);
 		
-		System.out.println("get parent: " + parent.name + " " + parent.attributes.toString() + " " + parent.id);
-		for (Tag t : parent.attributes) {
+		System.out.println("get parent: " + parent.name + " " + parent.attributeBindings.toString() + " " + parent.id);
+		for (Tag t : parent.attributeBindings) {
 			SQL.bindTag(file, t);
 		}
 		
+		SQL.bindFile(parent, file);
+		parent.setFileBinding(file);
 		
-		file.setAttributes(SQL.getBindedTagList(file));
+		
+		
+		file.setAttributeBindings(SQL.getBindedTagList(file));
 		file.updateViewName();
 
 		file.parent_ID = parent.id;
@@ -279,7 +285,7 @@ public class WatchDir extends Thread {
 			}
 
 			// update File
-			file.setAttributes(SQL.getBindedTagList(file));
+			file.setAttributeBindings(SQL.getBindedTagList(file));
 			file.updateViewName();
 			p5.files.add(file);
 			p5.updateShowFiles();
@@ -321,7 +327,7 @@ public class WatchDir extends Thread {
 
 			if (file.path.equals(path.toString())) {
 				//System.out.println("file.name: " + file.name);
-				file.setDeletTime(new Timestamp(System.currentTimeMillis()));
+				file.setDeleteTime(new Timestamp(System.currentTimeMillis()));
 				SQL.setDBDeletTime(file);
 			}
 

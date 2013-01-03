@@ -15,7 +15,8 @@ public class Tag_File extends Tag {
 		int origin_ID = 0;
 		int score;
 		
-		ArrayList<Tag> attributes = new ArrayList<Tag>();
+		ArrayList<Tag> attributeBindings = new ArrayList<Tag>();
+		ArrayList<Tag_File> fileBindings = new ArrayList<Tag_File>();
 		
 		public String viewName;
 
@@ -35,18 +36,25 @@ public class Tag_File extends Tag {
 			this.viewName = name;
 		}
 		
-		public void setDeletTime(Timestamp time){
+		public void setDeleteTime(Timestamp time){
 			this.delete_time = time;
 		}
 		
-		public void setAttributes(ArrayList<Tag> attributes){
-			this.attributes = attributes;
+		public void setAttributeBindings(ArrayList<Tag> attributes){
+			this.attributeBindings = attributes;
+		}
+		
+		public void setFileBindings(ArrayList<Tag_File> files){
+			this.fileBindings = files;
+		}
+		public void setFileBinding(Tag_File file){
+			this.fileBindings.add(file);
 		}
 		
 		public void updateViewName(){
 			String anhang = "";
 			
-			for(Tag t : attributes){
+			for(Tag t : attributeBindings){
 				anhang += ", " + t.type + ": " +  t.name;
 			}
 			
