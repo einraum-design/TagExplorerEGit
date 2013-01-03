@@ -9,6 +9,8 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.TreeSet;
 
+import tagexplorerprocessing2.Connection.Type;
+
 import de.bezier.data.sql.MySQL;
 
 public class SQLhelper {
@@ -243,15 +245,19 @@ public class SQLhelper {
 	}
 	
 	// alle verknüpften Files finden
-	public ArrayList<Tag_File> getBindedFileList(Tag_File file) {
+	public ArrayList<Tag_File> getBindedFileList(Tag_File file, Type type) {
 		ArrayList<Tag_File> fileList = new ArrayList<Tag_File>();
 
 		if (checkConnection()) {
 
-			msql.query("SELECT file2_ID FROM file_binding WHERE file1_ID = " + file.id);
+			msql.query("SELECT file2_ID FROM file_binding WHERE type = \"" + type.toString() + "\" && file1_ID = " + file.id);
 			ArrayList<Integer> fileIds = new ArrayList<Integer>();
 			while (msql.next()) {
 				fileIds.add(msql.getInt("file2_ID"));
+			}
+			
+			for(int i : fileIds){
+				System.out.println("Version id: " + i);
 			}
 
 			for (int i = 0; i < fileIds.size(); i++) {
@@ -354,7 +360,7 @@ public class SQLhelper {
 		}
 	}
 
-	public void bindFile(Tag_File file1, Tag_File file2) {
+	public void bindFile(Tag_File file1, Tag_File file2, Type type) {
 		if (checkConnection()) {
 
 			// file1 older than file2!
@@ -365,8 +371,8 @@ public class SQLhelper {
 
 			if (msql.getInt(1) == 0) {
 
-				msql.execute("INSERT INTO file_binding (file1_ID, file2_ID, time) VALUES (\"" + file1.id + "\", \""
-						+ file2.id + "\", \"" + new Timestamp(System.currentTimeMillis()) + "\")");
+				msql.execute("INSERT INTO file_binding (file1_ID, file2_ID, type, time) VALUES (\"" + file1.id + "\", \""
+						+ file2.id + "\", \"" + type.toString() + "\", \"" + new Timestamp(System.currentTimeMillis()) + "\")");
 				System.out.println("Added File-File Binding");
 			} else {
 				System.out.println("File-File binding exists already");

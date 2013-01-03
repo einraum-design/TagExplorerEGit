@@ -252,8 +252,8 @@ public class WatchDir extends Thread {
 			SQL.bindTag(file, t);
 		}
 		
-		SQL.bindFile(parent, file);
-		parent.setFileBinding(file);
+		SQL.bindFile(parent, file, Type.VERSION);
+		parent.setVersionBinding(file);
 		
 		
 		

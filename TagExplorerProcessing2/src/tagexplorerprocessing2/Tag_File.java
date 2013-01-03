@@ -17,6 +17,7 @@ public class Tag_File extends Tag {
 		
 		ArrayList<Tag> attributeBindings = new ArrayList<Tag>();
 		ArrayList<Tag_File> fileBindings = new ArrayList<Tag_File>();
+		ArrayList<Tag_File> versionBindings = new ArrayList<Tag_File>();
 		
 		public String viewName;
 
@@ -47,9 +48,15 @@ public class Tag_File extends Tag {
 		public void setFileBindings(ArrayList<Tag_File> files){
 			this.fileBindings = files;
 		}
-		public void setFileBinding(Tag_File file){
-			this.fileBindings.add(file);
+		
+		public void setVersionBindings(ArrayList<Tag_File> files){
+			this.versionBindings = files;
 		}
+		
+		public void setVersionBinding(Tag_File file){
+			this.versionBindings.add(file);
+		}
+
 		
 		public void updateViewName(){
 			String anhang = "";

@@ -333,26 +333,52 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	public void drawSprings(PGraphics renderer) {
 		PShape shape = createShape(GROUP);
-		
+
 		for (int i = 0; i < physics.springs.size(); i++) {
-			VerletSpring sp = physics.springs.get(i);
-			
-			shape.addChild(createArc(sp.a, sp.b));
-			
-//			renderer.stroke(255);
-//			renderer.strokeWeight(1);
-//			renderer.line(sp.a.x, sp.a.y, sp.a.z, sp.b.x, sp.b.y, sp.b.z);
+			Connection sp = (Connection) physics.springs.get(i);
+
+			PShape s = createArc(sp.a, sp.b);
+
+			switch (sp.type) {
+			case VERSION:
+				s.stroke(255, 0, 0);
+				break;
+			case FILEBINDING:
+				s.stroke(0, 255, 0);
+				break;
+			case TAGBINDING:
+				s.stroke(0, 0, 255);
+				break;
+			}
+
+			shape.addChild(s);
+
+			// renderer.stroke(255);
+			// renderer.strokeWeight(1);
+			// renderer.line(sp.a.x, sp.a.y, sp.a.z, sp.b.x, sp.b.y, sp.b.z);
 		}
 
-		for (int i = 0; i < filePhysics.springs.size(); i++) {
-			VerletSpring sp = filePhysics.springs.get(i);
-			
-			shape.addChild(createArc(sp.a, sp.b));
-			
-//			renderer.stroke(0, 255, 0);
-//			renderer.strokeWeight(1);
-//			renderer.line(sp.a.x, sp.a.y, sp.a.z, sp.b.x, sp.b.y, sp.b.z);
-		}
+		// filePhysics hat keine Springs
+		// for (int i = 0; i < filePhysics.springs.size(); i++) {
+		// Connection sp = (Connection) filePhysics.springs.get(i);
+		//
+		// PShape s = createArc(sp.a, sp.b);
+		//
+		// switch (sp.type) {
+		// case VERSION:
+		// s.stroke(255, 255, 0);
+		// break;
+		// case FILEBINDING:
+		// s.stroke(0, 255, 255);
+		// break;
+		// case TAGBINDING:
+		// s.stroke(255, 0, 255);
+		// break;
+		// }
+		//
+		// shape.addChild(s);
+		//
+		// }
 		renderer.shape(shape);
 	}
 
@@ -390,12 +416,13 @@ public class TagExplorerProcessing2 extends PApplet {
 		files = SQL.queryTagList("files");
 		this.files = files;
 
-		
 		for (Tag t : this.files) {
 			// set AttributeBindings
 			updateFileTagBinding((Tag_File) t);
 			// set FileBindings
 			updateFileFileBinding((Tag_File) t);
+			// set VersionBindings
+			updateVersionBinding((Tag_File) t);
 		}
 	}
 
@@ -461,18 +488,25 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		for (Tag tf : showFiles) {
 			Tag_File file = (Tag_File) tf;
-			
+
 			// File -> Tag Springs:
 			if (file.attributeBindings.size() > 0) {
 				for (Tag t : file.attributeBindings) {
 					dropSpring(physics, file, t, Type.TAGBINDING);
 				}
 			}
-			
+
 			// File -> File Springs:
 			if (file.fileBindings.size() > 0) {
 				for (Tag t : file.fileBindings) {
 					dropSpring(physics, file, t, Type.FILEBINDING);
+				}
+			}
+
+			// File -> File Springs:
+			if (file.versionBindings.size() > 0) {
+				for (Tag t : file.versionBindings) {
+					dropSpring(physics, file, t, Type.VERSION);
 				}
 			}
 		}
@@ -503,9 +537,9 @@ public class TagExplorerProcessing2 extends PApplet {
 				Tag_File parent = (Tag_File) getTagByID(files.get(i).type, ((Tag_File) files.get(i)).parent_ID);
 
 				dropParticles(physics, parent.x, parent.y, 0, files.get(i));
-				
+
 				// springs to partent anhand parent file
-				//dropSpring(physics, (Tag_File) files.get(i), parent);
+				// dropSpring(physics, (Tag_File) files.get(i), parent);
 			}
 
 			// ist origin File Version
@@ -532,7 +566,8 @@ public class TagExplorerProcessing2 extends PApplet {
 	float LEN = 400; // 10
 	float STR = 0.01f; // 0.01f
 
-	public void dropSpring(VerletPhysics physics, VerletParticle fileParticle, VerletParticle attributeParticle, Connection.Type type) {
+	public void dropSpring(VerletPhysics physics, VerletParticle fileParticle, VerletParticle attributeParticle,
+			Connection.Type type) {
 		Connection sp = new Connection(fileParticle, attributeParticle, LEN, STR, type);
 		physics.addSpring(sp);
 	}
@@ -600,7 +635,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 		return oldest;
 	}
-	
+
 	Timestamp getNewestDate(Tag_File file) {
 		Timestamp newest = file.creation_time;
 		if (file.expiration_time != null && file.expiration_time.after(newest)) {
@@ -616,10 +651,15 @@ public class TagExplorerProcessing2 extends PApplet {
 		file.setAttributeBindings(SQL.getBindedTagList(file));
 		file.updateViewName();
 	}
-	
+
 	void updateFileFileBinding(Tag_File file) {
-		file.setFileBindings(SQL.getBindedFileList(file));
-		//file.updateViewName();
+		file.setFileBindings(SQL.getBindedFileList(file, Type.FILEBINDING));
+		// file.updateViewName();
+	}
+
+	void updateVersionBinding(Tag_File file) {
+		file.setVersionBindings(SQL.getBindedFileList(file, Type.VERSION));
+		// file.updateViewName();
 	}
 
 	// ///////// INPUT ///////////////////
@@ -672,28 +712,29 @@ public class TagExplorerProcessing2 extends PApplet {
 						updateSprings();
 					}
 				}
-				
+
 				// File -> File
 				for (Tag t : files) {
-					if (t.id != startTag.id && mouseOver(mainscreen, t.x + mainscreen.width / 2, t.y + mainscreen.height / 2, t.z, 30, 30)) {
+					if (t.id != startTag.id
+							&& mouseOver(mainscreen, t.x + mainscreen.width / 2, t.y + mainscreen.height / 2, t.z, 30,
+									30)) {
 						Tag_File file = (Tag_File) t;
-						
-						
+
 						Timestamp t1 = getNewestDate(file);
-						Timestamp t2 = getNewestDate((Tag_File)startTag);
-						
+						Timestamp t2 = getNewestDate((Tag_File) startTag);
+
 						// oldest zu erst!
 						if (t1.before(t2)) {
-							SQL.bindFile(file, (Tag_File)startTag);
+							SQL.bindFile(file, (Tag_File) startTag, Type.FILEBINDING);
 							updateFileFileBinding(file);
-						} else{
-							SQL.bindFile((Tag_File)startTag, file);
-							updateFileFileBinding((Tag_File)startTag);
+						} else {
+							SQL.bindFile((Tag_File) startTag, file, Type.FILEBINDING);
+							updateFileFileBinding((Tag_File) startTag);
 						}
-						
+
 						// updateFileTags(file);
 						// updateTags();
-						
+
 						updateSprings();
 					}
 				}
