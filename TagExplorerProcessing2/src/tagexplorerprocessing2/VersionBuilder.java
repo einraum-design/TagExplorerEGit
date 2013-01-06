@@ -36,7 +36,7 @@ public class VersionBuilder extends Thread {
 
 	public void createVersion(String path, int nr) {
 		File file = new File(path);
-		String target = versionsVerzeichnis + String.format("%04d", nr)
+		String target = versionsVerzeichnis + String.format("%06d", nr)
 				+ file.getName();
 		copy(file, target);
 	}

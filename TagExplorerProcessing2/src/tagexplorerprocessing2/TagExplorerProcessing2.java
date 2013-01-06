@@ -22,10 +22,11 @@ import controlP5.Textfield;
 import processing.core.PApplet;
 import processing.core.PFont;
 import processing.core.PGraphics;
+import processing.core.PImage;
 import processing.core.PShape;
 import processing.core.PVector;
 
-import tagexplorerprocessing2.Connection.Type;
+import tagexplorerprocessing2.Connection.ConnectionType;
 import toxi.geom.Vec3D;
 import toxi.physics.VerletParticle;
 import toxi.physics.VerletPhysics;
@@ -61,6 +62,9 @@ public class TagExplorerProcessing2 extends PApplet {
 	Vec3D cam_eye;
 	Vec3D cam_target;
 	Vec3D cam_up;
+	
+	float xBillboardRotation = 0;
+	float yBillboardRotation = 0;
 
 	// PFrame f;
 
@@ -72,6 +76,17 @@ public class TagExplorerProcessing2 extends PApplet {
 	boolean _3d = true;
 
 	PShape ball;
+	
+	
+	String[] imageExtension = {"jpg", "jpeg", "png", "gif", "psd", "tif", "tiff", "bmp", "tga"};
+	String[] vectorExtension = {"ai", "drw", "eps", "ps", "svg"};
+	String[] layoutExtension = {"indd", "pdf", "pxd", "pxp"};
+	String[] audioExtension = {"aif", "m4a", "mid", "mp3", "mpa", "wav", "wma"};
+	String[] videoExtension = {"avi", "flv", "mov", "mp4", "mpg", "swf", "wmv", "vob"};
+	String[] textExtension = {"txt", "doc", "docx", "log", "pages", "rtf"};
+	String[] webExtension = {"css", "htm", "html", "js", "jsp", "php", "rss", "xhtml"};
+	String[] fontExtension = {"fnt", "fon", "otf", "ttf"};
+	String[] messageExtension = {"msg", "eml"};
 
 	// public void init() {
 	// frame.removeNotify();
@@ -83,7 +98,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	public void setup() {
 		size(800, 600, P3D);
-		frame.setLocation(1970, 50);
+//		frame.setLocation(1970, 50);
 
 		font = createFont("arial", 20);
 		ball = createShape(SPHERE, 10);
@@ -158,6 +173,8 @@ public class TagExplorerProcessing2 extends PApplet {
 	// /////////// draw ////////////////////
 
 	public void draw() {
+		
+		calcBillboardRotation();
 
 		// control p5
 		// removeController by Button cancel
@@ -220,18 +237,21 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		renderer.background(0);
 
-		int delta = 250;
-		renderer.noStroke();
-		renderer.fill(255, 80);
-		// renderer.pushMatrix();
-		// renderer.translate(width / 2, height / 2, 0);
-		renderer.beginShape();
-		renderer.vertex(delta, 0, delta);
-		renderer.vertex(-delta, 0, delta);
-		renderer.vertex(-delta, 0, -delta);
-		renderer.vertex(delta, 0, -delta);
-		renderer.endShape(CLOSE);
-		// renderer.popMatrix();
+		// grundplatte
+//		int delta = 250;
+//		renderer.noStroke();
+//		renderer.fill(255, 80);
+//		renderer.beginShape();
+//		renderer.vertex(delta, 0, delta);
+//		renderer.vertex(-delta, 0, delta);
+//		renderer.vertex(-delta, 0, -delta);
+//		renderer.vertex(delta, 0, -delta);
+//		renderer.endShape(CLOSE);
+		
+		
+		
+		
+
 
 		drawFiles(renderer);
 		drawTags(renderer);
@@ -247,7 +267,10 @@ public class TagExplorerProcessing2 extends PApplet {
 				renderer.line(startTag.x, startTag.y, startTag.z, hoverPoint.x, hoverPoint.y, hoverPoint.z);
 			}
 		}
-
+		
+		
+		timeline.render(renderer);
+		
 		renderer.popMatrix();
 		renderer.endDraw();
 		// renderer end
@@ -274,7 +297,9 @@ public class TagExplorerProcessing2 extends PApplet {
 
 				renderer.pushMatrix();
 				renderer.translate(vp.x, vp.y, vp.z);
+				
 				renderer.shape(ball);
+				
 				renderer.popMatrix();
 
 				if (mouseOver(renderer, vp, 30, 30)) {
@@ -288,7 +313,10 @@ public class TagExplorerProcessing2 extends PApplet {
 						// rotateY(rota[1]);
 						// rotateZ(rota[2]);
 					}
-
+					
+					renderer.rotateX(xBillboardRotation);
+					renderer.rotateY(yBillboardRotation);
+					renderer.fill(255);
 					renderer.text(vp.viewName, 10, 0);
 					renderer.text(vp.creation_time.toGMTString(), 10, 20);
 					if (_3d) {
@@ -322,7 +350,9 @@ public class TagExplorerProcessing2 extends PApplet {
 					// rotateY(rota[1]);
 					// rotateZ(rota[2]);
 				}
-
+				renderer.rotateX(xBillboardRotation);
+				renderer.rotateY(yBillboardRotation);
+				renderer.fill(255);
 				renderer.text(vp.name, 10, 0);
 				if (_3d) {
 					renderer.popMatrix();
@@ -492,21 +522,21 @@ public class TagExplorerProcessing2 extends PApplet {
 			// File -> Tag Springs:
 			if (file.attributeBindings.size() > 0) {
 				for (Tag t : file.attributeBindings) {
-					dropSpring(physics, file, t, Type.TAGBINDING);
+					dropSpring(physics, file, t, ConnectionType.TAGBINDING);
 				}
 			}
 
 			// File -> File Springs:
 			if (file.fileBindings.size() > 0) {
 				for (Tag t : file.fileBindings) {
-					dropSpring(physics, file, t, Type.FILEBINDING);
+					dropSpring(physics, file, t, ConnectionType.FILEBINDING);
 				}
 			}
 
 			// File -> File Springs:
 			if (file.versionBindings.size() > 0) {
 				for (Tag t : file.versionBindings) {
-					dropSpring(physics, file, t, Type.VERSION);
+					dropSpring(physics, file, t, ConnectionType.VERSION);
 				}
 			}
 		}
@@ -567,7 +597,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	float STR = 0.01f; // 0.01f
 
 	public void dropSpring(VerletPhysics physics, VerletParticle fileParticle, VerletParticle attributeParticle,
-			Connection.Type type) {
+			Connection.ConnectionType type) {
 		Connection sp = new Connection(fileParticle, attributeParticle, LEN, STR, type);
 		physics.addSpring(sp);
 	}
@@ -575,6 +605,8 @@ public class TagExplorerProcessing2 extends PApplet {
 	void setZAccessTime() {
 		for (Tag t : showFiles) {
 			Tag_File file = (Tag_File) t;
+			
+			println("aktuelle anzeige file:" + file.name);
 			file.z = -timeline.mapExp(getNewestDate(file), 150);
 		}
 	}
@@ -638,12 +670,18 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	Timestamp getNewestDate(Tag_File file) {
 		Timestamp newest = file.creation_time;
-		if (file.expiration_time != null && file.expiration_time.after(newest)) {
-			newest = file.expiration_time;
-		}
+//		if (file.expiration_time != null && file.expiration_time.after(newest)) {
+//			newest = file.expiration_time;
+//		}
+		
+		//////// Time /////// Changes !!!!!!!!!!!!!!
+		
+		
 		if (file.delete_time != null && file.delete_time.after(newest)) {
-			newest = file.expiration_time;
+			newest = file.delete_time;
 		}
+		
+		System.out.println("getNewestDate: " + newest.toGMTString());
 		return newest;
 	}
 
@@ -653,12 +691,12 @@ public class TagExplorerProcessing2 extends PApplet {
 	}
 
 	void updateFileFileBinding(Tag_File file) {
-		file.setFileBindings(SQL.getBindedFileList(file, Type.FILEBINDING));
+		file.setFileBindings(SQL.getBindedFileList(file, ConnectionType.FILEBINDING));
 		// file.updateViewName();
 	}
 
 	void updateVersionBinding(Tag_File file) {
-		file.setVersionBindings(SQL.getBindedFileList(file, Type.VERSION));
+		file.setVersionBindings(SQL.getBindedFileList(file, ConnectionType.VERSION));
 		// file.updateViewName();
 	}
 
@@ -725,10 +763,10 @@ public class TagExplorerProcessing2 extends PApplet {
 
 						// oldest zu erst!
 						if (t1.before(t2)) {
-							SQL.bindFile(file, (Tag_File) startTag, Type.FILEBINDING);
+							SQL.bindFile(file, (Tag_File) startTag, ConnectionType.FILEBINDING);
 							updateFileFileBinding(file);
 						} else {
-							SQL.bindFile((Tag_File) startTag, file, Type.FILEBINDING);
+							SQL.bindFile((Tag_File) startTag, file, ConnectionType.FILEBINDING);
 							updateFileFileBinding((Tag_File) startTag);
 						}
 
@@ -1101,6 +1139,37 @@ public class TagExplorerProcessing2 extends PApplet {
 		bCancelActive = false;
 		p = null;
 		System.out.println("removed Controller");
+	}
+	
+	
+
+	void calcBillboardRotation() {
+
+	  Vec3D cam = cam_eye.sub(cam_target);
+
+	  Vec3D cam_yz = new Vec3D(0, cam.y, cam.z).normalize();
+	  Vec3D cam_xz = new Vec3D(cam.x, 0, cam.z).normalize();
+
+	  if (cam.y >= 0) {
+	    xBillboardRotation = -cam_yz.angleBetween(new Vec3D(0, 0, 1));
+	  } 
+	  else {
+	    xBillboardRotation = cam_yz.angleBetween(new Vec3D(0, 0, 1));
+	  }
+	  if (cam.x >= 0) {
+	    yBillboardRotation = cam_xz.angleBetween(new Vec3D(0, 0, 1));
+	  } 
+	  else {
+	    yBillboardRotation = -cam_xz.angleBetween(new Vec3D(0, 0, 1));
+	  }
+	  
+	  if(cam.z<0){
+		  xBillboardRotation  += PI;
+		  yBillboardRotation *= -1;
+	  }
+
+//	  println("x:rotation: " + xBillboardRotation);
+//	  println("y:rotation: " + yBillboardRotation);
 	}
 
 	void mouseWheel(int delta) {

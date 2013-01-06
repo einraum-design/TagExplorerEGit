@@ -1,3 +1,8 @@
 next todo: 
 
-in updateFiles: set z wert nach versionsnummer.
+
+savePrevImage EXCEPTION!
+
+in zPositionsbereichnung getNewest Time auch changes berücksichtigen!
+
+in updateFiles: set z wert nach erstellungszeitpunk bei origin - ansonsten / bereich erstelleung expiration time .

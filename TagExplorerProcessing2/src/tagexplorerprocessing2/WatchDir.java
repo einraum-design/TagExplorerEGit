@@ -23,7 +23,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import tagexplorerprocessing2.Connection.Type;
+import processing.core.PGraphics;
+import processing.core.PImage;
+
+import tagexplorerprocessing2.Connection.ConnectionType;
 
 public class WatchDir extends Thread {
 
@@ -43,8 +46,7 @@ public class WatchDir extends Thread {
 	 * Register the given directory with the WatchService
 	 */
 	private void register(Path dir) throws IOException {
-		WatchKey key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE,
-				ENTRY_MODIFY);
+		WatchKey key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
 		if (trace) {
 			Path prev = keys.get(key);
 			if (prev == null) {
@@ -66,8 +68,7 @@ public class WatchDir extends Thread {
 		// register directory and sub-directories
 		Files.walkFileTree(start, new SimpleFileVisitor<Path>() {
 			@Override
-			public FileVisitResult preVisitDirectory(Path dir,
-					BasicFileAttributes attrs) throws IOException {
+			public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
 				register(dir);
 				return FileVisitResult.CONTINUE;
 			}
@@ -95,8 +96,7 @@ public class WatchDir extends Thread {
 	 */
 	SQLhelper SQL;
 
-	WatchDir(TagExplorerProcessing2 p5, Path dir, boolean recursive)
-			throws IOException {
+	WatchDir(TagExplorerProcessing2 p5, Path dir, boolean recursive) throws IOException {
 		this.p5 = p5;
 		SQL = new SQLhelper(p5);
 		this.watcher = FileSystems.getDefault().newWatchService();
@@ -197,8 +197,7 @@ public class WatchDir extends Thread {
 		String fileName = path.getFileName().toString();
 
 		if (!isRegularFile(path)) {
-			System.out.println("ignore " + fileName
-					+ " in WatchDir.createNewTagFile(). Not a file.");
+			System.out.println("ignore " + fileName + " in WatchDir.createNewTagFile(). Not a file.");
 			return;
 		}
 
@@ -206,12 +205,11 @@ public class WatchDir extends Thread {
 
 		if (file != null) {
 			new VersionBuilder(path.toString(), file.id).start();
-			// vbList.add(new VersionBuilder(path.toString(), file.id));
-			// for (VersionBuilder vb : vbList) {
-			// if(vb.started){
-			// vb.start();
-			// }
-			// }
+
+			// create Image if image
+			if (file instanceof Tag_File_Image) {
+				savePrevImage((Tag_File_Image) file);
+			}
 
 			// VersionBuilder.createVersion(path.toString(), file.id);
 
@@ -234,8 +232,7 @@ public class WatchDir extends Thread {
 
 		String fileName = path.getFileName().toString();
 		if (!isRegularFile(path)) {
-			System.out.println("ignore " + fileName
-					+ " in WatchDir.createNewTagFile(). Not a file.");
+			System.out.println("ignore " + fileName + " in WatchDir.createNewTagFile(). Not a file.");
 			return;
 		}
 
@@ -244,19 +241,17 @@ public class WatchDir extends Thread {
 
 		// set Origin get origin ID und setzes sie als origin
 		// origin File SQL.inDataBase(tableName, s)
-		
+
 		Tag_File parent = getParent(file);
-		
+
 		System.out.println("get parent: " + parent.name + " " + parent.attributeBindings.toString() + " " + parent.id);
 		for (Tag t : parent.attributeBindings) {
 			SQL.bindTag(file, t);
 		}
-		
-		SQL.bindFile(parent, file, Type.VERSION);
+
+		SQL.bindFile(parent, file, ConnectionType.VERSION);
 		parent.setVersionBinding(file);
-		
-		
-		
+
 		file.setAttributeBindings(SQL.getBindedTagList(file));
 		file.updateViewName();
 
@@ -273,11 +268,6 @@ public class WatchDir extends Thread {
 
 		if (file != null) {
 			new VersionBuilder(path.toString(), file.id).start();
-			// for(VersionBuilder vb : vbList){
-			// if(!vb.started){
-			// vb.start();
-			// }
-			// }
 
 			if (p5.user != null) {
 				// System.out.println(file.toString());
@@ -292,8 +282,8 @@ public class WatchDir extends Thread {
 			p5.updateSprings();
 		}
 	}
-	
-	private void ifDirectoryRecursive(Path path){
+
+	private void ifDirectoryRecursive(Path path) {
 		File f = new File(path.toString());
 
 		if (f.isDirectory()) {
@@ -326,14 +316,14 @@ public class WatchDir extends Thread {
 			Tag_File file = (Tag_File) f;
 
 			if (file.path.equals(path.toString())) {
-				//System.out.println("file.name: " + file.name);
+				// System.out.println("file.name: " + file.name);
 				file.setDeleteTime(new Timestamp(System.currentTimeMillis()));
 				SQL.setDBDeletTime(file);
 			}
 
 		}
 	}
-	
+
 	public Tag_File getParent(Tag_File file) {
 		Tag_File parent = null;
 
@@ -341,8 +331,7 @@ public class WatchDir extends Thread {
 		for (Tag t : p5.files) {
 			if (t instanceof Tag_File) {
 				// path!
-				if (((Tag_File) t).path.trim().toLowerCase()
-						.equals(file.path.trim().toLowerCase())) {
+				if (((Tag_File) t).path.trim().toLowerCase().equals(file.path.trim().toLowerCase())) {
 					parents.add((Tag_File) t);
 				}
 			}
@@ -351,12 +340,100 @@ public class WatchDir extends Thread {
 		parent = parents.get(0);
 		if (parents.size() > 1) {
 			for (Tag_File tag : parents) {
-				if(tag.creation_time.after(parent.creation_time)){
+				if (tag.creation_time.after(parent.creation_time)) {
 					parent = tag;
-				}			
+				}
 			}
 		}
 		return parent;
+	}
+
+	void savePrevImage(Tag_File_Image file) {
+		int w = 120;
+		int h = 80;
+		savePrevImage(file, w, h);
+	}
+
+	void _savePrevImage(Tag_File_Image file, int w, int h) {
+
+		// System.out.println("AUSKOMMENTIERT Couldn't save: " +
+		// VersionBuilder.versionsVerzeichnis + "prev" + String.format("%06d",
+		// file.id) + file.name.substring(0, file.name.lastIndexOf('.')) +
+		// ".png");
+
+		try {
+			PImage img = p5.loadImage(file.path);
+
+			PGraphics pg = p5.createGraphics(w, h, p5.P3D);
+			pg.imageMode(p5.CENTER);
+
+			pg.beginDraw();
+			pg.background(0, 0);
+
+			if (w / h > img.width / img.height) {
+				pg.image(img, pg.width / 2, pg.height / 2, ((float) pg.height / img.height) * img.width, pg.height);
+			} else {
+				pg.image(img, pg.width / 2, pg.height / 2, pg.width, ((float) pg.width / img.width) * img.height);
+			}
+
+			pg.endDraw();
+			pg.save(VersionBuilder.versionsVerzeichnis + "prev" + String.format("%06d", file.id)
+					+ file.name.substring(0, file.name.lastIndexOf('.')) + ".png");
+			System.out.println("saved :" + VersionBuilder.versionsVerzeichnis + "prev" + String.format("%06d", file.id)
+					+ file.name.substring(0, file.name.lastIndexOf('.')) + ".png");
+		} catch (Exception e) {
+			System.out.println("Couldn't save: " + VersionBuilder.versionsVerzeichnis + "prev"
+					+ String.format("%06d", file.id) + file.name.substring(0, file.name.lastIndexOf('.')) + ".png");
+		}
+	}
+
+	void savePrevImage(Tag_File_Image file, int w, int h) {
+
+		 System.out.println("AUSKOMMENTIERT Couldn't save: " +
+		 VersionBuilder.versionsVerzeichnis + "prev" + String.format("%06d",
+		 file.id) + file.name.substring(0, file.name.lastIndexOf('.')) +
+		 ".png");
+
+//		try {
+			//PImage img = p5.loadImage(file.path);
+			//img.resize((int) ((float) h / img.height) * img.width, h);
+			
+//
+//			if (w / h > img.width / img.height) {
+//				img.resize((int) ((float) h / img.height) * img.width, h);
+//
+//			} else {
+//				img.resize(w, (int) ((float) w / img.width) * img.height);
+//			}
+//			img.save(VersionBuilder.versionsVerzeichnis + "prev" + String.format("%06d", file.id)
+//					+ file.name.substring(0, file.name.lastIndexOf('.')) + ".png");
+
+			
+			
+			// PGraphics pg = p5.createGraphics(w, h, p5.P3D);
+			// pg.imageMode(p5.CENTER);
+			//
+			// pg.beginDraw();
+			// pg.background(0, 0);
+			//
+			// if (w / h > img.width / img.height) {
+			// pg.image(img, pg.width / 2, pg.height / 2, ((float) pg.height /
+			// img.height) * img.width, pg.height);
+			// } else {
+			// pg.image(img, pg.width / 2, pg.height / 2, pg.width, ((float)
+			// pg.width / img.width) * img.height);
+			// }
+			//
+			// pg.endDraw();
+			// pg.save(VersionBuilder.versionsVerzeichnis + "prev" +
+			// String.format("%06d", file.id) + file.name.substring(0,
+			// file.name.lastIndexOf('.')) + ".png");
+//			System.out.println("saved :" + VersionBuilder.versionsVerzeichnis + "prev" + String.format("%06d", file.id)
+//					+ file.name.substring(0, file.name.lastIndexOf('.')) + ".png");
+//		} catch (Exception e) {
+//			System.out.println("Couldn't save: " + VersionBuilder.versionsVerzeichnis + "prev"
+//					+ String.format("%06d", file.id) + file.name.substring(0, file.name.lastIndexOf('.')) + ".png");
+//		}
 	}
 
 	/*
