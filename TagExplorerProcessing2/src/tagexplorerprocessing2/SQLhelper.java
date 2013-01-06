@@ -640,7 +640,8 @@ public class SQLhelper {
 				tag.setDeleteTime(ts);
 			}
 			
-			tag.changes = getFileChanges(id);
+			// Ÿbergebe alle Changes
+			tag.setChanges(getFileChanges(id));
 			
 			t = tag;
 

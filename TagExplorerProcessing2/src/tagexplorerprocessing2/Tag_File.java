@@ -3,6 +3,8 @@ package tagexplorerprocessing2;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
+import processing.core.PShape;
+
 public class Tag_File extends Tag {
 
 	static public enum FileType {
@@ -19,12 +21,14 @@ public class Tag_File extends Tag {
 	int parent_ID = 0;
 	int origin_ID = 0;
 	int score;
+	
+	PShape shape;
 
 	ArrayList<Tag> attributeBindings = new ArrayList<Tag>();
 	ArrayList<Tag_File> fileBindings = new ArrayList<Tag_File>();
 	ArrayList<Tag_File> versionBindings = new ArrayList<Tag_File>();
 	
-	ArrayList<Change> changes = new ArrayList<Change>();
+	private ArrayList<Change> changes = new ArrayList<Change>();
 
 	public String viewName;
 
@@ -41,6 +45,10 @@ public class Tag_File extends Tag {
 		this.score = score;
 
 		this.viewName = name;
+	}
+	
+	public void setShape(PShape shape){		
+		this.shape = shape;
 	}
 	
 	public void setFileType(FileType fileType){
@@ -65,6 +73,14 @@ public class Tag_File extends Tag {
 
 	public void setVersionBinding(Tag_File file) {
 		this.versionBindings.add(file);
+	}
+	
+	public void addChange(Change c){
+		changes.add(c);
+	}
+	
+	public void setChanges(ArrayList<Change> changes){
+		this.changes = changes;
 	}
 
 	public void updateViewName() {
