@@ -30,6 +30,10 @@ public class Tag_File extends Tag {
 	
 	private ArrayList<Change> changes = new ArrayList<Change>();
 
+	public ArrayList<Change> getChanges() {
+		return changes;
+	}
+
 	public String viewName;
 
 	public Tag_File(String tableName, int id, String name, float size, String path, Timestamp creation_time,

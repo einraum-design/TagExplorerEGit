@@ -98,7 +98,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	// }
 
 	public void setup() {
-		size(800, 600, P3D);
+		size(1800, 600, P3D);
 		// frame.setLocation(1970, 50);
 
 		font = createFont("arial", 20);
@@ -250,7 +250,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		// renderer.endShape(CLOSE);
 
 		drawFiles(renderer);
-		drawTags(renderer);
+//		drawTags(renderer);
 		drawSprings(renderer);
 
 		// draw interaction
@@ -289,6 +289,8 @@ public class TagExplorerProcessing2 extends PApplet {
 				}
 
 				// renderer.point(vp.x, vp.y, vp.z);
+				
+				renderer.shape(vp.shape);
 
 				renderer.pushMatrix();
 				renderer.translate(vp.x, vp.y, vp.z);
@@ -300,23 +302,15 @@ public class TagExplorerProcessing2 extends PApplet {
 				if (mouseOver(renderer, vp, 30, 30)) {
 					renderer.textAlign(LEFT);
 
-					if (_3d) {
-						renderer.pushMatrix();
-						renderer.translate(vp.x, vp.y, vp.z);
-						// float[] rota = cam.getRotations();
-						// rotateX(rota[0]);
-						// rotateY(rota[1]);
-						// rotateZ(rota[2]);
-					}
+					renderer.pushMatrix();
+					renderer.translate(vp.x, vp.y, vp.z);
 
 					renderer.rotateX(xBillboardRotation);
 					renderer.rotateY(yBillboardRotation);
 					renderer.fill(255);
 					renderer.text(vp.viewName, 10, 0);
 					renderer.text(vp.creation_time.toGMTString(), 10, 20);
-					if (_3d) {
-						renderer.popMatrix();
-					}
+					renderer.popMatrix();
 				}
 
 			}
@@ -579,6 +573,13 @@ public class TagExplorerProcessing2 extends PApplet {
 			}
 		}
 
+		
+		
+		for (Tag t : files) {
+			Tag_File file = (Tag_File) t;
+			file.setShape(generateShape(file));
+		}
+		
 		// set z position creation time
 		setZAccessTime();
 	}
@@ -658,7 +659,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		Tag oldest = null;
 		Timestamp comp = new Timestamp(System.currentTimeMillis());
 		for (Tag file : files) {
-			println("getOldestTagFile: file.name: " + file.name);
+//			println("getOldestTagFile: file.name: " + file.name);
 			if (((Tag_File) file).creation_time.before(comp)) {
 				comp = ((Tag_File) file).creation_time;
 				oldest = file;
@@ -699,25 +700,44 @@ public class TagExplorerProcessing2 extends PApplet {
 		// file.updateViewName();
 	}
 
-	PShape generateShape(Tag_File file) {
-
+	public PShape generateShape(Tag_File file) {
+		PShape s = createShape(GROUP);
 		// file.creation_time;
-
+		s.addChild(makeRect(file, file.creation_time));
+		
+		
+		for(Change c : file.getChanges()){
+			s.addChild(makeRect(file, c.date));
+		}
+		
+		if(file.delete_time != null){
+			s.addChild(makeRect(file, file.delete_time));
+		}
+		return s;
+	}
+	
+	public PShape makeRect(Tag file, Timestamp ts){
+		float z = -mapExp(ts.getTime());
+		
 		PShape s = createShape();
-
-		s.fill(0, 0, 255);
+		s.fill(0, 0, 255, 100);
 		s.noStroke();
-		s.vertex(0, 0);
-		s.vertex(0, 50);
-		s.vertex(50, 0);
-		s.end();
-
+		s.vertex(file.x + 10, file.y +10, z);
+		s.vertex(file.x+10, file.y-10, z);
+		s.vertex(file.x-10, file.y-10, z);
+		s.vertex(file.x-10, file.y+10, z);
+		s.end(CLOSE);
+		
 		return s;
 	}
 
 	public float mapExp(long time) {
-		float val = map(sqrt(time), 0, sqrt(System.currentTimeMillis() - oldestTime.getTime()), 0, 1);
-		// System.out.println("val: " + p5.sqrt(time));
+		//float val = map(sqrt(time), 0, sqrt(System.currentTimeMillis() - oldestTime.getTime()), 0, 1);
+		float val = map(sqrt(System.currentTimeMillis()-time), 0, sqrt(System.currentTimeMillis() - oldestTime.getTime()), 0, 2000); // 150 hand gesetzt!
+		
+		println(sqrt(time) + ", " + 0 + ", " + sqrt(System.currentTimeMillis() - timeline.oldest.getTime()) + ", " + 0 + ", " + 2000);
+
+		System.out.println("z-koord: " + val);
 		return val;
 	}
 
