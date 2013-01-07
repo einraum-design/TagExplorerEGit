@@ -211,15 +211,20 @@ public class WatchDir extends Thread {
 				savePrevImage((Tag_File_Image) file);
 			}
 
-			// VersionBuilder.createVersion(path.toString(), file.id);
-
-			if (p5.user != null) {
-				// System.out.println(file.toString());
-				SQL.bindTag(file, p5.user);
+			// add all current filters
+			for (Filter filter : p5.filters) {
+				if (filter.inOut) {
+					SQL.bindTag(file, filter.tag);
+				}
 			}
 
 			// update File
 			p5.updateFileTagBinding(file);
+			p5.updateFileFileBinding(file);
+			p5.updateVersionBinding(file);
+			file.updateViewName();
+			// muss vor files.add erzeugt werden!
+			p5.generateShape(file);
 			p5.files.add(file);
 			p5.updateShowFiles();
 			p5.updateSprings();
@@ -252,9 +257,6 @@ public class WatchDir extends Thread {
 		SQL.bindFile(parent, file, ConnectionType.VERSION);
 		parent.setVersionBinding(file);
 
-		file.setAttributeBindings(SQL.getBindedTagList(file));
-		file.updateViewName();
-
 		file.parent_ID = parent.id;
 
 		if (parent.origin_ID == 0) {
@@ -266,21 +268,33 @@ public class WatchDir extends Thread {
 		SQL.setDBOrigin(file);
 		SQL.setDBParent(file);
 
-		if (file != null) {
-			new VersionBuilder(path.toString(), file.id).start();
+		// if (file != null) {
+		new VersionBuilder(path.toString(), file.id).start();
 
-			if (p5.user != null) {
-				// System.out.println(file.toString());
-				SQL.bindTag(file, p5.user);
+		// add all current filters
+		for (Filter filter : p5.filters) {
+			if (filter.inOut) {
+				SQL.bindTag(file, filter.tag);
 			}
-
-			// update File
-			file.setAttributeBindings(SQL.getBindedTagList(file));
-			file.updateViewName();
-			p5.files.add(file);
-			p5.updateShowFiles();
-			p5.updateSprings();
 		}
+
+		// x + y von parent;
+		// file.x = parent.x;
+		// file.y = parent.y;
+
+		System.out.print(file.toString());
+
+		// update File
+		file.updateViewName();
+		// muss vor files.add erzeugt werden!
+		p5.updateFileTagBinding(file);
+		p5.updateFileFileBinding(file);
+		p5.updateVersionBinding(file);
+		p5.files.add(file);
+		p5.updateShowFiles();
+		p5.updateSprings();
+		System.out.print(file.toString());
+		// }
 	}
 
 	private void ifDirectoryRecursive(Path path) {
@@ -389,51 +403,51 @@ public class WatchDir extends Thread {
 
 	void savePrevImage(Tag_File_Image file, int w, int h) {
 
-		 System.out.println("AUSKOMMENTIERT Couldn't save: " +
-		 VersionBuilder.versionsVerzeichnis + "prev" + String.format("%06d",
-		 file.id) + file.name.substring(0, file.name.lastIndexOf('.')) +
-		 ".png");
+		System.out.println("AUSKOMMENTIERT Couldn't save: " + VersionBuilder.versionsVerzeichnis + "prev"
+				+ String.format("%06d", file.id) + file.name.substring(0, file.name.lastIndexOf('.')) + ".png");
 
-//		try {
-			//PImage img = p5.loadImage(file.path);
-			//img.resize((int) ((float) h / img.height) * img.width, h);
-			
-//
-//			if (w / h > img.width / img.height) {
-//				img.resize((int) ((float) h / img.height) * img.width, h);
-//
-//			} else {
-//				img.resize(w, (int) ((float) w / img.width) * img.height);
-//			}
-//			img.save(VersionBuilder.versionsVerzeichnis + "prev" + String.format("%06d", file.id)
-//					+ file.name.substring(0, file.name.lastIndexOf('.')) + ".png");
+		// try {
+		// PImage img = p5.loadImage(file.path);
+		// img.resize((int) ((float) h / img.height) * img.width, h);
 
-			
-			
-			// PGraphics pg = p5.createGraphics(w, h, p5.P3D);
-			// pg.imageMode(p5.CENTER);
-			//
-			// pg.beginDraw();
-			// pg.background(0, 0);
-			//
-			// if (w / h > img.width / img.height) {
-			// pg.image(img, pg.width / 2, pg.height / 2, ((float) pg.height /
-			// img.height) * img.width, pg.height);
-			// } else {
-			// pg.image(img, pg.width / 2, pg.height / 2, pg.width, ((float)
-			// pg.width / img.width) * img.height);
-			// }
-			//
-			// pg.endDraw();
-			// pg.save(VersionBuilder.versionsVerzeichnis + "prev" +
-			// String.format("%06d", file.id) + file.name.substring(0,
-			// file.name.lastIndexOf('.')) + ".png");
-//			System.out.println("saved :" + VersionBuilder.versionsVerzeichnis + "prev" + String.format("%06d", file.id)
-//					+ file.name.substring(0, file.name.lastIndexOf('.')) + ".png");
-//		} catch (Exception e) {
-//			System.out.println("Couldn't save: " + VersionBuilder.versionsVerzeichnis + "prev"
-//					+ String.format("%06d", file.id) + file.name.substring(0, file.name.lastIndexOf('.')) + ".png");
-//		}
+		//
+		// if (w / h > img.width / img.height) {
+		// img.resize((int) ((float) h / img.height) * img.width, h);
+		//
+		// } else {
+		// img.resize(w, (int) ((float) w / img.width) * img.height);
+		// }
+		// img.save(VersionBuilder.versionsVerzeichnis + "prev" +
+		// String.format("%06d", file.id)
+		// + file.name.substring(0, file.name.lastIndexOf('.')) + ".png");
+
+		// PGraphics pg = p5.createGraphics(w, h, p5.P3D);
+		// pg.imageMode(p5.CENTER);
+		//
+		// pg.beginDraw();
+		// pg.background(0, 0);
+		//
+		// if (w / h > img.width / img.height) {
+		// pg.image(img, pg.width / 2, pg.height / 2, ((float) pg.height /
+		// img.height) * img.width, pg.height);
+		// } else {
+		// pg.image(img, pg.width / 2, pg.height / 2, pg.width, ((float)
+		// pg.width / img.width) * img.height);
+		// }
+		//
+		// pg.endDraw();
+		// pg.save(VersionBuilder.versionsVerzeichnis + "prev" +
+		// String.format("%06d", file.id) + file.name.substring(0,
+		// file.name.lastIndexOf('.')) + ".png");
+		// System.out.println("saved :" + VersionBuilder.versionsVerzeichnis +
+		// "prev" + String.format("%06d", file.id)
+		// + file.name.substring(0, file.name.lastIndexOf('.')) + ".png");
+		// } catch (Exception e) {
+		// System.out.println("Couldn't save: " +
+		// VersionBuilder.versionsVerzeichnis + "prev"
+		// + String.format("%06d", file.id) + file.name.substring(0,
+		// file.name.lastIndexOf('.')) + ".png");
+		// }
 	}
 
 	/*

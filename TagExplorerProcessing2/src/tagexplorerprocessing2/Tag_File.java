@@ -99,7 +99,13 @@ public class Tag_File extends Tag {
 
 	@Override
 	public String toString() {
-		return "Tag_File [size=" + size + ", path=" + path + ", creation_time=" + creation_time + ", expiration_time="
-				+ expiration_time + ", origin_ID=" + origin_ID + ", score=" + score + "]";
+		return "Tag_File [fileType=" + fileType + ", size=" + size + ", path=" + path + ", creation_time="
+				+ creation_time + ", expiration_time=" + expiration_time + ", delete_time=" + delete_time
+				+ ", parent_ID=" + parent_ID + ", origin_ID=" + origin_ID + ", score=" + score + ", shape=" + shape
+				+ ", attributeBindings=" + attributeBindings + ", fileBindings=" + fileBindings + ", versionBindings="
+				+ versionBindings + ", changes=" + changes + ", viewName=" + viewName + ", id=" + id + ", name=" + name
+				+ ", type=" + type + ", x=" + x + ", y=" + y + ", z=" + z + "]";
 	}
+
+	
 }

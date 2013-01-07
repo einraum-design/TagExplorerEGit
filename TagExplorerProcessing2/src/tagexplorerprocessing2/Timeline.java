@@ -81,60 +81,15 @@ public class Timeline {
 		renderer.translate(0, 0, -mapExp(60 * 60 * 1000));
 	}
 
-	public void draw() {
-		Timestamp now = new Timestamp(System.currentTimeMillis());
-
-		pg.beginDraw();
-		pg.background(120);
-		pg.pushMatrix();
-		pg.translate(0, 40);
-
-		pg.fill(200);
-		pg.text(now.toGMTString(), 0, 0);
-
-		if (oldest != null) {
-			int timeLineLength = pg.height - 80;
-			long delta = System.currentTimeMillis() - oldest.getTime();
-
-			pg.text("1 hour ", 0, mapExp(60 * 60 * 1000));
-
-			pg.text("1 day ", 0, mapExp(24 * 60 * 60 * 1000));
-
-			pg.text("1 week ", 0, mapExp(7L * 24 * 60 * 60 * 1000));
-			pg.text("2 weeks ", 0, mapExp(14L * 24 * 60 * 60 * 1000));
-
-			pg.text("1 month ", 0, mapExp(30L * 24 * 60 * 60 * 1000));
-
-			pg.text(oldest.toGMTString(), 0,
-					p5.map(System.currentTimeMillis() - oldest.getTime(), 0, delta, 0, timeLineLength));
-		}
-		pg.popMatrix();
-		pg.endDraw();
-
-		// p5.pushMatrix();
-		// p5.translate(p5.width-100, 40);
-		//
-		// p5.fill(200);
-		// p5.text(now.toGMTString(), 0, 0);
-		//
-		// if(oldest != null)
-		// p5.text(oldest.toGMTString(), 0, p5.height-80);
-		//
-		// p5.popMatrix();
+	public float mapExp(Timestamp ts) {
+		// System.out.println("ts time: " + ts.getTime());
+		long time = System.currentTimeMillis() - ts.getTime();
+		// System.out.println("delta time: " + time);
+		return mapExp(time);
 	}
 
 	public float mapExp(long time) {
-		return mapExp(time, timelineLength);
-	}
-
-	public float mapExp(Timestamp ts, long maxLength) {
-		System.out.println("ts time: " + ts.getTime());
-		long time = System.currentTimeMillis() - ts.getTime();
-		System.out.println("delta time: " + time);
-		return mapExp(time, timelineLength);
-	}
-
-	public float mapExp(long time, long maxLength) {
+		float maxLength = timelineLength;
 		float val = p5.map(p5.sqrt(time), 0, p5.sqrt(System.currentTimeMillis() - oldest.getTime()), 0, maxLength);
 		// System.out.println("val: " + p5.sqrt(time));
 		return val;
