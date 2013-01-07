@@ -52,7 +52,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	ArrayList<Tag> files = null;
 	ArrayList<Tag> showFiles = null;
 	Tag_File oldest_showFile = null;
-	
+
 	Timestamp oldestTime;
 
 	ArrayList<Filter> filters = new ArrayList<Filter>();
@@ -67,6 +67,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	float xBillboardRotation = 0;
 	float yBillboardRotation = 0;
+	float zBillboardRotation = 0;
 
 	// PFrame f;
 
@@ -74,8 +75,6 @@ public class TagExplorerProcessing2 extends PApplet {
 	VerletPhysics physics;
 	VerletPhysics filePhysics;
 
-	// PeasyCam cam;
-	boolean _3d = true;
 
 	PShape ball;
 
@@ -89,6 +88,8 @@ public class TagExplorerProcessing2 extends PApplet {
 	String[] fontExtension = { "fnt", "fon", "otf", "ttf" };
 	String[] messageExtension = { "msg", "eml" };
 
+	String hoverString = null;
+	
 	// public void init() {
 	// frame.removeNotify();
 	// frame.setUndecorated(true);
@@ -183,7 +184,10 @@ public class TagExplorerProcessing2 extends PApplet {
 			removeController();
 			removeController = !removeController;
 		}
-
+		
+		// reset hoverString
+		hoverString = null;
+		
 		// draw mainscene
 		drawMainscreen(mainscreen);
 
@@ -192,6 +196,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		// image(timeline.pg, width - 200, 0);
 
 		fill(150);
+		noStroke();
 		if (user != null) {
 			text("User: " + user.name, 5, 16);
 		}
@@ -201,6 +206,20 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 
 		text(frameRate, width - 120, 16);
+		
+		if(hoverString != null){
+			fill(255);
+			
+			//textSize(28);
+
+//			char c = 'T';
+//			float cw = textWidth(c);
+			
+			rect(mouseX, mouseY-10, textWidth(hoverString)+20, 20);
+			fill(0);
+			textAlign(LEFT, CENTER);
+			text(hoverString, mouseX + 10, mouseY);
+		}
 
 		// Promt Messages
 		if (p != null) {
@@ -250,7 +269,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		// renderer.endShape(CLOSE);
 
 		drawFiles(renderer);
-//		drawTags(renderer);
+		// drawTags(renderer);
 		drawSprings(renderer);
 
 		// draw interaction
@@ -280,37 +299,33 @@ public class TagExplorerProcessing2 extends PApplet {
 			for (int i = 0; i < filePhysics.particles.size(); i++) {
 				Tag_File vp = (Tag_File) filePhysics.particles.get(i);
 
-				renderer.strokeWeight(5);
-
-				if (vp.isLocked()) {
-					renderer.stroke(255, 0, 0);
-				} else {
-					renderer.stroke(0, 255, 200);
-				}
-
-				// renderer.point(vp.x, vp.y, vp.z);
-				
 				renderer.shape(vp.shape);
 
-				renderer.pushMatrix();
-				renderer.translate(vp.x, vp.y, vp.z);
-
-				renderer.shape(ball);
-
-				renderer.popMatrix();
+				// balls statt 3D-shapes
+				// renderer.pushMatrix();
+				// renderer.translate(vp.x, vp.y, vp.z);
+				//
+				// renderer.shape(ball);
+				//
+				// renderer.popMatrix();
 
 				if (mouseOver(renderer, vp, 30, 30)) {
-					renderer.textAlign(LEFT);
-
-					renderer.pushMatrix();
-					renderer.translate(vp.x, vp.y, vp.z);
-
-					renderer.rotateX(xBillboardRotation);
-					renderer.rotateY(yBillboardRotation);
-					renderer.fill(255);
-					renderer.text(vp.viewName, 10, 0);
-					renderer.text(vp.creation_time.toGMTString(), 10, 20);
-					renderer.popMatrix();
+//					renderer.textAlign(LEFT);
+//
+//					renderer.pushMatrix();
+//					renderer.translate(vp.x, vp.y, vp.z);
+//
+//					renderer.rotateX(xBillboardRotation);
+//					renderer.rotateY(yBillboardRotation);
+//					renderer.rotateZ(zBillboardRotation);
+//					renderer.fill(255);
+					
+					
+					hoverString = vp.viewName;
+					
+//					renderer.text(vp.viewName, 10, 0);
+//					renderer.text(vp.creation_time.toGMTString(), 10, 20);
+//					renderer.popMatrix();
 				}
 
 			}
@@ -330,22 +345,17 @@ public class TagExplorerProcessing2 extends PApplet {
 			renderer.point(vp.x, vp.y, vp.z);
 
 			if (mouseOver(renderer, vp, 30, 30)) {
-				renderer.textAlign(LEFT);
-				if (_3d) {
-					renderer.pushMatrix();
-					renderer.translate(vp.x, vp.y, vp.z);
-					// float[] rota = cam.getRotations();
-					// rotateX(rota[0]);
-					// rotateY(rota[1]);
-					// rotateZ(rota[2]);
-				}
-				renderer.rotateX(xBillboardRotation);
-				renderer.rotateY(yBillboardRotation);
-				renderer.fill(255);
+//				renderer.textAlign(LEFT);
+//				renderer.pushMatrix();
+//				renderer.translate(vp.x, vp.y, vp.z);
+//				renderer.rotateX(xBillboardRotation);
+//				renderer.rotateY(yBillboardRotation);
+//				renderer.fill(255);
+				
+				hoverString = vp.name;
 				renderer.text(vp.name, 10, 0);
-				if (_3d) {
-					renderer.popMatrix();
-				}
+
+//				renderer.popMatrix();
 			}
 		}
 	}
@@ -443,7 +453,7 @@ public class TagExplorerProcessing2 extends PApplet {
 			// set VersionBindings
 			updateVersionBinding((Tag_File) t);
 		}
-		
+
 		oldestTime = ((Tag_File) getOldestTagFile(files)).creation_time;
 	}
 
@@ -558,6 +568,8 @@ public class TagExplorerProcessing2 extends PApplet {
 				// get parent
 				Tag_File parent = (Tag_File) getTagByID(files.get(i).type, ((Tag_File) files.get(i)).parent_ID);
 
+				// System.out.println("dropParticles: file: " +
+				// files.get(i).name);
 				dropParticles(physics, parent.x, parent.y, 0, files.get(i));
 
 				// springs to partent anhand parent file
@@ -573,13 +585,11 @@ public class TagExplorerProcessing2 extends PApplet {
 			}
 		}
 
-		
-		
 		for (Tag t : files) {
 			Tag_File file = (Tag_File) t;
 			file.setShape(generateShape(file));
 		}
-		
+
 		// set z position creation time
 		setZAccessTime();
 	}
@@ -659,7 +669,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		Tag oldest = null;
 		Timestamp comp = new Timestamp(System.currentTimeMillis());
 		for (Tag file : files) {
-//			println("getOldestTagFile: file.name: " + file.name);
+			// println("getOldestTagFile: file.name: " + file.name);
 			if (((Tag_File) file).creation_time.before(comp)) {
 				comp = ((Tag_File) file).creation_time;
 				oldest = file;
@@ -703,41 +713,78 @@ public class TagExplorerProcessing2 extends PApplet {
 	public PShape generateShape(Tag_File file) {
 		PShape s = createShape(GROUP);
 		// file.creation_time;
-		s.addChild(makeRect(file, file.creation_time));
-		
-		
-		for(Change c : file.getChanges()){
-			s.addChild(makeRect(file, c.date));
+		PShape start = makeRect(file, file.creation_time);
+		s.addChild(start);
+
+		PShape next = null;
+		for (Change c : file.getChanges()) {
+			next = makeRect(file, c.date);
+			s.addChild(next);
+			s.addChild(generateConnection(start, next));
+			start = next;
 		}
-		
-		if(file.delete_time != null){
-			s.addChild(makeRect(file, file.delete_time));
+
+		if (file.delete_time != null) {
+			next = makeRect(file, file.delete_time);
+			s.addChild(next);
+			println(file.name);
+
+			// PShape[] shapes = s.getChildren();
+			s.addChild(generateConnection(start, next));
+
 		}
 		return s;
 	}
-	
-	public PShape makeRect(Tag file, Timestamp ts){
+
+	public PShape makeRect(Tag file, Timestamp ts) {
 		float z = -mapExp(ts.getTime());
-		
+
 		PShape s = createShape();
-		s.fill(0, 0, 255, 100);
+		s.fill(0, 0, 255);
 		s.noStroke();
-		s.vertex(file.x + 10, file.y +10, z);
-		s.vertex(file.x+10, file.y-10, z);
-		s.vertex(file.x-10, file.y-10, z);
-		s.vertex(file.x-10, file.y+10, z);
+		s.vertex(file.x + 10, file.y + 10, z);
+		s.vertex(file.x + 10, file.y - 10, z);
+		s.vertex(file.x - 10, file.y - 10, z);
+		s.vertex(file.x - 10, file.y + 10, z);
 		s.end(CLOSE);
+
+		return s;
+	}
+
+	public PShape generateConnection(PShape s1, PShape s2) {
+
+		int count = s1.getVertexCount();
+
+		PShape s = createShape(TRIANGLE_STRIP);
 		
+		s.fill(0, 255, 255);
+		s.noStroke();
+		for (int i = 0; i < count; i++) {
+			println(s1.getVertexX(i) + " ," + s1.getVertexY(i) + " ," + s1.getVertexZ(i));
+			s.vertex(s1.getVertexX(i), s1.getVertexY(i), s1.getVertexZ(i));
+			println(s2.getVertexX(i) + " ," + s2.getVertexY(i) + " ," + s2.getVertexZ(i));
+			s.vertex(s2.getVertexX(i), s2.getVertexY(i), s2.getVertexZ(i));
+		}
+		s.vertex(s1.getVertexX(0), s1.getVertexY(0), s1.getVertexZ(0));
+		s.vertex(s2.getVertexX(0), s2.getVertexY(0), s2.getVertexZ(0));
+		s.end();
+
 		return s;
 	}
 
 	public float mapExp(long time) {
-		//float val = map(sqrt(time), 0, sqrt(System.currentTimeMillis() - oldestTime.getTime()), 0, 1);
-		float val = map(sqrt(System.currentTimeMillis()-time), 0, sqrt(System.currentTimeMillis() - oldestTime.getTime()), 0, 2000); // 150 hand gesetzt!
-		
-		println(sqrt(time) + ", " + 0 + ", " + sqrt(System.currentTimeMillis() - timeline.oldest.getTime()) + ", " + 0 + ", " + 2000);
+		// float val = map(sqrt(time), 0, sqrt(System.currentTimeMillis() -
+		// oldestTime.getTime()), 0, 1);
+		float val = map(sqrt(System.currentTimeMillis() - time), 0,
+				sqrt(System.currentTimeMillis() - oldestTime.getTime()), 0, 2000); // 150
+																					// hand
+																					// gesetzt!
 
-		System.out.println("z-koord: " + val);
+		// println(sqrt(time) + ", " + 0 + ", " +
+		// sqrt(System.currentTimeMillis() - timeline.oldest.getTime()) + ", " +
+		// 0 + ", " + 2000);
+
+		// System.out.println("z-koord: " + val);
 		return val;
 	}
 
@@ -972,6 +1019,22 @@ public class TagExplorerProcessing2 extends PApplet {
 			// // promts.remove(p);
 			// }
 			break;
+		case 'a':
+			cam_eye.x -= 20;
+			println("cam_eye.x = " + cam_eye.x);
+			break;
+		case 'd':
+			cam_eye.x += 20;
+			println("cam_eye.x = " + cam_eye.x);
+			break;
+		case 'w':
+			cam_eye.y -= 20;
+			println("cam_eye.y = " + cam_eye.y);
+			break;
+		case 's':
+			cam_eye.y += 20;
+			println("cam_eye.y = " + cam_eye.y);
+			break;
 		}
 	}
 
@@ -1188,6 +1251,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		Vec3D cam_yz = new Vec3D(0, cam.y, cam.z).normalize();
 		Vec3D cam_xz = new Vec3D(cam.x, 0, cam.z).normalize();
+		Vec3D cam_xy = new Vec3D(cam.x, cam.y, 0).normalize();
 
 		if (cam.y >= 0) {
 			xBillboardRotation = -cam_yz.angleBetween(new Vec3D(0, 0, 1));
@@ -1199,6 +1263,11 @@ public class TagExplorerProcessing2 extends PApplet {
 		} else {
 			yBillboardRotation = -cam_xz.angleBetween(new Vec3D(0, 0, 1));
 		}
+		
+		//zBillboardRotation = cam_xy.angleBetween(new Vec3D(0, -1, 0));
+		//println(zBillboardRotation);
+		
+//		zBillboardRotation = 0;
 
 		if (cam.z < 0) {
 			xBillboardRotation += PI;
