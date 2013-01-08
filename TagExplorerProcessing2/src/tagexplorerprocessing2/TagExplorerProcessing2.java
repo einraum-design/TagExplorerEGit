@@ -92,8 +92,8 @@ public class TagExplorerProcessing2 extends PApplet {
 	String[] fontExtension = { "fnt", "fon", "otf", "ttf" };
 	String[] messageExtension = { "msg", "eml" };
 
-	String hoverString = null;
-	
+
+	HoverPlane hoverPlane = null;
 
 	PShader transition;
 	PShader transition2;
@@ -137,7 +137,7 @@ public class TagExplorerProcessing2 extends PApplet {
 //		textu.shader(transition);
 //		textu.endDraw();
 
-		font = createFont("arial", 120);
+		font = createFont("arial", 40);
 		ball = createShape(SPHERE, 10);
 		ball.noStroke();
 		ball.fill(155, 100);
@@ -216,8 +216,6 @@ public class TagExplorerProcessing2 extends PApplet {
 			removeController = !removeController;
 		}
 
-		// reset hoverString
-		hoverString = null;
 
 		// draw mainscene
 		drawMainscreen(mainscreen);
@@ -245,18 +243,14 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		text(frameRate, width - 120, 16);
 
-		if (hoverString != null) {
-			fill(255);
-
-			// textSize(28);
-
-			// char c = 'T';
-			// float cw = textWidth(c);
-
-			rect(mouseX, mouseY - 10, textWidth(hoverString) + 20, 20);
-			fill(0);
-			textAlign(LEFT, CENTER);
-			text(hoverString, mouseX + 10, mouseY);
+		// Hover Plane Dateiinfos
+		if(hoverPlane != null){
+			if(hoverPlane.mouseOver()){
+				hoverPlane.render();
+				//println("render hoverplane");
+			} else{
+				hoverPlane = null;
+			}
 		}
 
 		// Promt Messages
@@ -279,6 +273,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	private void drawMainscreen(PGraphics renderer) {
 		// renderer begin:
 		renderer.beginDraw();
+		renderer.smooth(4);
 
 		renderer.background(255);
 
@@ -369,8 +364,11 @@ public class TagExplorerProcessing2 extends PApplet {
 					// renderer.rotateY(yBillboardRotation);
 					// renderer.rotateZ(zBillboardRotation);
 					// renderer.fill(255);
-
-					hoverString = file.viewName + " " + getNewestDate(file);
+					
+					if(hoverPlane == null){
+						hoverPlane = new HoverPlane(this, file, (int)mainscreen.screenX(file.x, file.y, file.z), (int)mainscreen.screenY(file.x, file.y, file.z));
+//						println("Create hoverPlane");
+					}
 
 					// renderer.text(vp.viewName, 10, 0);
 					// renderer.text(vp.creation_time.toGMTString(), 10, 20);
@@ -388,17 +386,17 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	public void drawTags(PGraphics renderer) {
 		for (int i = 0; i < physics.particles.size(); i++) {
-			Tag vp = (Tag) physics.particles.get(i);
+			Tag tag = (Tag) physics.particles.get(i);
 			renderer.strokeWeight(5);
 
-			if (vp.isLocked()) {
+			if (tag.isLocked()) {
 				renderer.stroke(255, 0, 0);
 			} else {
 				renderer.stroke(0, 255, 200);
 			}
-			renderer.point(vp.x, vp.y, vp.z);
+			renderer.point(tag.x, tag.y, tag.z);
 
-			if (mouseOver(renderer, vp, 30, 30)) {
+			if (mouseOver(renderer, tag, 30, 30)) {
 				// renderer.textAlign(LEFT);
 				// renderer.pushMatrix();
 				// renderer.translate(vp.x, vp.y, vp.z);
@@ -406,8 +404,11 @@ public class TagExplorerProcessing2 extends PApplet {
 				// renderer.rotateY(yBillboardRotation);
 				// renderer.fill(255);
 
-				hoverString = vp.name;
-				renderer.text(vp.name, 10, 0);
+				if(hoverPlane == null){
+					//hoverPlane = new HoverPlane(this, file, mouseX, mouseY);
+					hoverPlane = new HoverPlane(this, tag, (int)mainscreen.screenX(tag.x, tag.y, tag.z), (int)mainscreen.screenY(tag.x, tag.y, tag.z));
+					println("Create hoverPlane");
+				}
 
 				// renderer.popMatrix();
 			}

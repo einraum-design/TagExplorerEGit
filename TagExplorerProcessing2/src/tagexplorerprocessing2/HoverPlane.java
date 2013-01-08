@@ -10,26 +10,50 @@ public class HoverPlane extends Vec2D {
 	PShape infoBox;
 	String fileName;
 	
-	public HoverPlane(PApplet p5, Tag_File file, int x, int y){
+	int w = 0;
+	int h = 70;
+	
+	public HoverPlane(PApplet p5, Tag file, int x, int y){
 		super(x, y);
 		this.p5 = p5;
 		this.fileName = file.name;
 		
+		w = (int)p5.textWidth(fileName) + 30;
+		if(w<200){
+			w = 200;
+		}
+		
 		infoBox = p5.createShape();
 		infoBox.fill(255);
-//		infoBox.noStroke();
+//		infoBox.stroke(100);
 		infoBox.vertex(0, 0);
-		infoBox.vertex(0, -300);
-		infoBox.vertex(400, -300);
-		infoBox.vertex(400, -50);
-		infoBox.vertex(30, -50);
+		infoBox.vertex(0, -h);
+		infoBox.vertex(w, -h);
+		infoBox.vertex(w, -20);
+		infoBox.vertex(12, -20);
 		infoBox.end(p5.CLOSE);
+		
+		//System.out.println(this.toString());
 	}
 	
+	@Override
+	public String toString() {
+		return "HoverPlane [p5=" + p5 + ", infoBox=" + infoBox + ", fileName=" + fileName + ", w=" + w + ", h=" + h
+				+ "]";
+	}
+
 	public void render(){
 		p5.shape(infoBox, x, y);
 		p5.fill(0);
-		p5.text(fileName, x+30, y-260);
+		p5.text(fileName, x+15, y-h+20);
 		
+	}
+	
+	public boolean mouseOver(){
+		boolean over = false;
+		if(p5.mouseX >= x-10 && p5.mouseX < x + w && p5.mouseY < y +10 && p5.mouseY > y-h) {
+			over = true;
+		}	
+		return over;
 	}
 }
