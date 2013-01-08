@@ -58,7 +58,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	ArrayList<Tag> showFiles = null;
 	Tag_File oldest_showFile = null;
 
-	Timestamp oldestTime;
+	//Timestamp oldestTime;
 
 	ArrayList<Filter> filters = new ArrayList<Filter>();
 
@@ -93,6 +93,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	String[] messageExtension = { "msg", "eml" };
 
 	String hoverString = null;
+	
 
 	PShader transition;
 	PShader transition2;
@@ -346,9 +347,9 @@ public class TagExplorerProcessing2 extends PApplet {
 	public void drawFiles(PGraphics renderer) {
 		if (filePhysics.particles != null) {
 			for (int i = 0; i < filePhysics.particles.size(); i++) {
-				Tag_File vp = (Tag_File) filePhysics.particles.get(i);
+				Tag_File file = (Tag_File) filePhysics.particles.get(i);
 
-				renderer.shape(vp.shape);
+				renderer.shape(file.shape);
 
 				// balls statt 3D-shapes
 				// renderer.pushMatrix();
@@ -358,7 +359,7 @@ public class TagExplorerProcessing2 extends PApplet {
 				//
 				// renderer.popMatrix();
 
-				if (mouseOver(renderer, vp, 30, 30)) {
+				if (mouseOver(renderer, file, 30, 30)) {
 					// renderer.textAlign(LEFT);
 					//
 					// renderer.pushMatrix();
@@ -369,11 +370,16 @@ public class TagExplorerProcessing2 extends PApplet {
 					// renderer.rotateZ(zBillboardRotation);
 					// renderer.fill(255);
 
-					hoverString = vp.viewName + " " + getNewestDate(vp);
+					hoverString = file.viewName + " " + getNewestDate(file);
 
 					// renderer.text(vp.viewName, 10, 0);
 					// renderer.text(vp.creation_time.toGMTString(), 10, 20);
 					// renderer.popMatrix();
+					
+					if(mousePressed){
+						SQL.setAccessTimeNow(file);
+						
+					}
 				}
 
 			}
@@ -491,6 +497,16 @@ public class TagExplorerProcessing2 extends PApplet {
 	public void initFiles() {
 		ArrayList<Tag> files = new ArrayList<Tag>();
 		files = SQL.queryTagList("files");
+		
+		// get new access times -> access times are strange! set own by opening file SQL.setAccessTimeNow(file);
+//		for(Tag t : files){
+//			Tag_File file = (Tag_File) t;
+//			updateVersionBinding((Tag_File) t);
+//			if(file.versionBindings.size()==0 && file.delete_time == null){
+//				SQL.setLastAccessTime(file);
+//			}
+//		}
+		
 		this.files = files;
 
 		for (Tag t : this.files) {
@@ -502,7 +518,7 @@ public class TagExplorerProcessing2 extends PApplet {
 			updateVersionBinding((Tag_File) t);
 		}
 
-		oldestTime = ((Tag_File) getOldestTagFile(files)).creation_time;
+		oldest_showFile = ((Tag_File) getOldestTagFile(files));
 	}
 
 	// ///////// update Methods ////////////////////
@@ -520,9 +536,10 @@ public class TagExplorerProcessing2 extends PApplet {
 			// alle files
 			showFiles = files;
 		}
-
+		
+		oldest_showFile = null;
 		oldest_showFile = (Tag_File) getOldestTagFile(showFiles);
-		oldestTime = ((Tag_File) getOldestTagFile(files)).creation_time;
+		//oldestTime = ((Tag_File) getOldestTagFile(files)).creation_time;
 
 		if (oldest_showFile != null) {
 			timeline.setWertebereich(oldest_showFile.creation_time);
@@ -556,7 +573,10 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 
 		for (int i = 0; i < tags.size(); i++) {
-			dropParticles(physics, i * dist - (dist * (count - 1) / 2), 0, 50, tags.get(i));
+			//dropParticles(physics, i * dist - (dist * (count - 1) / 2), 0, 50, tags.get(i));
+			
+			dropParticles(physics, i * dist - (dist * (count - 1) / 2), -500, -250, tags.get(i));
+			
 			// dropParticles(physics, width - 150, i * dist + 20, 0,
 			// tags.get(i));
 		}
@@ -618,7 +638,9 @@ public class TagExplorerProcessing2 extends PApplet {
 
 				// System.out.println("dropParticles: file: " +
 				// files.get(i).name);
-				dropParticles(physics, parent.x, parent.y, 0, files.get(i));
+				
+				//dropParticles(physics, parent.x, parent.y, 0, files.get(i));
+				dropParticles(physics, parent.x, parent.y - 40, 0, files.get(i));
 
 				// springs to partent anhand parent file
 				// dropSpring(physics, (Tag_File) files.get(i), parent);
@@ -737,8 +759,8 @@ public class TagExplorerProcessing2 extends PApplet {
 			return newest;
 		}
 		
-		// changes:
-		for(Change c : file.getChanges()){
+		// accesses:
+		for(Access c : file.getAccesses()){
 			if(c.date.after(newest)){
 				newest = c.date;
 			}
@@ -770,7 +792,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		s.addChild(start);
 
 		PShape next = null;
-		for (Change c : file.getChanges()) {
+		for (Access c : file.getAccesses()) {
 			next = makeRect(file, c.date);
 			s.addChild(next);
 			s.addChild(generateConnection(start, next));
@@ -780,7 +802,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		if (file.delete_time != null) {
 			next = makeRect(file, file.delete_time);
 			s.addChild(next);
-			println(file.name);
+			println("generateShape(): deleted file: " + file.name);
 
 			// PShape[] shapes = s.getChildren();
 			s.addChild(generateConnection(start, next));
@@ -790,7 +812,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	}
 
 	public PShape makeRect(Tag file, Timestamp ts) {
-		float z = -mapExp(ts.getTime());
+		float z = -timeline.mapExp(System.currentTimeMillis() - ts.getTime());
 
 		//image(pg, 0, 500, 100, 100);
 		
@@ -882,15 +904,16 @@ public class TagExplorerProcessing2 extends PApplet {
 		return s;
 	}
 
-	public float mapExp(long time) {
-
-		float val = map(sqrt(System.currentTimeMillis() - time), 0,
-				sqrt(System.currentTimeMillis() - timeline.oldest.getTime()), 0, 2000); // 150
-																					// hand
-																					// gesetzt!
-
-		return val;
-	}
+	// verwende timeline.mapExpe(long time);
+//	public float mapExp(long time) {
+//
+//		float val = map(sqrt(System.currentTimeMillis() - time), 0,
+//				sqrt(System.currentTimeMillis() - timeline.oldest.getTime()), 0, 2000); // 150
+//																					// hand
+//																					// gesetzt!
+//
+//		return val;
+//	}
 
 	// ///////// INPUT ///////////////////
 	public void mousePressed() {
@@ -1160,7 +1183,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		Tag_File file = null;
 		String s = path.toString().trim();
 		if (SQL.inDataBase(tableName, s)) {
-			System.out.println("Tag " + s + " is already imported in " + tableName);
+			System.out.println("createNewFile(): Tag " + s + " is already imported in " + tableName);
 		} else {
 			file = (Tag_File) SQL.createDbTag(tableName, s);
 		}

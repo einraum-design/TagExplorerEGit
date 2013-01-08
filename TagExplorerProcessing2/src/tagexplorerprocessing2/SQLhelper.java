@@ -20,7 +20,7 @@ public class SQLhelper {
 	TagExplorerProcessing2 p5;
 
 	MySQL msql;
-	MySQL msql2 ;
+	MySQL msql2;
 	String user = "root";
 	String pass = "root";
 	String database = "files_db";
@@ -34,7 +34,7 @@ public class SQLhelper {
 		this.p5 = p5;
 		msql = new MySQL(p5, host, database, user, pass);
 		msql.connect();
-		
+
 		msql2 = new MySQL(p5, host, database, user, pass);
 		msql2.connect();
 		System.out.println("SQL connection: " + checkConnection());
@@ -55,21 +55,21 @@ public class SQLhelper {
 
 	boolean checkConnection() {
 		boolean connected = true;
-		
-//		if (msql.connect()) {
-//			connected = true;
-//			// System.out.println("SQL connected");
-//		}
+
+		// if (msql.connect()) {
+		// connected = true;
+		// // System.out.println("SQL connected");
+		// }
 		return connected;
 	}
-	
+
 	boolean checkConnection(MySQL msql) {
 		boolean connected = true;
-		
-//		if (msql.connect()) {
-//			connected = true;
-//			// System.out.println("SQL connected");
-//		}
+
+		// if (msql.connect()) {
+		// connected = true;
+		// // System.out.println("SQL connected");
+		// }
 		return connected;
 	}
 
@@ -344,40 +344,23 @@ public class SQLhelper {
 
 					if (fileType == null) {
 						System.out.println("fileType = null extension nicht bekannt, filename: " + file.getFileName());
-						msql.execute("INSERT INTO " + tableName
-								+ " (name, path, size, creation_time) VALUES (\""
+						msql.execute("INSERT INTO " + tableName + " (name, path, size, creation_time) VALUES (\""
 								+ file.getFileName().toString().trim() + "\", \"" + s.trim() + "\", \"" + attr.size()
 								+ "\", \"" + new Timestamp(attr.creationTime().toMillis()) + "\")");
-						
-						
-						// msql.execute( expiration_time     
-						
-						// create Changes Entry last access Time
-						//System.out.println("checkConnection: " + checkConnection(msql2));
-						if(msql2.connect()){
-							msql2.query("SELECT MAX(ID) FROM files");
-							msql2.next();
-							int fileId = msql2.getInt(1);
-							System.out.println("fileId: " + fileId);
-							msql2.execute("INSERT INTO changes (fileID, date, comment) VALUES (" + fileId + ", \"" + new Timestamp(attr.lastAccessTime().toMillis()) + "\", \"" + "comment" + "\")");
-						}
+
+						// msql.execute( expiration_time
+
+						// create Accesses Entry last access Time
+						setLastAccessTime(attr);
 					} else {
 						System.out.println(fileType.toString());
-						msql.execute("INSERT INTO " + tableName
-								+ " (name, type, path, size, creation_time) VALUES (\""
+						msql.execute("INSERT INTO " + tableName + " (name, type, path, size, creation_time) VALUES (\""
 								+ file.getFileName().toString().trim() + "\", \"" + fileType.toString() + "\", \""
 								+ s.trim() + "\", \"" + attr.size() + "\", \""
 								+ new Timestamp(attr.creationTime().toMillis()) + "\")");
-						
-						// create Changes Entry last access Time
-						//System.out.println("checkConnection: " + checkConnection(msql2));
-						if(msql2.connect()){
-							msql2.query("SELECT MAX(ID) FROM files");
-							msql2.next();
-							int fileId = msql2.getInt(1);
-							System.out.println("fileId: " + fileId);
-							msql2.execute("INSERT INTO changes (fileID, date, comment) VALUES (" + fileId + ", \"" + new Timestamp(attr.lastAccessTime().toMillis()) + "\", \"" + "comment" + "\")");
-						}
+
+						// create Accesses Entry last access Time
+						setLastAccessTime(attr);
 					}
 					System.out.println("File " + file.getFileName().toString() + " registered in DB");
 				} else {
@@ -392,6 +375,88 @@ public class SQLhelper {
 			System.out.println(tableName + "wrong or not yet in SQL.createDBTag");
 		}
 		return null;
+	}
+
+	// public void setLastAccessTime(){
+	// if(msql2.connect()){
+	// msql2.query("SELECT MAX(ID) FROM files");
+	// msql2.next();
+	// int fileId = msql2.getInt(1);
+	// System.out.println("fileId: " + fileId);
+	// msql2.execute("INSERT INTO accesses (fileID, date, comment) VALUES (" +
+	// fileId + ", \"" + new Timestamp(attr.lastAccessTime().toMillis()) +
+	// "\", \"" + "comment" + "\")");
+	// }
+	// }
+
+	public void setLastAccessTime(BasicFileAttributes attr) {
+		if (msql2.connect()) {
+			msql2.query("SELECT MAX(ID) FROM files");
+			msql2.next();
+			int fileId = msql2.getInt(1);
+			System.out.println("fileId: " + fileId);
+			if (p5.user != null) {
+				msql2.execute("INSERT INTO accesses (fileID, date, comment, userID) VALUES (" + fileId + ", \""
+						+ new Timestamp(attr.lastAccessTime().toMillis()) + "\", \"" + "comment" + "\", \""
+						+ p5.user.id + "\")");
+			} else {
+				msql2.execute("INSERT INTO accesses (fileID, date, comment) VALUES (" + fileId + ", \""
+						+ new Timestamp(attr.lastAccessTime().toMillis()) + "\", \"" + "comment" + "\")");
+			}
+		}
+	}
+
+	public void setLastAccessTime(Tag_File file) {
+		if (msql2.connect()) {
+
+			Path filePath = FileSystems.getDefault().getPath(file.path);
+			BasicFileAttributes attr;
+			try {
+				attr = Files.readAttributes(filePath, BasicFileAttributes.class);
+
+				// wenn lastAccessTime der Datei neuer ist als newest Timestamp
+				// des Tag_Files
+				if (new Timestamp(attr.lastAccessTime().toMillis()).after(p5.getNewestDate(file))) {
+
+					if (p5.user != null) {
+						msql2.execute("INSERT INTO accesses (fileID, date, comment, userID) VALUES (" + file.id
+								+ ", \"" + new Timestamp(attr.lastAccessTime().toMillis()) + "\", \"" + "comment"
+								+ "\", \"" + p5.user.id + "\")");
+					} else {
+						msql2.execute("INSERT INTO accesses (fileID, date, comment) VALUES (" + file.id + ", \""
+								+ new Timestamp(attr.lastAccessTime().toMillis()) + "\", \"" + "comment" + "\")");
+					}
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+				System.out.println("couldn't reach file to update access time");
+			}
+		}
+	}
+
+	public void setAccessTimeNow(Tag_File file) {
+		if (msql2.connect()) {
+			System.out.println("setAccessTimeNow: " + file.name);
+			
+			Timestamp now = new Timestamp(System.currentTimeMillis());
+			
+			if(now.getTime() - p5.getNewestDate(file).getTime() > 5000){
+				System.out.println("setAccessTimeNow: set! " + file.name);
+//				if (p5.user != null) {
+//					msql2.execute("INSERT INTO accesses (fileID, date, comment, userID) VALUES (" + file.id + ", \""
+//							+ now + "\", \"" + "comment" + "\", \""
+//							+ p5.user.id + "\")");
+//				} else {
+//					msql2.execute("INSERT INTO accesses (fileID, date, comment) VALUES (" + file.id + ", \""
+//							+ now + "\", \"" + "comment" + "\")");
+//				}
+				
+				file.addAccess(new Access(now, "per mouseclick"));
+				file.setShape(p5.generateShape(file));
+				file.z = -p5.timeline.mapExp(p5.getNewestDate(file));
+			}
+
+		}
 	}
 
 	private FileType getFileType(String fileName) {
@@ -604,11 +669,11 @@ public class SQLhelper {
 
 					String blancName = name.substring(0, name.lastIndexOf('.'));
 
-					
 					PImage img = null;
 
 					try {
-						img = p5.loadImage(VersionBuilder.versionsVerzeichnis + "prev" + String.format("%06d", id) + blancName + ".png");
+						img = p5.loadImage(VersionBuilder.versionsVerzeichnis + "prev" + String.format("%06d", id)
+								+ blancName + ".png");
 					} catch (Exception e) {
 						img = p5.loadImage("versionsVerzeichnis/prev.png");
 					}
@@ -618,9 +683,9 @@ public class SQLhelper {
 							msql.getInt("parent_ID"), msql.getInt("origin_ID"), msql.getInt("score"), img);
 
 					tag.setFileType(FileType.IMAGE);
-				} 
+				}
 				// Default FileType
-				else{
+				else {
 					tag = new Tag_File(tableName, id, msql.getString("name"), msql.getFloat("size"),
 							msql.getString("path"), msql.getTimestamp("creation_time"),
 							msql.getTimestamp("expiration_time"), msql.getInt("parent_ID"), msql.getInt("origin_ID"),
@@ -639,10 +704,10 @@ public class SQLhelper {
 			if (ts != null) {
 				tag.setDeleteTime(ts);
 			}
-			
-			// Ÿbergebe alle Changes
-			tag.setChanges(getFileChanges(id));
-			
+
+			// Ÿbergebe alle Accesses
+			tag.setAccesses(getFileAccesses(id));
+
 			t = tag;
 
 		} else if (tableName.equals("locations")) {
@@ -688,24 +753,23 @@ public class SQLhelper {
 			System.out.println("not Connected setDBParent()");
 		}
 	}
-	
-	public ArrayList<Change> getFileChanges(int id){
-		ArrayList<Change> changes = new ArrayList<Change>();
-		
-		if(msql2.connect()){
-		
-			String s = "SELECT * FROM changes WHERE fileID = \"" + id + "\"";
+
+	public ArrayList<Access> getFileAccesses(int id) {
+		ArrayList<Access> accesses = new ArrayList<Access>();
+
+		if (msql2.connect()) {
+
+			String s = "SELECT * FROM accesses WHERE fileID = \"" + id + "\"";
 			msql2.query(s);
-			while(msql2.next()){
-				System.out.println("checkConnection: " + checkConnection(msql2) + " in next()");
-				Change c = new Change(msql2.getTimestamp("date"), msql2.getString("comment"));
-				changes.add(c);
+			while (msql2.next()) {
+				// System.out.println("checkConnection: " +
+				// checkConnection(msql2) + " in next()");
+				Access c = new Access(msql2.getTimestamp("date"), msql2.getString("comment"));
+				accesses.add(c);
 			}
-			System.out.println(id + " changes: " + changes.size());
+			// System.out.println(id + " accesses: " + accesses.size());
 		}
 
-		
-		
-		return changes;
+		return accesses;
 	}
 }

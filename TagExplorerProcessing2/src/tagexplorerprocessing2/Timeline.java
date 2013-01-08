@@ -13,8 +13,6 @@ public class Timeline {
 
 	int timelineLength;
 
-	long startTime;
-
 	public Timeline(TagExplorerProcessing2 p5) {
 		this.p5 = p5;
 
@@ -35,12 +33,8 @@ public class Timeline {
 			renderer.vertex(-10, 0, -timelineLength);
 			renderer.vertex(-10, 0, 0);
 			renderer.endShape(p5.CLOSE);
-
-			
-			long delta = System.currentTimeMillis() - oldest.getTime();
 			
 			renderer.pushMatrix();
-			
 			
 			renderTime(renderer, 60 * 60 * 1000, "1 hour ");
 			
@@ -48,7 +42,11 @@ public class Timeline {
 			
 			renderTime(renderer, 7L * 24 * 60 * 60 * 1000, "1 week ");
 			
-			renderTime(renderer, 14L * 24 * 60 * 60 * 1000, "2 weeds ");
+			renderTime(renderer, 14L * 24 * 60 * 60 * 1000, "2 weeks ");
+			
+			renderTime(renderer, 21L * 24 * 60 * 60 * 1000, "3 weeks ");
+			
+			renderTime(renderer, 28L * 24 * 60 * 60 * 1000, "4 weeks ");
 			
 			renderTime(renderer, 30L * 24 * 60 * 60 * 1000, "1 month ");
 			
@@ -74,11 +72,11 @@ public class Timeline {
 		renderer.translate(0, 0, -mapExp(time));
 		renderer.rotateX(p5.xBillboardRotation);
 		renderer.rotateY(p5.yBillboardRotation);
-		renderer.fill(255);
+		renderer.fill(0);
 		renderer.text(name, 0, 0);
 		renderer.rotateY(-p5.yBillboardRotation);
 		renderer.rotateX(-p5.xBillboardRotation);
-		renderer.translate(0, 0, -mapExp(60 * 60 * 1000));
+		renderer.translate(0, 0, mapExp(time));
 	}
 
 	public float mapExp(Timestamp ts) {
@@ -89,8 +87,7 @@ public class Timeline {
 	}
 
 	public float mapExp(long time) {
-		float maxLength = timelineLength;
-		float val = p5.map(p5.sqrt(time), 0, p5.sqrt(System.currentTimeMillis() - oldest.getTime()), 0, maxLength);
+		float val = p5.map(p5.sqrt(time), 0, p5.sqrt(System.currentTimeMillis() - oldest.getTime()), 0, timelineLength);
 		// System.out.println("val: " + p5.sqrt(time));
 		return val;
 	}
@@ -98,9 +95,10 @@ public class Timeline {
 	public void setWertebereich(Timestamp ts) {
 		if (ts != null) {
 			oldest = ts;
-			long currentTime = System.currentTimeMillis();
-			startTime = ts.getTime();
-			long delta = currentTime - startTime;
+			timelineLength = (int) p5.sqrt((System.currentTimeMillis() - oldest.getTime())/10000);
+			System.out.println(System.currentTimeMillis() +  " - " + oldest.getTime());
+			System.out.println(System.currentTimeMillis() - oldest.getTime());
+			System.out.println("setWertebereich: timelineLength: " + timelineLength);
 		}
 
 	}

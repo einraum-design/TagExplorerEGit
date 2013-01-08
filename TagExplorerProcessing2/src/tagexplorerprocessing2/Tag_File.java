@@ -28,10 +28,10 @@ public class Tag_File extends Tag {
 	ArrayList<Tag_File> fileBindings = new ArrayList<Tag_File>();
 	ArrayList<Tag_File> versionBindings = new ArrayList<Tag_File>();
 	
-	private ArrayList<Change> changes = new ArrayList<Change>();
+	private ArrayList<Access> accesses = new ArrayList<Access>();
 
-	public ArrayList<Change> getChanges() {
-		return changes;
+	public ArrayList<Access> getAccesses() {
+		return accesses;
 	}
 
 	public String viewName;
@@ -79,12 +79,12 @@ public class Tag_File extends Tag {
 		this.versionBindings.add(file);
 	}
 	
-	public void addChange(Change c){
-		changes.add(c);
+	public void addAccess(Access c){
+		accesses.add(c);
 	}
 	
-	public void setChanges(ArrayList<Change> changes){
-		this.changes = changes;
+	public void setAccesses(ArrayList<Access> accesses){
+		this.accesses = accesses;
 	}
 
 	public void updateViewName() {
@@ -103,7 +103,7 @@ public class Tag_File extends Tag {
 				+ creation_time + ", expiration_time=" + expiration_time + ", delete_time=" + delete_time
 				+ ", parent_ID=" + parent_ID + ", origin_ID=" + origin_ID + ", score=" + score + ", shape=" + shape
 				+ ", attributeBindings=" + attributeBindings + ", fileBindings=" + fileBindings + ", versionBindings="
-				+ versionBindings + ", changes=" + changes + ", viewName=" + viewName + ", id=" + id + ", name=" + name
+				+ versionBindings + ", accesses=" + accesses + ", viewName=" + viewName + ", id=" + id + ", name=" + name
 				+ ", type=" + type + ", x=" + x + ", y=" + y + ", z=" + z + "]";
 	}
 
