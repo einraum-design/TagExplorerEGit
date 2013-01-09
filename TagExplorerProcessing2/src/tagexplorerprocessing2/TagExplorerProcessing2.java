@@ -52,7 +52,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	ArrayList<Tag> files = null;
 	ArrayList<Tag> showFiles = null;
 	ArrayList<Tag> availableTags = new ArrayList<Tag>();
-	
+
 	Tag_File oldest_showFile = null;
 
 	// Timestamp oldestTime;
@@ -115,10 +115,10 @@ public class TagExplorerProcessing2 extends PApplet {
 		size(1800, 600, P3D);
 		// frame.setLocation(1970, 50);
 		smooth(4);
-		
+
 		font = createFont("arial", 40);
 		textFont(font, 14);
-		
+
 		loadImages();
 
 		// ControlP5
@@ -148,7 +148,6 @@ public class TagExplorerProcessing2 extends PApplet {
 		transition2.set("res", 100.0f, 100.0f);
 		transition2.set("color", (1.0f), (0.1f), (0.1f));
 
-		
 		// ball = createShape(SPHERE, 10);
 		// ball.noStroke();
 		// ball.fill(155, 100);
@@ -207,7 +206,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		// set Mouse active nach jeweils 600 millis;
 		if (System.currentTimeMillis() > lastClick.getTime() + 600) {
 			mouseActive = true;
-		} else{
+		} else {
 			mouseActive = false;
 		}
 
@@ -395,11 +394,6 @@ public class TagExplorerProcessing2 extends PApplet {
 					// renderer.text(vp.viewName, 10, 0);
 					// renderer.text(vp.creation_time.toGMTString(), 10, 20);
 					// renderer.popMatrix();
-
-					if (mousePressed) {
-						SQL.setAccessTimeNow(file);
-
-					}
 				}
 
 			}
@@ -561,10 +555,6 @@ public class TagExplorerProcessing2 extends PApplet {
 			// alle files
 			showFiles = files;
 		}
-		
-		// get mit showFiles verknüpfte Tags & Häufigkeit
-//		availableTags = getTagcountAndTags(showFiles);
-		
 
 		oldest_showFile = null;
 		oldest_showFile = (Tag_File) getOldestTagFile(showFiles);
@@ -579,25 +569,16 @@ public class TagExplorerProcessing2 extends PApplet {
 		setParticlesPosition(filePhysics, showFiles);
 	}
 
-//	private ArrayList<Tag> getTagcountAndTags(ArrayList<Tag> showFiles) {
-//		
-//		resetTagCount();
-//		
-//		ArrayList<Tag> aktuelleTagMap = new ArrayList<Tag>();
-//		
-//		for(Tag t: showFiles){
-//			Tag_File file = (Tag_File) t;
-//			for(Tag tag : file.attributeBindings){
-//				if(aktuelleTagMap.contains(tag)){
-//					int key = aktuelleTagMap.get(tag);
-//				}else{
-//					aktuelleTagMap.put(1, tag);
-//				}
-//			}
-//		}
-//		
-//		return null;
-//	}
+	private ArrayList<Tag> getTagcountAndTags(ArrayList<Tag> showFiles) {
+		ArrayList<Tag> aktuelleTags = new ArrayList<Tag>();
+
+		for (Tag tag : attributes) {
+			if (tag.bindCount > 0) {
+				aktuelleTags.add(tag);
+			}
+		}
+		return aktuelleTags;
+	}
 
 	public void updateTags() {
 		ArrayList<Tag> tags = new ArrayList<Tag>();
@@ -610,19 +591,27 @@ public class TagExplorerProcessing2 extends PApplet {
 		// tags.addAll(SQL.queryTagList("files"));
 		// tags nicht überscheiben, sondern nur abgleichen!
 		this.attributes = tags;
-		
-		
+
 		// reset bindCount
-		for(Tag tag : attributes){
+		for (Tag tag : attributes) {
 			tag.bindCount = 0;
 		}
-		
+
 		// aktuelle FileBindings
-		for(Tag f : showFiles){
-			Tag_File file = (Tag_File) f;
-			for(Tag tag : file.attributeBindings){
-				tag.bindCount ++;
+		if (showFiles != null) {
+			for (Tag f : showFiles) {
+				Tag_File file = (Tag_File) f;
+				for (Tag tag : file.attributeBindings) {
+					tag.bindCount++;
+				}
 			}
+		}
+
+		// get mit showFiles verknüpfte Tags & Häufigkeit
+		this.availableTags = getTagcountAndTags(showFiles);
+
+		for (Tag tag : availableTags) {
+			System.out.println(tag.name + " " + tag.bindCount);
 		}
 
 		physics.particles.clear();
@@ -995,21 +984,22 @@ public class TagExplorerProcessing2 extends PApplet {
 			}
 		}
 
-//		if (b != null) {
-//			println("dispose");
-//			// PromtNewFile pro = promts.get(0);
-//			b.dispose();
-//			b = null;
-//
-//			// pro = null;
-//			// pro.markForDisposal();
-//			// promts.remove(p);
-//		}
+		// if (b != null) {
+		// println("dispose");
+		// // PromtNewFile pro = promts.get(0);
+		// b.dispose();
+		// b = null;
+		//
+		// // pro = null;
+		// // pro.markForDisposal();
+		// // promts.remove(p);
+		// }
 	}
 
-//	public void handleTextEvents(GEditableTextControl textcontrol, GEvent event) {
-//		println("textEvent");
-//	}
+	// public void handleTextEvents(GEditableTextControl textcontrol, GEvent
+	// event) {
+	// println("textEvent");
+	// }
 
 	// public void mouseDragged() {
 	// if (mouseOver(50, 50, 100, 100)) {
@@ -1191,7 +1181,7 @@ public class TagExplorerProcessing2 extends PApplet {
 			updateSprings();
 			break;
 		case 'C':
-//			b = new GTextField(this, 0, 0, 100, 100);
+			// b = new GTextField(this, 0, 0, 100, 100);
 			// PromtNewFile p = new PromtNewFile(this);
 			// promts.add(p);
 			break;
@@ -1228,7 +1218,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 	}
 
-//	GTextField b = null;
+	// GTextField b = null;
 	ArrayList<PromtNewFile> promts = new ArrayList<PromtNewFile>();
 
 	// ///////////// Tag handling /////////////////////
@@ -1344,32 +1334,32 @@ public class TagExplorerProcessing2 extends PApplet {
 			removeController();
 		}
 	}
-	
-	public void tagInput(String tagName){
+
+	public void tagInput(String tagName) {
 		println("Textfield tagInput content: " + tagName);
 	}
 
-//	public void handleButtonEvents(GButton button, GEvent event) {
-//		println("buttonEvent: " + event.toString());
-//
-//		for (PromtNewFile p : promts) {
-//
-//			if (button == p.btnCancel) {
-//
-//				return;
-//			}
-//		}
-//	}
-//
-//	public void handlePanelEvents(GPanel panel, GEvent event) {
-//		println("panelEvent: " + event.toString());
-//		for (PromtNewFile p : promts) {
-//
-//			if (panel == p) {
-//				println("hello p");
-//			}
-//		}
-//	}
+	// public void handleButtonEvents(GButton button, GEvent event) {
+	// println("buttonEvent: " + event.toString());
+	//
+	// for (PromtNewFile p : promts) {
+	//
+	// if (button == p.btnCancel) {
+	//
+	// return;
+	// }
+	// }
+	// }
+	//
+	// public void handlePanelEvents(GPanel panel, GEvent event) {
+	// println("panelEvent: " + event.toString());
+	// for (PromtNewFile p : promts) {
+	//
+	// if (panel == p) {
+	// println("hello p");
+	// }
+	// }
+	// }
 
 	// ///////////// Promt Location ////////////
 	Promt p = null;

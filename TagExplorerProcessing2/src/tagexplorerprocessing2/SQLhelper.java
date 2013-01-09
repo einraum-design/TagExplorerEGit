@@ -217,21 +217,26 @@ public class SQLhelper {
 				query += "ID = '" + id + "'";
 				first = false;
 			}
-
-			msql.query(query);
-
-			// get Tags
-			while (msql.next()) {
-				Tag t = getSpecificTags(tableName);
-				if (t != null) {
-					tags.add(t);
+			
+			// wenn keine Ÿbrig bleiben!
+			if(!query.equals("SELECT * FROM " + tableName + " WHERE ")){
+				msql.query(query);
+	
+				// get Tags
+				while (msql.next()) {
+					Tag t = getSpecificTags(tableName);
+					if (t != null) {
+						tags.add(t);
+					}
 				}
+			} else{
+				System.out.println("queryTagListFiltered(): Filter ergeben keinen Treffer!");
 			}
 		} else {
 			System.out.println("not Connected queryTagListFiltered()");
 		}
 
-		System.out.println("return " + tags.size() + " tags from queryTagListFiltered");
+		System.out.println("return " + tags.size() + " tags from queryTagListFiltered()");
 		return tags;
 	}
 
