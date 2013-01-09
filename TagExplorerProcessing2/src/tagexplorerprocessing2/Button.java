@@ -21,7 +21,7 @@ public class Button extends Vec2D{
 		this.h = h;
 	}
 	
-	public Button(PApplet p5, int x, int y, int w, int h){
+	public Button(PApplet p5, int w, int h, int x, int y){
 		super(x, y);
 		this.p5 = p5;
 		this.w = w;

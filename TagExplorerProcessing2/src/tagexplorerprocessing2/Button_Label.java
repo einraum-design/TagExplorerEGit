@@ -17,8 +17,8 @@ public class Button_Label extends Button {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public Button_Label(PApplet p5, String label, int x, int y, int w, int h){
-		super(p5, x, y, w, h);
+	public Button_Label(PApplet p5, String label, int w, int h, int x, int y){
+		super(p5, w, h, x, y);
 		this.p5 = p5;
 		if (w < (int) p5.textWidth(label) + 10) {
 			w = (int) p5.textWidth(label) + 10;

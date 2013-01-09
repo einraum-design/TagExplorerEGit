@@ -212,7 +212,7 @@ public class WatchDir extends Thread {
 			}
 
 			// add all current filters
-			for (Filter filter : p5.filters) {
+			for (Filter filter : p5.filterList) {
 				if (filter.inOut) {
 					SQL.bindTag(file, filter.tag);
 				}
@@ -227,6 +227,7 @@ public class WatchDir extends Thread {
 			//p5.generateShape(file);
 			p5.files.add(file);
 			p5.updateShowFiles();
+			p5.updateTags();
 			p5.updateSprings();
 		}
 	}
@@ -272,7 +273,7 @@ public class WatchDir extends Thread {
 		new VersionBuilder(path.toString(), file.id).start();
 
 		// add all current filters
-		for (Filter filter : p5.filters) {
+		for (Filter filter : p5.filterList) {
 			if (filter.inOut) {
 				SQL.bindTag(file, filter.tag);
 			}
@@ -292,6 +293,7 @@ public class WatchDir extends Thread {
 		p5.updateVersionBinding(file);
 		p5.files.add(file);
 		p5.updateShowFiles();
+		p5.updateTags();
 		p5.updateSprings();
 		System.out.print(file.toString());
 		// }

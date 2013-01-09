@@ -7,6 +7,7 @@ public class Tag extends VerletParticle {
 	String name;
 	String type = "tag";
 //	TagField tagField;
+	int bindCount = 0;
 	
 	public Tag(){
 		super(0, 0, 0);

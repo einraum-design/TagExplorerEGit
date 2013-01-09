@@ -2,13 +2,12 @@ package tagexplorerprocessing2;
 
 import java.util.ArrayList;
 
-import processing.core.PApplet;
 import processing.core.PShape;
 import toxi.geom.Vec2D;
 
 public class HoverPlane extends Vec2D {
 	
-	PApplet p5;
+	TagExplorerProcessing2 p5;
 	PShape infoBox;
 	String fileName;
 	
@@ -17,7 +16,7 @@ public class HoverPlane extends Vec2D {
 	
 	ArrayList<Button> buttonList = new ArrayList<Button>();
 	
-	public HoverPlane(PApplet p5, Tag tag, int x, int y){
+	public HoverPlane(TagExplorerProcessing2 p5, Tag tag, int x, int y){
 		super(x, y);
 		this.p5 = p5;
 		this.fileName = tag.name;
@@ -29,8 +28,11 @@ public class HoverPlane extends Vec2D {
 		
 		infoBox = createInfoBox();
 		
-		Button b = new Button_Label(p5, "open", x+w-15-50, y-30-20, 50, 20);
+		Button b = new Button_Label(p5, "open", 50, 20, x+w-15-50, y-30-20);
 		buttonList.add(b);
+		
+//		b = new Button_Symbol(p5, p5.closeImg, x+w-15-80, y-30-20);
+//		buttonList.add(b);
 		
 		//System.out.println(this.toString());
 	}
@@ -50,7 +52,6 @@ public class HoverPlane extends Vec2D {
 		for(Button b:buttonList){
 			b.render();
 		}
-		
 	}
 	
 	private PShape createInfoBox() {
