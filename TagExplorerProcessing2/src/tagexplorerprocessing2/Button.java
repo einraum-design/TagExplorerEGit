@@ -12,6 +12,9 @@ public class Button extends Vec2D{
 		super(0, 0);
 		this.p5 = p5;
 		this.w = w;
+		if(w<(int)p5.textWidth(label) + 10){
+			w = (int)p5.textWidth(label) + 10;
+		}
 		this.h = h;
 		this.label = label;
 	}
@@ -20,6 +23,9 @@ public class Button extends Vec2D{
 		super(x, y);
 		this.p5 = p5;
 		this.w = w;
+		if(w<(int)p5.textWidth(label) + 10){
+			w = (int)p5.textWidth(label) + 10;
+		}
 		this.h = h;
 		this.label = label;
 	}
@@ -32,7 +38,9 @@ public class Button extends Vec2D{
 		}
 		
 		p5.rect(x, y, w, h);
-		p5.text(label, x+5, y+15);
+		p5.fill(50);
+		p5.textAlign(p5.CENTER, p5.CENTER);
+		p5.text(label, x+w/2, y+h/2);
 		
 	}
 	

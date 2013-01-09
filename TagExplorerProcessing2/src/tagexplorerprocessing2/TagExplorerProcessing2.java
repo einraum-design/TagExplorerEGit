@@ -109,6 +109,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	public void setup() {
 		size(1800, 600, P3D);
 		// frame.setLocation(1970, 50);
+		smooth(4);
 
 		mainscreen = createGraphics(width, height - 40, P3D);
 		pg = createGraphics(100, 100, P2D);

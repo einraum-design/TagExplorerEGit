@@ -36,34 +36,20 @@ public class Timeline {
 			
 			renderer.pushMatrix();
 			
-			renderTime(renderer, 60 * 60 * 1000, "1 hour ");
+			renderer.textAlign(p5.CENTER);
 			
-			renderTime(renderer, 24 * 60 * 60 * 1000, "1 day ");
-			
-			renderTime(renderer, 7L * 24 * 60 * 60 * 1000, "1 week ");
-			
-			renderTime(renderer, 14L * 24 * 60 * 60 * 1000, "2 weeks ");
-			
-			renderTime(renderer, 21L * 24 * 60 * 60 * 1000, "3 weeks ");
-			
-			renderTime(renderer, 28L * 24 * 60 * 60 * 1000, "4 weeks ");
-			
-			renderTime(renderer, 30L * 24 * 60 * 60 * 1000, "1 month ");
+			renderTime(renderer, 60 * 60 * 1000, "1 hour");
+			renderTime(renderer, 24 * 60 * 60 * 1000, "1 day");
+			renderTime(renderer, 7L * 24 * 60 * 60 * 1000, "1 week");
+			renderTime(renderer, 14L * 24 * 60 * 60 * 1000, "2 weeks");
+			renderTime(renderer, 21L * 24 * 60 * 60 * 1000, "3 weeks");
+//			renderTime(renderer, 28L * 24 * 60 * 60 * 1000, "4 weeks ");
+			renderTime(renderer, 30L * 24 * 60 * 60 * 1000, "1 month");
+			renderTime(renderer, 6 * 30L * 24 * 60 * 60 * 1000, "6 month");
+			renderTime(renderer, 365 * 24 * 60 * 60 * 1000, "1 year");
 			
 			renderTime(renderer, System.currentTimeMillis() - oldest.getTime(), oldest.toGMTString());
-			
 
-//			pg.text("1 day ", 0, mapExp(24 * 60 * 60 * 1000));
-//
-//			pg.text("1 week ", 0, mapExp(7L * 24 * 60 * 60 * 1000));
-//			pg.text("2 weeks ", 0, mapExp(14L * 24 * 60 * 60 * 1000));
-//
-//			pg.text("1 month ", 0, mapExp(30L * 24 * 60 * 60 * 1000));
-//
-//			pg.text(oldest.toGMTString(), 0,
-//					p5.map(System.currentTimeMillis() - oldest.getTime(), 0, delta, 0, timeLineLength));
-			
-			
 			renderer.popMatrix();
 		}
 	}
