@@ -29,7 +29,7 @@ public class HoverPlane extends Vec2D {
 		
 		infoBox = createInfoBox();
 		
-		Button b = new Button(p5, "open", x+w-15-50, y-30-20, 50, 20);
+		Button b = new Button_Label(p5, "open", x+w-15-50, y-30-20, 50, 20);
 		buttonList.add(b);
 		
 		//System.out.println(this.toString());

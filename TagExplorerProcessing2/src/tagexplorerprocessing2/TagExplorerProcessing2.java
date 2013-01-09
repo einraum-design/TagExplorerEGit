@@ -80,7 +80,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	VerletPhysics physics;
 	VerletPhysics filePhysics;
 
-	PShape ball;
+//	PShape ball;
 
 	String[] imageExtension = { "jpg", "jpeg", "png", "gif", "psd", "tif", "tiff", "bmp", "tga" };
 	String[] vectorExtension = { "ai", "drw", "eps", "ps", "svg" };
@@ -94,6 +94,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 
 	HoverPlane hoverPlane = null;
+	MenuPlane menuPlane;
 
 	PShader transition;
 	PShader transition2;
@@ -111,6 +112,8 @@ public class TagExplorerProcessing2 extends PApplet {
 		// frame.setLocation(1970, 50);
 		smooth(4);
 
+		menuPlane = new MenuPlane(this);
+		
 		mainscreen = createGraphics(width, height - 40, P3D);
 		pg = createGraphics(100, 100, P2D);
 		// mainscreen.smooth(4);
@@ -132,17 +135,11 @@ public class TagExplorerProcessing2 extends PApplet {
 		transition2.set("res", 100.0f, 100.0f);
 		transition2.set("color", (1.0f), (0.1f), (0.1f));
 
-//		textu = createGraphics(100, 100);
-//		textu.beginDraw();
-//		textu.rect(0, 0, textu.width, textu.height);
-//		textu.shader(transition);
-//		textu.endDraw();
-
 		font = createFont("arial", 40);
-		ball = createShape(SPHERE, 10);
-		ball.noStroke();
-		ball.fill(155, 100);
-		ball.emissive(150, 0, 0);
+//		ball = createShape(SPHERE, 10);
+//		ball.noStroke();
+//		ball.fill(155, 100);
+//		ball.emissive(150, 0, 0);
 
 		// ball.shininess(0);
 
@@ -221,17 +218,31 @@ public class TagExplorerProcessing2 extends PApplet {
 		// draw mainscene
 		drawMainscreen(mainscreen);
 
-		// draw timeline right
-		// timeline.draw();
-		// image(timeline.pg, width - 200, 0);
-
 //		pg.beginDraw();
 //		pg.fill(25, 0, 0);
 //		pg.rect(0, 0, pg.width, pg.height);
 //		pg.shader(transition2);
 //		pg.endDraw();
+
+		
+		// MenuPlane
+		menuPlane.update();
+		menuPlane.render();
+		
+
+		// Hover Plane Dateiinfos
+		if(hoverPlane != null){
+			if(hoverPlane.mouseOver()){
+				hoverPlane.render();
+				//println("render hoverplane");
+			} else{
+				hoverPlane = null;
+			}
+		}
 		
 		
+		
+		// logging
 		fill(150);
 		noStroke();
 		if (user != null) {
@@ -243,16 +254,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 
 		text(frameRate, width - 120, 16);
-
-		// Hover Plane Dateiinfos
-		if(hoverPlane != null){
-			if(hoverPlane.mouseOver()){
-				hoverPlane.render();
-				//println("render hoverplane");
-			} else{
-				hoverPlane = null;
-			}
-		}
+		
 
 		// Promt Messages
 		if (p != null) {

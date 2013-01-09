@@ -6,28 +6,26 @@ import toxi.geom.Vec2D;
 public class Button extends Vec2D{
 	PApplet p5;
 	int w, h;
-	String label;
 	
-	public Button(PApplet p5, String label, int w, int h){
+	public Button(PApplet p5){
 		super(0, 0);
 		this.p5 = p5;
-		this.w = w;
-		if(w<(int)p5.textWidth(label) + 10){
-			w = (int)p5.textWidth(label) + 10;
-		}
-		this.h = h;
-		this.label = label;
+		this.w = 10;	
+		this.h = 10;
 	}
 	
-	public Button(PApplet p5, String label, int x, int y, int w, int h){
+	public Button(PApplet p5, int w, int h){
+		super(0, 0);
+		this.p5 = p5;
+		this.w = w;	
+		this.h = h;
+	}
+	
+	public Button(PApplet p5, int x, int y, int w, int h){
 		super(x, y);
 		this.p5 = p5;
 		this.w = w;
-		if(w<(int)p5.textWidth(label) + 10){
-			w = (int)p5.textWidth(label) + 10;
-		}
 		this.h = h;
-		this.label = label;
 	}
 	
 	public void render(){
@@ -36,12 +34,8 @@ public class Button extends Vec2D{
 		} else{
 			p5.fill(200);
 		}
-		
+		p5.noStroke();
 		p5.rect(x, y, w, h);
-		p5.fill(50);
-		p5.textAlign(p5.CENTER, p5.CENTER);
-		p5.text(label, x+w/2, y+h/2);
-		
 	}
 	
 	
