@@ -6,3 +6,6 @@ savePrevImage EXCEPTION!
 in zPositionsbereichnung getNewest Time auch changes berŸcksichtigen!
 
 in updateFiles: set z wert nach erstellungszeitpunk bei origin - ansonsten / bereich erstelleung expiration time .
+
+
+Java Abfrage der gefilten Dateien, countMatches -> setVisible or not / positions werden nicht komplett neu gesetzt

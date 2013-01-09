@@ -441,20 +441,22 @@ public class SQLhelper {
 
 	public void setAccessTimeNow(Tag_File file) {
 		if (msql2.connect()) {
-			System.out.println("setAccessTimeNow: " + file.name);
+			//System.out.println("setAccessTimeNow: " + file.name);
 			
 			Timestamp now = new Timestamp(System.currentTimeMillis());
 			
+			// letzter zugriff mindestens 5 sekunden her!
 			if(now.getTime() - p5.getNewestDate(file).getTime() > 5000){
-				System.out.println("setAccessTimeNow: set! " + file.name);
-//				if (p5.user != null) {
-//					msql2.execute("INSERT INTO accesses (fileID, date, comment, userID) VALUES (" + file.id + ", \""
-//							+ now + "\", \"" + "comment" + "\", \""
-//							+ p5.user.id + "\")");
-//				} else {
-//					msql2.execute("INSERT INTO accesses (fileID, date, comment) VALUES (" + file.id + ", \""
-//							+ now + "\", \"" + "comment" + "\")");
-//				}
+				System.out.println("setAccessTimeNow: open! " + file.name);
+				
+				if (p5.user != null) {
+					msql2.execute("INSERT INTO accesses (fileID, date, comment, userID) VALUES (" + file.id + ", \""
+							+ now + "\", \"" + "comment" + "\", \""
+							+ p5.user.id + "\")");
+				} else {
+					msql2.execute("INSERT INTO accesses (fileID, date, comment) VALUES (" + file.id + ", \""
+							+ now + "\", \"" + "per mouseclick" + "\")");
+				}
 				
 				file.addAccess(new Access(now, "per mouseclick"));
 				file.setShape(p5.generateShape(file));
@@ -613,7 +615,7 @@ public class SQLhelper {
 		return isInDB;
 	}
 
-	// noch nicht fertig!
+	// noch nicht fertig! - sollte gehen!
 	public Tag getLastCreatedTag(String tableName) {
 		Tag tag = null;
 

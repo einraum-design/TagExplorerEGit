@@ -1,5 +1,6 @@
 package tagexplorerprocessing2;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import de.bezier.data.sql.SQL;
@@ -62,8 +63,13 @@ public class HoverPlane extends Vec2D {
 		// }
 		if (openButton != null) {
 			openButton.render();
+			
+//			System.out.println(p5.mouseActive +"&&" + p5.mousePressed + "&&" + openButton.mouseOver());
 			if (p5.mouseActive && p5.mousePressed && openButton.mouseOver()) {
 				p5.SQL.setAccessTimeNow((Tag_File) tag);
+				p5.lastClick = new Timestamp(System.currentTimeMillis());
+				p5.mouseActive = false;
+				System.out.println("ResetLastClick in HoverPlane.render()");
 			}
 		}
 

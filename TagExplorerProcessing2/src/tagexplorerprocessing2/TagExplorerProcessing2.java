@@ -208,7 +208,9 @@ public class TagExplorerProcessing2 extends PApplet {
 			mouseActive = true;
 		} else {
 			mouseActive = false;
+			
 		}
+//		println("mouseActive: " + mouseActive);
 
 		calcBillboardRotation();
 		transition.set("shaderTime", (millis() / 1000.0f));
@@ -251,12 +253,10 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 
 		// logging
-
-		if (location != null) {
-			text("Location: " + location.name, 150, 16);
-		}
-
+		fill(0);
 		text(frameRate, width - 120, 16);
+		// macht hintergrund für 3D Objekte weiß!
+		fill(255);
 
 		// Promt Messages
 		if (p != null) {
@@ -516,16 +516,6 @@ public class TagExplorerProcessing2 extends PApplet {
 		ArrayList<Tag> files = new ArrayList<Tag>();
 		files = SQL.queryTagList("files");
 
-		// get new access times -> access times are strange! set own by opening
-		// file SQL.setAccessTimeNow(file);
-		// for(Tag t : files){
-		// Tag_File file = (Tag_File) t;
-		// updateVersionBinding((Tag_File) t);
-		// if(file.versionBindings.size()==0 && file.delete_time == null){
-		// SQL.setLastAccessTime(file);
-		// }
-		// }
-
 		this.files = files;
 
 		for (Tag t : this.files) {
@@ -539,6 +529,19 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		oldest_showFile = ((Tag_File) getOldestTagFile(files));
 	}
+	
+	public ArrayList<Tag> initTagsFromDB() {
+		ArrayList<Tag> tags = new ArrayList<Tag>();
+
+		tags = SQL.queryTagList("keywords");
+		tags.addAll(SQL.queryTagList("locations"));
+		tags.addAll(SQL.queryTagList("projects"));
+		tags.addAll(SQL.queryTagList("users"));
+
+		// tags.addAll(SQL.queryTagList("files"));
+		// tags nicht überscheiben, sondern nur abgleichen!
+		return tags;
+	}
 
 	// ///////// update Methods ////////////////////
 	public void updateShowFiles() {
@@ -546,11 +549,16 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		// filter files
 		if (filterList.size() > 0) {
-			// ArrayList<Tag> files = SQL.queryTagListFiltered("files",
-			// filters.get(0));
-			// showFiles = files;
-			// showFiles = SQL.queryTagListFiltered("files", filters);
+			
+			// DB abfrage 
 			showFiles = SQL.queryTagListFiltered("files", filterList);
+			
+			
+			//alternativ Java Abfrage:
+			// set matches -> mit wie vielen Tags stimmt überein!
+			
+			//showFiles = getMatches(filterList);
+			
 		} else {
 			// alle files
 			showFiles = files;
@@ -581,17 +589,19 @@ public class TagExplorerProcessing2 extends PApplet {
 	}
 
 	public void updateTags() {
-		ArrayList<Tag> tags = new ArrayList<Tag>();
+//		ArrayList<Tag> tags = new ArrayList<Tag>();
+//
+//		tags = SQL.queryTagList("keywords");
+//		tags.addAll(SQL.queryTagList("locations"));
+//		tags.addAll(SQL.queryTagList("projects"));
+//		tags.addAll(SQL.queryTagList("users"));
+//
+//		// tags.addAll(SQL.queryTagList("files"));
+//		// tags nicht überscheiben, sondern nur abgleichen!
+//		this.attributes = tags;
 
-		tags = SQL.queryTagList("keywords");
-		tags.addAll(SQL.queryTagList("locations"));
-		tags.addAll(SQL.queryTagList("projects"));
-		tags.addAll(SQL.queryTagList("users"));
-
-		// tags.addAll(SQL.queryTagList("files"));
-		// tags nicht überscheiben, sondern nur abgleichen!
-		this.attributes = tags;
-
+		attributes = initTagsFromDB();
+		
 		// reset bindCount
 		for (Tag tag : attributes) {
 			tag.bindCount = 0;
@@ -616,7 +626,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		physics.particles.clear();
 
-		int count = tags.size();
+		int count = attributes.size();
 		float dist;
 		if (count > 1) {
 			dist = ((float) height - 40) / (count - 1);
@@ -624,11 +634,11 @@ public class TagExplorerProcessing2 extends PApplet {
 			dist = 0;
 		}
 
-		for (int i = 0; i < tags.size(); i++) {
+		for (int i = 0; i < attributes.size(); i++) {
 			// dropParticles(physics, i * dist - (dist * (count - 1) / 2), 0,
 			// 50, tags.get(i));
 
-			dropParticles(physics, i * dist - (dist * (count - 1) / 2), -500, -250, tags.get(i));
+			dropParticles(physics, i * dist - (dist * (count - 1) / 2), -500, -250, attributes.get(i));
 
 			// dropParticles(physics, width - 150, i * dist + 20, 0,
 			// tags.get(i));
@@ -972,6 +982,9 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	// ///////// INPUT ///////////////////
 	public void mousePressed() {
+		
+		//lastClick = new Timestamp(System.currentTimeMillis());
+		
 		for (Tag t : showFiles) {
 
 			if (mouseOver(mainscreen, t.x + mainscreen.width / 2, t.y + mainscreen.height / 2, t.z, 30, 30)) {
@@ -1009,6 +1022,8 @@ public class TagExplorerProcessing2 extends PApplet {
 	// }
 
 	public void mouseReleased() {
+		lastClick = new Timestamp(System.currentTimeMillis());
+		
 		if (startTag != null) {
 			if (startTag instanceof Tag_File) {
 				// File -> Attribute

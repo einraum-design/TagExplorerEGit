@@ -1,5 +1,7 @@
 package tagexplorerprocessing2;
 
+import java.sql.Timestamp;
+
 import controlP5.ControlP5;
 import controlP5.Textfield;
 import processing.core.PApplet;
@@ -44,6 +46,23 @@ public class MenuPlane {
 		String inputText = cp5.get(Textfield.class,inputFieldName).getText().trim();
 		if(!inputText.equals(infoText) && !inputText.equals("")){
 			System.out.println(inputText);
+		}
+		
+		if(cp5.get(Textfield.class,inputFieldName).isFocus()){
+			for(int i = 0; i<p5.availableTags.size(); i++){
+				Tag tag = p5.availableTags.get(i);
+				Button_Label b = new Button_Label(p5, tag.name + " " + tag.bindCount, cp5.get(Textfield.class,inputFieldName).getWidth(), cp5.get(Textfield.class,inputFieldName).getHeight(), (int) cp5.get(Textfield.class,inputFieldName).getPosition().x, (int)cp5.get(Textfield.class,inputFieldName).getPosition().y);
+				b.y = b.y + cp5.get(Textfield.class,inputFieldName).getHeight()*(i+1);
+				b.render();
+				if(p5.mouseActive && b.mouseOver() && p5.mousePressed){
+					p5.filterList.add(new Filter(tag, true));
+					p5.updateShowFiles();
+					p5.updateTags();
+					p5.updateSprings();
+					p5.lastClick = new Timestamp(System.currentTimeMillis());
+					p5.mouseActive = false;
+				}
+			}
 		}
 		
 	}
