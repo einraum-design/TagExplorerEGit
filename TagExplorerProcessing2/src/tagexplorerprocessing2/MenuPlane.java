@@ -53,7 +53,7 @@ public class MenuPlane {
 		if (cp5.get(Textfield.class, inputFieldName).isFocus() && inputText.equals(infoText)) {
 			cp5.get(Textfield.class, inputFieldName).setValue("");
 		}
-		
+
 		// nicht Focus -> infoText
 		if (!cp5.get(Textfield.class, inputFieldName).isFocus()) {
 			cp5.get(Textfield.class, inputFieldName).setValue(infoText);
@@ -122,6 +122,7 @@ public class MenuPlane {
 	}
 
 	public void render() {
+		// weiße Fläche
 		p5.fill(255, 220);
 		p5.noStroke();
 		p5.rect(0, 0, p5.width, h);
@@ -139,11 +140,12 @@ public class MenuPlane {
 	}
 
 	public void createTextField(String name, String value) {
-		System.out.println("createTextfield");
+//		System.out.println("createTextfield");
 
 		cp5.addTextfield(name).setValue(value).setPosition(10, 40).setSize(200, 28).setFont(font).setFocus(false)
-				.setColorCursor(0).setColorBackground(p5.color(255)).setColorActive(p5.color(0, 255, 50))
+				.setColorCursor(0).setColorBackground(p5.color(255)).setColorActive(p5.color(0, 255, 50)).setLabelVisible(false)
 				.setColor(p5.color(0));
+//		cp5.get(Textfield.class, inputFieldName).getLabel().
 	}
 
 	public boolean mouseOver() {

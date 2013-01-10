@@ -22,6 +22,8 @@ public class Tag_File extends Tag {
 	int origin_ID = 0;
 	int score;
 	
+	int matches = 0;
+	
 	PShape shape;
 
 	ArrayList<Tag> attributeBindings = new ArrayList<Tag>();

@@ -190,8 +190,8 @@ public class TagExplorerProcessing2 extends PApplet {
 		filePhysics = new VerletPhysics();
 
 		// erst Tags, dann Files!
-		updateTags();
-		initFiles();
+		attributes = initTagsFromDB();
+		files = initFilesFromDB();
 		updateShowFiles();
 		updateTags();
 		updateSprings();
@@ -251,9 +251,9 @@ public class TagExplorerProcessing2 extends PApplet {
 		// pg.shader(transition2);
 		// pg.endDraw();
 
-		// MenuPlane
-		menuPlane.update();
+		// MenuPlane	
 		menuPlane.render();
+		menuPlane.update();
 
 		// Hover Plane Dateiinfos
 		if (hoverPlane != null) {
@@ -378,40 +378,20 @@ public class TagExplorerProcessing2 extends PApplet {
 			for (int i = 0; i < filePhysics.particles.size(); i++) {
 				Tag_File file = (Tag_File) filePhysics.particles.get(i);
 
-				//
 				renderer.shape(file.shape);
-				//
 
 				// balls statt 3D-shapes
 				// renderer.pushMatrix();
 				// renderer.translate(vp.x, vp.y, vp.z);
-				//
 				// renderer.shape(ball);
-				//
 				// renderer.popMatrix();
 
 				if (mouseOver(renderer, file, 30, 30)) {
-					// renderer.textAlign(LEFT);
-					//
-					// renderer.pushMatrix();
-					// renderer.translate(vp.x, vp.y, vp.z);
-					//
-					// renderer.rotateX(xBillboardRotation);
-					// renderer.rotateY(yBillboardRotation);
-					// renderer.rotateZ(zBillboardRotation);
-					// renderer.fill(255);
-
 					if (hoverPlane == null) {
 						hoverPlane = new HoverPlane(this, file, (int) mainscreen.screenX(file.x, file.y, file.z),
 								(int) mainscreen.screenY(file.x, file.y, file.z));
-						// println("Create hoverPlane");
 					}
-
-					// renderer.text(vp.viewName, 10, 0);
-					// renderer.text(vp.creation_time.toGMTString(), 10, 20);
-					// renderer.popMatrix();
 				}
-				
 			}
 //			resetShader();
 		}
@@ -430,21 +410,11 @@ public class TagExplorerProcessing2 extends PApplet {
 			renderer.point(tag.x, tag.y, tag.z);
 
 			if (mouseOver(renderer, tag, 30, 30)) {
-				// renderer.textAlign(LEFT);
-				// renderer.pushMatrix();
-				// renderer.translate(vp.x, vp.y, vp.z);
-				// renderer.rotateX(xBillboardRotation);
-				// renderer.rotateY(yBillboardRotation);
-				// renderer.fill(255);
-
 				if (hoverPlane == null) {
-					// hoverPlane = new HoverPlane(this, file, mouseX, mouseY);
 					hoverPlane = new HoverPlane(this, tag, (int) mainscreen.screenX(tag.x, tag.y, tag.z),
 							(int) mainscreen.screenY(tag.x, tag.y, tag.z));
-					println("Create hoverPlane");
+//					println("Create hoverPlane");
 				}
-
-				// renderer.popMatrix();
 			}
 		}
 	}
@@ -529,13 +499,13 @@ public class TagExplorerProcessing2 extends PApplet {
 	}
 
 	// ///////// init Methods //////////////////////
-	public void initFiles() {
+	public ArrayList<Tag> initFilesFromDB() {
 		ArrayList<Tag> files = new ArrayList<Tag>();
 		files = SQL.queryTagList("files");
 
-		this.files = files;
+		//this.files = files;
 
-		for (Tag t : this.files) {
+		for (Tag t : files) {
 			// set AttributeBindings
 			updateFileTagBinding((Tag_File) t);
 			// set FileBindings
@@ -545,6 +515,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 
 		oldest_showFile = ((Tag_File) getOldestTagFile(files));
+		return files;
 	}
 
 	public ArrayList<Tag> initTagsFromDB() {
@@ -564,16 +535,18 @@ public class TagExplorerProcessing2 extends PApplet {
 	public void updateShowFiles() {
 		System.out.println("updateShowFiles()");
 
+		// count matches mit FilterList
+		updateMatches(files);
+		
 		// filter files
 		if (filterList.size() > 0) {
 
 			// DB abfrage
 			showFiles = SQL.queryTagListFiltered("files", filterList);
 
-			// alternativ Java Abfrage:
-			// set matches -> mit wie vielen Tags stimmt überein!
-
-			// showFiles = getMatches(filterList);
+			// alternativ Java Abfrage:			
+			//showFiles = getAllMatches(files);
+			
 
 		} else {
 			// alle files
@@ -592,6 +565,40 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		setParticlesPosition(filePhysics, showFiles);
 	}
+	
+	private ArrayList<Tag> getAllMatches(ArrayList<Tag> files) {
+		ArrayList<Tag> fullMatches = new ArrayList<Tag>();
+		for(Tag t:files){
+			Tag_File file = (Tag_File) t;
+			if(file.matches == filterList.size()){
+				fullMatches.add(file);
+			}
+		}
+		return fullMatches;
+	}
+
+	// zählt matches mit Filer ++ oder bei inOut false --
+	public void updateMatches(ArrayList<Tag> files){
+		for(Tag t : files){
+			Tag_File file = (Tag_File) t;
+			// set matches = 0
+			file.matches = 0;
+			
+			// count matches mit filterList
+			for(Filter f : filterList){
+				if(f.inOut){
+					if(file.attributeBindings.contains(f.tag)){
+						file.matches ++;
+					}
+				} else{
+					if(file.attributeBindings.contains(f.tag)){
+						file.matches --;
+					}
+				}
+			}	
+		}
+	}
+	
 
 	private ArrayList<Tag> getTagcountAndTags(ArrayList<Tag> showFiles) {
 		ArrayList<Tag> aktuelleTags = new ArrayList<Tag>();
@@ -1367,6 +1374,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 	}
 
+	// Menuplane Textinput Feld
 	public void tagInput(String tagName) {
 		println("Textfield tagInput content: " + tagName);
 	}
