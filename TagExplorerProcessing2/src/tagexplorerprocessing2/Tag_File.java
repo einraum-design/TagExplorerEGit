@@ -23,6 +23,7 @@ public class Tag_File extends Tag {
 	int score;
 	
 	int matches = 0;
+	boolean newest = false;
 	
 	PShape shape;
 

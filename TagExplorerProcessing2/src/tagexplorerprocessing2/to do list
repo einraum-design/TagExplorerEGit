@@ -1,13 +1,20 @@
 next todo: 
 
 
-neuen Tag in der void tagInput() in der main
+OverlayPlanes: Attribute werden gezeigt und können hinzugefügt werden.
+müssen noch gelöscht werden können!
+
+main.getNewestTagFile(ArrayList<Tag> files) { !!!
+
+
+neues Attribut in der void tagInput() in der main  -> nutze alte Promts!
+
+Shiftpositionierung der Attribute von MenuPlane (Fileter.render()) und HoverPlane (Tag.render())
 
 savePrevImage EXCEPTION!
 
-in zPositionsbereichnung getNewest Time auch changes berücksichtigen!
 
-in updateFiles: set z wert nach erstellungszeitpunk bei origin - ansonsten / bereich erstelleung expiration time .
+in updateFiles: set z wert nach erstellungszeitpunk bei origin - ansonsten / bereich erstellung expiration time .
 
 
 Java Abfrage der gefilten Dateien, countMatches -> setVisible or not / positions werden nicht komplett neu gesetzt

@@ -127,7 +127,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		cp5_Promt = new ControlP5(this);
 		cp5_Menu = new ControlP5(this);
 
-		menuPlane = new MenuPlane(this, cp5_Menu);
+		menuPlane = new MenuPlane(this);
 
 		mainscreen = createGraphics(width, height - 40, P3D);
 		pg = createGraphics(100, 100, P2D);
@@ -245,22 +245,19 @@ public class TagExplorerProcessing2 extends PApplet {
 		// draw mainscene
 		drawMainscreen(mainscreen);
 
-		// pg.beginDraw();
-		// pg.fill(25, 0, 0);
-		// pg.rect(0, 0, pg.width, pg.height);
-		// pg.shader(transition2);
-		// pg.endDraw();
-
 		// MenuPlane	
 		menuPlane.render();
 		menuPlane.update();
 
 		// Hover Plane Dateiinfos
 		if (hoverPlane != null) {
+			
 			if (hoverPlane.mouseOver()) {
 				hoverPlane.render();
 				// println("render hoverplane");
 			} else {
+				// delete Textfield
+				cp5_Menu.get(Textfield.class, hoverPlane.inputFieldName).remove();
 				hoverPlane = null;
 			}
 		}
@@ -282,26 +279,8 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		physics.update();
 		filePhysics.update();
-
-		// update filterList
-		// boolean change = false;
-		// for (FilterM filter : filterMList) {
-		// if (filter.dispose) {
-		// ArrayList<FilterM> myFilters = (ArrayList<FilterM>)
-		// filterMList.clone();
-		// myFilters.remove(filter);
-		// filterMList = myFilters;
-		// change = true;
-		// }
-		// }
-		// if (change) {
-		// updateShowFiles();
-		// // updateTags();
-		// updateSprings();
-		// }
 	}
 
-	float mainScreenYRotation = 0;
 
 	private void drawMainscreen(PGraphics renderer) {
 		// renderer begin:
@@ -373,12 +352,16 @@ public class TagExplorerProcessing2 extends PApplet {
 	// ///////// display Methods ////////////////////
 
 	public void drawFiles(PGraphics renderer) {
+		
+		PShape s = createShape(GROUP);
+		
 		if (filePhysics.particles != null) {
 //			shader(plifShader);
 			for (int i = 0; i < filePhysics.particles.size(); i++) {
 				Tag_File file = (Tag_File) filePhysics.particles.get(i);
-
-				renderer.shape(file.shape);
+				
+				s.addChild(file.shape);
+//				renderer.shape(file.shape);
 
 				// balls statt 3D-shapes
 				// renderer.pushMatrix();
@@ -393,6 +376,8 @@ public class TagExplorerProcessing2 extends PApplet {
 					}
 				}
 			}
+			
+			renderer.shape(s);
 //			resetShader();
 		}
 	}
@@ -438,7 +423,8 @@ public class TagExplorerProcessing2 extends PApplet {
 				s.stroke(0, 0, 255);
 				break;
 			}
-
+			
+//			shape(s);
 			shape.addChild(s);
 
 			// renderer.stroke(255);
@@ -594,7 +580,6 @@ public class TagExplorerProcessing2 extends PApplet {
 			}	
 		}
 	}
-	
 
 	private ArrayList<Tag> getTagcountAndTags(ArrayList<Tag> showFiles) {
 		ArrayList<Tag> aktuelleTags = new ArrayList<Tag>();
@@ -607,6 +592,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		return aktuelleTags;
 	}
 
+	// setzt bindCount & available Tags & setzt Patikelpositionen neu
 	public void updateTags() {
 		// ArrayList<Tag> tags = new ArrayList<Tag>();
 		//
@@ -832,6 +818,27 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 		return oldest;
 	}
+	
+	
+	// noch nicht fertig!
+	private Tag getNewestTagFile(ArrayList<Tag> files) {
+
+		Tag newest = null;
+		
+//		Tag oldest = null;
+//		Timestamp comp = new Timestamp(System.currentTimeMillis());
+//		for (Tag file : files) {
+//			// println("getOldestTagFile: file.name: " + file.name);
+//			if (((Tag_File) file).creation_time.before(comp)) {
+//				comp = ((Tag_File) file).creation_time;
+//				oldest = file;
+//			}
+//		}
+//		return oldest;
+		
+		return newest;
+	}
+	
 
 	Timestamp getNewestDate(Tag_File file) {
 		Timestamp newest = file.creation_time;
@@ -1050,8 +1057,9 @@ public class TagExplorerProcessing2 extends PApplet {
 				for (Tag t : attributes) {
 					if (mouseOver(mainscreen, t.x + mainscreen.width / 2, t.y + mainscreen.height / 2, t.z, 30, 30)) {
 						Tag_File file = (Tag_File) startTag;
+						file.attributeBindings.add(startTag);
 						SQL.bindTag(file, t);
-						updateFileTagBinding(file);
+						//updateFileTagBinding(file);
 						updateTags();
 						updateSprings();
 					}
