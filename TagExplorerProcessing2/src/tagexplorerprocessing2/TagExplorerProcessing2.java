@@ -191,7 +191,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		// erst Tags, dann Files!
 		attributes = initTagsFromDB();
-		files = initFilesFromDB();
+		initFilesFromDB();
 		updateShowFiles();
 		updateTags();
 		updateSprings();
@@ -499,13 +499,13 @@ public class TagExplorerProcessing2 extends PApplet {
 	}
 
 	// ///////// init Methods //////////////////////
-	public ArrayList<Tag> initFilesFromDB() {
+	public void initFilesFromDB() {
 		ArrayList<Tag> files = new ArrayList<Tag>();
 		files = SQL.queryTagList("files");
 
-		//this.files = files;
+		this.files = files;
 
-		for (Tag t : files) {
+		for (Tag t : this.files) {
 			// set AttributeBindings
 			updateFileTagBinding((Tag_File) t);
 			// set FileBindings
@@ -514,8 +514,8 @@ public class TagExplorerProcessing2 extends PApplet {
 			updateVersionBinding((Tag_File) t);
 		}
 
-		oldest_showFile = ((Tag_File) getOldestTagFile(files));
-		return files;
+		oldest_showFile = ((Tag_File) getOldestTagFile(this.files));
+//		return files;
 	}
 
 	public ArrayList<Tag> initTagsFromDB() {
@@ -540,23 +540,19 @@ public class TagExplorerProcessing2 extends PApplet {
 		
 		// filter files
 		if (filterList.size() > 0) {
-
-			// DB abfrage
-			showFiles = SQL.queryTagListFiltered("files", filterList);
+			// DB Abfrage
+			//showFiles = SQL.queryTagListFiltered("files", filterList);
 
 			// alternativ Java Abfrage:			
-			//showFiles = getAllMatches(files);
-			
-
+			showFiles = getFullMatches(files);
 		} else {
 			// alle files
 			showFiles = files;
 		}
 
-		oldest_showFile = null;
 		oldest_showFile = (Tag_File) getOldestTagFile(showFiles);
-		// oldestTime = ((Tag_File) getOldestTagFile(files)).creation_time;
-
+		
+		// set Timeline Wertebereich
 		if (oldest_showFile != null) {
 			timeline.setWertebereich(oldest_showFile.creation_time);
 		} else {
@@ -566,7 +562,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		setParticlesPosition(filePhysics, showFiles);
 	}
 	
-	private ArrayList<Tag> getAllMatches(ArrayList<Tag> files) {
+	private ArrayList<Tag> getFullMatches(ArrayList<Tag> files) {
 		ArrayList<Tag> fullMatches = new ArrayList<Tag>();
 		for(Tag t:files){
 			Tag_File file = (Tag_File) t;
