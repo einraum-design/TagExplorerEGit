@@ -96,6 +96,8 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	PShader transition;
 	PShader transition2;
+	PShader plifShader;
+	PImage env_plif;
 
 	// Images
 	PImage closeImg;
@@ -147,6 +149,9 @@ public class TagExplorerProcessing2 extends PApplet {
 		transition2 = loadShader("../shader/transition.glsl");
 		transition2.set("res", 100.0f, 100.0f);
 		transition2.set("color", (1.0f), (0.1f), (0.1f));
+
+		plifShader = loadShader("../shader/plifFrag.glsl", "../shader/plifVert.glsl");
+		env_plif = loadImage("../data/env_plif.jpg");
 
 		// ball = createShape(SPHERE, 10);
 		// ball.noStroke();
@@ -208,13 +213,21 @@ public class TagExplorerProcessing2 extends PApplet {
 			mouseActive = true;
 		} else {
 			mouseActive = false;
-			
+
 		}
-//		println("mouseActive: " + mouseActive);
+		// println("mouseActive: " + mouseActive);
 
 		calcBillboardRotation();
 		transition.set("shaderTime", (millis() / 1000.0f));
 		transition2.set("shaderTime", (millis() / 1000.0f));
+
+		plifShader.set("shininess", 5.1f);
+		// plifShader.set("BaseColor", .4f, .4f, 1.0f);
+		plifShader.set("EnvMap", 0);
+		plifShader.set("MixRatio", 0.2f);
+		plifShader.set("SpecularVal", 0.2f);
+		// plifShader.set("Xunitvec", 1, 0, 0);
+		// plifShader.set("Yunitvec", 0, 1, 0);
 
 		pg.beginDraw();
 		pg.fill(25, 0, 0);
@@ -361,10 +374,13 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	public void drawFiles(PGraphics renderer) {
 		if (filePhysics.particles != null) {
+//			shader(plifShader);
 			for (int i = 0; i < filePhysics.particles.size(); i++) {
 				Tag_File file = (Tag_File) filePhysics.particles.get(i);
 
+				//
 				renderer.shape(file.shape);
+				//
 
 				// balls statt 3D-shapes
 				// renderer.pushMatrix();
@@ -395,8 +411,9 @@ public class TagExplorerProcessing2 extends PApplet {
 					// renderer.text(vp.creation_time.toGMTString(), 10, 20);
 					// renderer.popMatrix();
 				}
-
+				
 			}
+//			resetShader();
 		}
 	}
 
@@ -529,7 +546,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		oldest_showFile = ((Tag_File) getOldestTagFile(files));
 	}
-	
+
 	public ArrayList<Tag> initTagsFromDB() {
 		ArrayList<Tag> tags = new ArrayList<Tag>();
 
@@ -549,16 +566,15 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		// filter files
 		if (filterList.size() > 0) {
-			
-			// DB abfrage 
+
+			// DB abfrage
 			showFiles = SQL.queryTagListFiltered("files", filterList);
-			
-			
-			//alternativ Java Abfrage:
+
+			// alternativ Java Abfrage:
 			// set matches -> mit wie vielen Tags stimmt Ÿberein!
-			
-			//showFiles = getMatches(filterList);
-			
+
+			// showFiles = getMatches(filterList);
+
 		} else {
 			// alle files
 			showFiles = files;
@@ -589,19 +605,19 @@ public class TagExplorerProcessing2 extends PApplet {
 	}
 
 	public void updateTags() {
-//		ArrayList<Tag> tags = new ArrayList<Tag>();
-//
-//		tags = SQL.queryTagList("keywords");
-//		tags.addAll(SQL.queryTagList("locations"));
-//		tags.addAll(SQL.queryTagList("projects"));
-//		tags.addAll(SQL.queryTagList("users"));
-//
-//		// tags.addAll(SQL.queryTagList("files"));
-//		// tags nicht Ÿberscheiben, sondern nur abgleichen!
-//		this.attributes = tags;
+		// ArrayList<Tag> tags = new ArrayList<Tag>();
+		//
+		// tags = SQL.queryTagList("keywords");
+		// tags.addAll(SQL.queryTagList("locations"));
+		// tags.addAll(SQL.queryTagList("projects"));
+		// tags.addAll(SQL.queryTagList("users"));
+		//
+		// // tags.addAll(SQL.queryTagList("files"));
+		// // tags nicht Ÿberscheiben, sondern nur abgleichen!
+		// this.attributes = tags;
 
 		attributes = initTagsFromDB();
-		
+
 		// reset bindCount
 		for (Tag tag : attributes) {
 			tag.bindCount = 0;
@@ -884,6 +900,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		s.fill(0, 0, 255);
 		s.noStroke();
 		s.texture(pg);
+		// s.texture(env_plif);
 		s.vertex(file.x + 10, file.y + 10, z, 0, 0);
 		s.vertex(file.x + 10, file.y - 10, z, 0, pg.height);
 		s.vertex(file.x - 10, file.y - 10, z, pg.width, pg.height);
@@ -982,9 +999,9 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	// ///////// INPUT ///////////////////
 	public void mousePressed() {
-		
-		//lastClick = new Timestamp(System.currentTimeMillis());
-		
+
+		// lastClick = new Timestamp(System.currentTimeMillis());
+
 		for (Tag t : showFiles) {
 
 			if (mouseOver(mainscreen, t.x + mainscreen.width / 2, t.y + mainscreen.height / 2, t.z, 30, 30)) {
@@ -1023,7 +1040,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	public void mouseReleased() {
 		lastClick = new Timestamp(System.currentTimeMillis());
-		
+
 		if (startTag != null) {
 			if (startTag instanceof Tag_File) {
 				// File -> Attribute
