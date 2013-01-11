@@ -22,6 +22,8 @@ public class Tag extends VerletParticle {
 		
 	}
 	
+	
+	
 	public int renderTag(TagExplorerProcessing2 p5, Tag_File file, int x, int y) {
 
 		int w = (int) p5.textWidth(this.name) + 25;
@@ -40,8 +42,6 @@ public class Tag extends VerletParticle {
 			// lŠsst sich nicht wŠhrend scheifendurchlauf lšschen -> passiert nach rendert Tag in HoverPlane.render()
 			//file.attributeBindings.remove(this);
 			p5.SQL.unbindTag(file, this);
-			//removeAtrribute!
-			//removeFromFilterList(p5);
 		}
 
 		return w;

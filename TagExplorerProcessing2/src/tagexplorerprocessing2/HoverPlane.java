@@ -18,8 +18,6 @@ public class HoverPlane extends Plane {
 	int w = 0;
 	int h = 130;
 
-	
-
 	Button_Label openButton;
 
 	String infoText = "add Tag";
@@ -34,12 +32,15 @@ public class HoverPlane extends Plane {
 		if (w < 200) {
 			w = 200;
 		}
-		
+
 		infoBox = createInfoBox();
-		
+
 		if (tag instanceof Tag_File) {
 			openButton = new Button_Label(p5, "open", 50, 20, x + w - 15 - 50, y - 30 - 20);
+
 			createTextField(inputFieldName, infoText, x + 10, y - 60);
+
+			createTypeButtons(inputFieldName);
 		}
 		// buttonList.add(b);
 
@@ -71,7 +72,9 @@ public class HoverPlane extends Plane {
 			// verwende die funktion von MenüPlane
 			updateTextfieldValue(inputFieldName, infoText);
 
-			dropDownHeight = drawTagList(inputFieldName);
+			dropDownHeight = drawTagAuswahlList(inputFieldName);
+			
+			drawSaveTypeButtons();
 
 			openButton.render();
 
@@ -84,13 +87,12 @@ public class HoverPlane extends Plane {
 				System.out.println("ResetLastClick in HoverPlane.render()");
 			}
 		}
-		
-		
+
 		// draw binded Tags
 		int xShift = 0;
 		int yShift = 0;
-		for (Tag tag : ((Tag_File)this.tag).attributeBindings) {
-			xShift += tag.renderTag(p5, (Tag_File)this.tag, (int)x + 10 + xShift,(int) y -h + 35 + yShift) + 3;
+		for (Tag tag : ((Tag_File) this.tag).attributeBindings) {
+			xShift += tag.renderTag(p5, (Tag_File) this.tag, (int) x + 10 + xShift, (int) y - h + 35 + yShift) + 3;
 
 			if (xShift > w - 20) {
 				xShift = 0;
@@ -98,15 +100,16 @@ public class HoverPlane extends Plane {
 			}
 		}
 		// update attributeBindings der File
-		((Tag_File)this.tag).attributeBindings = p5.SQL.getBindedTagList(((Tag_File)this.tag));
-		
-		
+		((Tag_File) this.tag).attributeBindings = p5.SQL.getBindedTagList(((Tag_File) this.tag));
+		// wenn attribut gelöscht wurde:
+		p5.updateSprings();
+
 	}
 
 	// draw TagList
 	//
 
-	public int drawTagList(String inputFieldName) {
+	public int drawTagAuswahlList(String inputFieldName) {
 		if (cp5.get(Textfield.class, inputFieldName).isFocus()) {
 
 			ArrayList<Tag> sortedTags = sort(inputFieldName, 12);
@@ -122,10 +125,10 @@ public class HoverPlane extends Plane {
 				if (p5.mouseActive && b.mouseOver() && p5.mousePressed) {
 
 					// add TagBinding to Tag_File!
-					((Tag_File)this.tag).attributeBindings.add(tag);
-					p5.SQL.bindTag((Tag_File)this.tag, tag);
-					
-					//p5.updateShowFiles();
+					((Tag_File) this.tag).attributeBindings.add(tag);
+					p5.SQL.bindTag((Tag_File) this.tag, tag);
+
+					// p5.updateShowFiles();
 					p5.updateTags();
 					p5.updateSprings();
 					p5.lastClick = new Timestamp(System.currentTimeMillis());
@@ -133,11 +136,48 @@ public class HoverPlane extends Plane {
 				}
 			}
 			return (sortedTags.size() + 1) * cp5.get(Textfield.class, inputFieldName).getHeight();
+
 		}
 
 		return 0;
 	}
 	
+	public void drawSaveTypeButtons(){
+		for(Button b : buttonTypeList){
+			b.render();
+			// text nicht gleich "" oder infotext
+			if(!cp5.get(Textfield.class, inputFieldName).getText().trim().toLowerCase().equals("") && 
+					!cp5.get(Textfield.class, inputFieldName).getText().equals(infoText)){
+				if (p5.mouseActive && b.mouseOver() && p5.mousePressed) {
+					
+					// create neuen Tag + update Tags + Springs
+					Tag tag = p5.createNewTag(cp5.get(Textfield.class, inputFieldName).getText().trim(), ((Button_TagType)b).type);
+					
+					// wenn tag schon existiert gebe tag zurück (nur absicherung)
+					if(tag == null){
+						System.out.println("Tag exixts already - use existing tag");
+						tag = p5.getTagByName(cp5.get(Textfield.class, inputFieldName).getText().trim());
+					}
+					
+					//add File-Tag binding
+					((Tag_File) this.tag).attributeBindings.add(tag);
+					p5.SQL.bindTag(((Tag_File) this.tag), tag);
+					p5.updateTags();
+					
+					p5.lastClick = new Timestamp(System.currentTimeMillis());
+					p5.mouseActive = false;
+				}
+			} else{
+				// 
+				//System.out.println("inputTextField ist " + cp5.get(Textfield.class, inputFieldName).getText());
+			}
+			
+			
+		}
+		
+		//return (int) buttonTypeList.get(buttonTypeList.size() - 1).x + buttonTypeList.get(buttonTypeList.size() - 1).h;
+	}
+
 	public ArrayList<Tag> sort(String inputFieldName) {
 		ArrayList<Tag> sortedTags = new ArrayList<Tag>();
 		// nicht gleich "":
@@ -197,9 +237,10 @@ public class HoverPlane extends Plane {
 	public void createTextField(String name, String value, float x, float y) {
 		// System.out.println("createTextfield");
 
-		cp5.addTextfield(name).setValue(value).setPosition(x, y).setSize(w-20, 18).setFont(p5.createFont("arial", 14))
-				.setFocus(false).setColorCursor(0).setColorBackground(p5.color(255))
-				.setColorActive(p5.color(0, 255, 50)).setLabelVisible(false).setColor(p5.color(0)).getCaptionLabel().setVisible(false);
+		cp5.addTextfield(name).setValue(value).setPosition(x, y).setSize(w - 120, 18)
+				.setFont(p5.createFont("arial", 14)).setFocus(false).setColorCursor(0)
+				.setColorBackground(p5.color(255)).setColorActive(p5.color(0, 255, 50)).setLabelVisible(false)
+				.setColor(p5.color(0)).getCaptionLabel().setVisible(false);
 		// cp5.get(Textfield.class, inputFieldName).getLabel().
 	}
 
@@ -207,22 +248,17 @@ public class HoverPlane extends Plane {
 		boolean over = false;
 		if (p5.mouseX >= x - 10 && p5.mouseX < x + w && p5.mouseY < y + 10 && p5.mouseY > y - h) {
 			over = true;
-		} else if (dropDownHeight > 0 && cp5.get(Textfield.class, inputFieldName).isFocus()
+		} else if (dropDownHeight > 0
+				&& cp5.get(Textfield.class, inputFieldName).isFocus()
 				&& p5.mouseX >= cp5.get(Textfield.class, inputFieldName).getPosition().x - 10
-				&& p5.mouseX < cp5.get(Textfield.class, inputFieldName).getPosition().x + cp5.get(Textfield.class, inputFieldName).getWidth() + 10
-				&& p5.mouseY > cp5.get(Textfield.class, inputFieldName).getPosition().y - 10 
+				&& p5.mouseX < cp5.get(Textfield.class, inputFieldName).getPosition().x
+						+ cp5.get(Textfield.class, inputFieldName).getWidth() + 10
+				&& p5.mouseY > cp5.get(Textfield.class, inputFieldName).getPosition().y - 10
 				&& p5.mouseY < cp5.get(Textfield.class, inputFieldName).getPosition().y + dropDownHeight + 10) {
-	
+
 			over = true;
 		}
-		
-//		p5.rectMode(p5.CORNERS);
-//		p5.fill(0, 60);
-//		p5.rect(cp5.get(Textfield.class, inputFieldName).getPosition().x - 10, 
-//			cp5.get(Textfield.class, inputFieldName).getPosition().y - 10,
-//			cp5.get(Textfield.class, inputFieldName).getPosition().x + cp5.get(Textfield.class, inputFieldName).getWidth() + 10,
-//			cp5.get(Textfield.class, inputFieldName).getPosition().y + dropDownHeight + 10);
-//		p5.rectMode(p5.CORNER);
+
 		return over;
 	}
 }

@@ -3,20 +3,22 @@ package tagexplorerprocessing2;
 import processing.core.PApplet;
 import processing.core.PConstants;
 
-public class Button_Label extends Button {
-
+public class Button_TagType extends Button {
 	String label;
+	String type = null;
 	
-	public Button_Label(TagExplorerProcessing2 p5, String label, int w, int h) {
+	
+	public Button_TagType(TagExplorerProcessing2 p5, String label, String type, int w, int h) {
 		super(p5, w, h);
 		this.p5 = p5;
 		if (this.w < (int) p5.textWidth(label) + 10) {
 			this.w = (int) p5.textWidth(label) + 10;
 		}
 		this.label = label;
+		this.type = type;
 	}
 	
-	public Button_Label(TagExplorerProcessing2 p5, String label, int w, int h, int x, int y){
+	public Button_TagType(TagExplorerProcessing2 p5, String label, String type, int w, int h, int x, int y){
 		super(p5, w, h, x, y);
 		this.p5 = p5;
 		
@@ -24,6 +26,7 @@ public class Button_Label extends Button {
 			this.w = (int) p5.textWidth(label) + 20;
 		}
 		this.label = label;
+		this.type = type;
 	}
 	
 	public void render(){
@@ -40,5 +43,4 @@ public class Button_Label extends Button {
 		p5.textAlign(PConstants.CENTER, PConstants.CENTER);
 		p5.text(label, x+w/2, y+h/2);
 	}
-
 }

@@ -245,19 +245,23 @@ public class TagExplorerProcessing2 extends PApplet {
 		// draw mainscene
 		drawMainscreen(mainscreen);
 
-		// MenuPlane	
+		// MenuPlane
 		menuPlane.render();
 		menuPlane.update();
 
 		// Hover Plane Dateiinfos
 		if (hoverPlane != null) {
-			
+
 			if (hoverPlane.mouseOver()) {
 				hoverPlane.render();
 				// println("render hoverplane");
 			} else {
 				// delete Textfield
+				try{
 				cp5_Menu.get(Textfield.class, hoverPlane.inputFieldName).remove();
+				} catch (Exception e){
+					e.printStackTrace();
+				}
 				hoverPlane = null;
 			}
 		}
@@ -273,6 +277,10 @@ public class TagExplorerProcessing2 extends PApplet {
 			p.showPromt();
 		}
 
+		if (typeChooser != null) {
+			typeChooser.render();
+		}
+
 		// reset mouseHover & interation status
 		interaction = false;
 		hoverPoint = null;
@@ -280,7 +288,6 @@ public class TagExplorerProcessing2 extends PApplet {
 		physics.update();
 		filePhysics.update();
 	}
-
 
 	private void drawMainscreen(PGraphics renderer) {
 		// renderer begin:
@@ -352,16 +359,16 @@ public class TagExplorerProcessing2 extends PApplet {
 	// ///////// display Methods ////////////////////
 
 	public void drawFiles(PGraphics renderer) {
-		
+
 		PShape s = createShape(GROUP);
-		
+
 		if (filePhysics.particles != null) {
-//			shader(plifShader);
+			// shader(plifShader);
 			for (int i = 0; i < filePhysics.particles.size(); i++) {
 				Tag_File file = (Tag_File) filePhysics.particles.get(i);
-				
+
 				s.addChild(file.shape);
-//				renderer.shape(file.shape);
+				// renderer.shape(file.shape);
 
 				// balls statt 3D-shapes
 				// renderer.pushMatrix();
@@ -376,9 +383,9 @@ public class TagExplorerProcessing2 extends PApplet {
 					}
 				}
 			}
-			
+
 			renderer.shape(s);
-//			resetShader();
+			// resetShader();
 		}
 	}
 
@@ -398,7 +405,7 @@ public class TagExplorerProcessing2 extends PApplet {
 				if (hoverPlane == null) {
 					hoverPlane = new HoverPlane(this, tag, (int) mainscreen.screenX(tag.x, tag.y, tag.z),
 							(int) mainscreen.screenY(tag.x, tag.y, tag.z));
-//					println("Create hoverPlane");
+					// println("Create hoverPlane");
 				}
 			}
 		}
@@ -423,8 +430,8 @@ public class TagExplorerProcessing2 extends PApplet {
 				s.stroke(0, 0, 255);
 				break;
 			}
-			
-//			shape(s);
+
+			// shape(s);
 			shape.addChild(s);
 
 			// renderer.stroke(255);
@@ -501,7 +508,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 
 		oldest_showFile = ((Tag_File) getOldestTagFile(this.files));
-//		return files;
+		// return files;
 	}
 
 	public ArrayList<Tag> initTagsFromDB() {
@@ -523,13 +530,13 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		// count matches mit FilterList
 		updateMatches(files);
-		
+
 		// filter files
 		if (filterList.size() > 0) {
 			// DB Abfrage
-			//showFiles = SQL.queryTagListFiltered("files", filterList);
+			// showFiles = SQL.queryTagListFiltered("files", filterList);
 
-			// alternativ Java Abfrage:			
+			// alternativ Java Abfrage:
 			showFiles = getFullMatches(files);
 		} else {
 			// alle files
@@ -537,7 +544,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 
 		oldest_showFile = (Tag_File) getOldestTagFile(showFiles);
-		
+
 		// set Timeline Wertebereich
 		if (oldest_showFile != null) {
 			timeline.setWertebereich(oldest_showFile.creation_time);
@@ -547,12 +554,12 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		setParticlesPosition(filePhysics, showFiles);
 	}
-	
+
 	private ArrayList<Tag> getFullMatches(ArrayList<Tag> files) {
 		ArrayList<Tag> fullMatches = new ArrayList<Tag>();
-		for(Tag t:files){
+		for (Tag t : files) {
 			Tag_File file = (Tag_File) t;
-			if(file.matches == filterList.size()){
+			if (file.matches == filterList.size()) {
 				fullMatches.add(file);
 			}
 		}
@@ -560,24 +567,24 @@ public class TagExplorerProcessing2 extends PApplet {
 	}
 
 	// zählt matches mit Filer ++ oder bei inOut false --
-	public void updateMatches(ArrayList<Tag> files){
-		for(Tag t : files){
+	public void updateMatches(ArrayList<Tag> files) {
+		for (Tag t : files) {
 			Tag_File file = (Tag_File) t;
 			// set matches = 0
 			file.matches = 0;
-			
+
 			// count matches mit filterList
-			for(Filter f : filterList){
-				if(f.inOut){
-					if(file.attributeBindings.contains(f.tag)){
-						file.matches ++;
+			for (Filter f : filterList) {
+				if (f.inOut) {
+					if (file.attributeBindings.contains(f.tag)) {
+						file.matches++;
 					}
-				} else{
-					if(file.attributeBindings.contains(f.tag)){
-						file.matches --;
+				} else {
+					if (file.attributeBindings.contains(f.tag)) {
+						file.matches--;
 					}
 				}
-			}	
+			}
 		}
 	}
 
@@ -761,7 +768,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 	}
 
-	private Tag getTagByID(String tableName, int id) {
+	public Tag getTagByID(String tableName, int id) {
 		Tag tag = null;
 		// files:
 		if (tableName == "files" && files != null) {
@@ -775,6 +782,23 @@ public class TagExplorerProcessing2 extends PApplet {
 		else if (tableName != "files" && attributes != null) {
 			for (Tag _tag : attributes) {
 				if (_tag.id == id && _tag.type.equals(tableName)) {
+					tag = _tag;
+				}
+			}
+		}
+		return tag;
+	}
+	
+	public Tag getTagByName(String name){
+		Tag tag = null;
+		
+		String tagName = name.trim().toLowerCase();
+		// no files!
+
+		// attributes
+		if (attributes != null) {
+			for (Tag _tag : attributes) {
+				if (_tag.name.toLowerCase().equals(tagName)) {
 					tag = _tag;
 				}
 			}
@@ -818,27 +842,25 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 		return oldest;
 	}
-	
-	
+
 	// noch nicht fertig!
 	private Tag getNewestTagFile(ArrayList<Tag> files) {
 
 		Tag newest = null;
-		
-//		Tag oldest = null;
-//		Timestamp comp = new Timestamp(System.currentTimeMillis());
-//		for (Tag file : files) {
-//			// println("getOldestTagFile: file.name: " + file.name);
-//			if (((Tag_File) file).creation_time.before(comp)) {
-//				comp = ((Tag_File) file).creation_time;
-//				oldest = file;
-//			}
-//		}
-//		return oldest;
-		
+
+		// Tag oldest = null;
+		// Timestamp comp = new Timestamp(System.currentTimeMillis());
+		// for (Tag file : files) {
+		// // println("getOldestTagFile: file.name: " + file.name);
+		// if (((Tag_File) file).creation_time.before(comp)) {
+		// comp = ((Tag_File) file).creation_time;
+		// oldest = file;
+		// }
+		// }
+		// return oldest;
+
 		return newest;
 	}
-	
 
 	Timestamp getNewestDate(Tag_File file) {
 		Timestamp newest = file.creation_time;
@@ -1059,7 +1081,7 @@ public class TagExplorerProcessing2 extends PApplet {
 						Tag_File file = (Tag_File) startTag;
 						file.attributeBindings.add(startTag);
 						SQL.bindTag(file, t);
-						//updateFileTagBinding(file);
+						// updateFileTagBinding(file);
 						updateTags();
 						updateSprings();
 					}
@@ -1314,6 +1336,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	//
 	// }
 
+	// nicht mehr gebraucht alte Promts
 	public void locationInput(String theText) {
 		// System.out.println("function locationInput");
 		theText = theText.trim();
@@ -1332,11 +1355,12 @@ public class TagExplorerProcessing2 extends PApplet {
 			removeController();
 
 			// update
-			updateTags();
-			updateSprings();
+//			updateTags();
+//			updateSprings();
 		}
 	}
 
+	// nicht mehr gebraucht alte Promts
 	public void projectInput(String theText) {
 		// System.out.println("function locationInput");
 		theText = theText.trim();
@@ -1357,6 +1381,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 	}
 
+	// nicht mehr gebraucht alte Promts
 	public void keywordInput(String theText) {
 		// System.out.println("function locationInput");
 		theText = theText.trim();
@@ -1377,10 +1402,43 @@ public class TagExplorerProcessing2 extends PApplet {
 			removeController();
 		}
 	}
+	
+	
+	public Tag createNewTag(String theText, String type) {
+		// System.out.println("function locationInput");
+		Tag tag = null;
+		theText = theText.trim();
+		
+		if (SQL.inDataBase(type, theText)) {
+			System.out.println(type + ": " + theText + " already exists");
+		} else {
+			tag = SQL.createDbTag(type, theText);
 
-	// Menuplane Textinput Feld
+			// update
+			updateTags();
+			updateSprings();
+
+			removeController();
+		}
+		return tag;
+	}
+	
+	
+
+	// Menuplane Textinput Feld nicht mehr gebraucht
 	public void tagInput(String tagName) {
 		println("Textfield tagInput content: " + tagName);
+//		if (!tagName.trim().equals("")) {
+//			createChooserButtons("tagInput", tagName);
+//		}
+	}
+
+	// Hoverplane Textinput Feld nicht mehr gebraucht
+	public void tagInputHoverPlane(String tagName) {
+		println("Textfield tagInputHoverPlane content: " + tagName);
+//		if (!tagName.trim().equals("")) {
+//			createChooserButtons("tagInputHoverPlane", tagName);
+//		}
 	}
 
 	// public void handleButtonEvents(GButton button, GEvent event) {
@@ -1423,6 +1481,13 @@ public class TagExplorerProcessing2 extends PApplet {
 			p = new Promt(this, cp5_Promt, "projectInput");
 			println("keywordinput created");
 		}
+	}
+
+	Promt_TypeChooser typeChooser = null;
+
+	public void createChooserButtons(String inputFieldName, String value) {
+		// removeController();
+		typeChooser = new Promt_TypeChooser(this, cp5_Menu, inputFieldName, value);
 	}
 
 	// nur ein Textfield erlaubt, sonst unterscheidung beim submit!

@@ -5,7 +5,8 @@ import toxi.geom.Vec2D;
 
 public class Button extends Vec2D{
 	PApplet p5;
-	int w, h;
+	protected int w;
+	protected int h;
 	
 	public Button(PApplet p5){
 		super(0, 0);

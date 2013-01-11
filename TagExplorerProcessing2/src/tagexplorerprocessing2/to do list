@@ -1,8 +1,6 @@
 next todo: 
 
 
-OverlayPlanes: Attribute werden gezeigt und können hinzugefügt werden.
-müssen noch gelöscht werden können!
 
 main.getNewestTagFile(ArrayList<Tag> files) { !!!
 

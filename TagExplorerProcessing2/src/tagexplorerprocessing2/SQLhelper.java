@@ -108,7 +108,7 @@ public class SQLhelper {
 		if (checkConnection()) {
 			// String queryFields = queries.get(tableName);
 			// msql.query("SELECT (" + queryFields + ") FROM " + tableName);
-			msql.query("SELECT * FROM " + tableName);
+			msql.query("SELECT * FROM " + tableName + " ORDER BY ID ASC");
 
 			while (msql.next()) {
 				Tag t = getSpecificTags(tableName);
@@ -218,7 +218,7 @@ public class SQLhelper {
 				first = false;
 			}
 			
-			// wenn keine Ÿbrig bleiben!
+			
 			if(!query.equals("SELECT * FROM " + tableName + " WHERE ")){
 				msql.query(query);
 	
@@ -230,6 +230,7 @@ public class SQLhelper {
 					}
 				}
 			} else{
+				// wenn keine Ÿbrig bleiben!
 				System.out.println("queryTagListFiltered(): Filter ergeben keinen Treffer!");
 			}
 		} else {
