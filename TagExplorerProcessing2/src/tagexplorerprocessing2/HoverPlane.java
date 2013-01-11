@@ -99,10 +99,18 @@ public class HoverPlane extends Plane {
 				yShift += 30;
 			}
 		}
+		
+		// !!!!!! nur wenn Attribute sich ändern!
 		// update attributeBindings der File
-		((Tag_File) this.tag).attributeBindings = p5.SQL.getBindedTagList(((Tag_File) this.tag));
-		// wenn attribut gelöscht wurde:
-		p5.updateSprings();
+		
+		ArrayList<Tag> bindetTags = p5.SQL.getBindedTagList(((Tag_File) this.tag));
+		
+		if(bindetTags.size() != ((Tag_File) this.tag).attributeBindings.size()){
+			((Tag_File) this.tag).attributeBindings = bindetTags;
+			// wenn attribut geändert wurden:
+			p5.updateSprings();
+		}
+		
 
 	}
 

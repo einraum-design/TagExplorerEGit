@@ -8,6 +8,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
@@ -102,6 +103,10 @@ public class TagExplorerProcessing2 extends PApplet {
 	// Images
 	PImage closeImg;
 	PImage openImg;
+	
+	
+	
+	Tag_Comparator_Id comp_id;
 
 	// PImage
 
@@ -175,6 +180,10 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		// TIMELINE
 		timeline = new Timeline(this);
+		
+		
+		// Comparator
+		comp_id = new Tag_Comparator_Id();
 
 		// Standartuser: …ffentlich
 		// user = (Tag_User) SQL.queryTagList("users").get(0);
@@ -843,10 +852,16 @@ public class TagExplorerProcessing2 extends PApplet {
 		return oldest;
 	}
 
+	
 	// noch nicht fertig!
-	private Tag getNewestTagFile(ArrayList<Tag> files) {
+	private ArrayList<Tag> getNewestTagFile(ArrayList<Tag> files) {
 
-		Tag newest = null;
+		ArrayList<Tag> newestVersions = (ArrayList<Tag>) files.clone();
+		
+		Collections.sort(newestVersions, comp_id);
+		
+		
+		
 
 		// Tag oldest = null;
 		// Timestamp comp = new Timestamp(System.currentTimeMillis());
@@ -859,7 +874,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		// }
 		// return oldest;
 
-		return newest;
+		return newestVersions;
 	}
 
 	Timestamp getNewestDate(Tag_File file) {
