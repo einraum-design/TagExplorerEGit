@@ -90,13 +90,15 @@ public class HoverPlane extends Plane {
 		int xShift = 0;
 		int yShift = 0;
 		for (Tag tag : ((Tag_File)this.tag).attributeBindings) {
-			xShift += tag.renderTag(p5, (int)x + 10 + xShift,(int) y -h + 35 + yShift) + 3;
+			xShift += tag.renderTag(p5, (Tag_File)this.tag, (int)x + 10 + xShift,(int) y -h + 35 + yShift) + 3;
 
 			if (xShift > w - 20) {
 				xShift = 0;
 				yShift += 30;
 			}
 		}
+		// update attributeBindings der File
+		((Tag_File)this.tag).attributeBindings = p5.SQL.getBindedTagList(((Tag_File)this.tag));
 		
 		
 	}

@@ -22,7 +22,7 @@ public class Tag extends VerletParticle {
 		
 	}
 	
-	public int renderTag(TagExplorerProcessing2 p5, int x, int y) {
+	public int renderTag(TagExplorerProcessing2 p5, Tag_File file, int x, int y) {
 
 		int w = (int) p5.textWidth(this.name) + 25;
 		int h = 22;
@@ -37,13 +37,19 @@ public class Tag extends VerletParticle {
 		b.render();
 
 		if (p5.mouseActive && b.mouseOver() && p5.mousePressed) {
-			
+			// lŠsst sich nicht wŠhrend scheifendurchlauf lšschen -> passiert nach rendert Tag in HoverPlane.render()
+			//file.attributeBindings.remove(this);
+			p5.SQL.unbindTag(file, this);
 			//removeAtrribute!
 			//removeFromFilterList(p5);
 		}
 
 		return w;
 	}
+	
+//	public void updateFileBinding(){
+//		
+//	}
 
 	@Override
 	public String toString() {

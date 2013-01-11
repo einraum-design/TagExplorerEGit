@@ -562,6 +562,14 @@ public class SQLhelper {
 			}
 		}
 	}
+	
+	public void unbindTag(Tag_File file, Tag tag){
+		if (checkConnection()) {
+			msql.execute("DELETE FROM tag_binding WHERE file_ID = \"" + file.id + "\" AND tag_ID = \"" + tag.id + "\"");
+		} else {
+			System.out.println("unbindTag() - couldn't connect");
+		}
+	}
 
 	public void bindFile(Tag_File file1, Tag_File file2, ConnectionType type) {
 		if (checkConnection()) {
