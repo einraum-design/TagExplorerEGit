@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import controlP5.ControlP5;
 import controlP5.Controller;
@@ -266,10 +267,8 @@ public class TagExplorerProcessing2 extends PApplet {
 				// println("render hoverplane");
 			} else {
 				// delete Textfield
-				try{
-				cp5_Menu.get(Textfield.class, hoverPlane.inputFieldName).remove();
-				} catch (Exception e){
-					e.printStackTrace();
+				if(hoverPlane.openButton != null){
+					cp5_Menu.get(Textfield.class, hoverPlane.inputFieldName).remove();
 				}
 				hoverPlane = null;
 			}
@@ -551,6 +550,8 @@ public class TagExplorerProcessing2 extends PApplet {
 			// alle files
 			showFiles = files;
 		}
+		
+		showFiles = getNewestTagFileVersions(showFiles);
 
 		oldest_showFile = (Tag_File) getOldestTagFile(showFiles);
 
@@ -683,7 +684,10 @@ public class TagExplorerProcessing2 extends PApplet {
 			// File -> File Springs:
 			if (file.fileBindings.size() > 0) {
 				for (Tag t : file.fileBindings) {
-					dropSpring(physics, file, t, ConnectionType.FILEBINDING);
+					// wenn file in showFiles ist!
+					if(showFiles.contains(t)){
+						dropSpring(physics, file, t, ConnectionType.FILEBINDING);
+					}
 				}
 			}
 
@@ -702,6 +706,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		physics.particles.clear();
 
 		int count = getSizeWithoutVersion(files);
+		
 
 		float dist;
 		if (count > 1) {
@@ -713,10 +718,17 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 
 		int shiftCount = 0;
+		
+//		System.out.println("files.size(): " + files.size());
+//		System.out.println("count: " + count);
+		
 		for (int i = 0; i < files.size(); i++) {
-
-			// set x & y wert nach parent.
-			if (((Tag_File) files.get(i)).parent_ID != 0) {
+			println("setParticlesPosition(): " + files.get(i).name + " " + files.get(i).id + " " + ((Tag_File)files.get(i)).parent_ID);
+			
+			
+			
+			// wenn versionen nicht ausgeblendet sind && parent_ID -> set x & y wert nach parent.
+			if (files.size() != count && ((Tag_File) files.get(i)).parent_ID != 0) {
 				// get parent
 				Tag_File parent = (Tag_File) getTagByID(files.get(i).type, ((Tag_File) files.get(i)).parent_ID);
 
@@ -798,6 +810,16 @@ public class TagExplorerProcessing2 extends PApplet {
 		return tag;
 	}
 	
+	public Tag getTagFileByID(ArrayList<Tag> files, int id){
+		Tag tag = null;
+		for (Tag _tag : files) {
+			if (_tag.id == id) {
+				tag = _tag;
+			}
+		}
+		return tag;
+	}
+	
 	public Tag getTagByName(String name){
 		Tag tag = null;
 		
@@ -854,25 +876,39 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	
 	// noch nicht fertig!
-	private ArrayList<Tag> getNewestTagFile(ArrayList<Tag> files) {
+	private ArrayList<Tag> getNewestTagFileVersions(ArrayList<Tag> files) {
+		ArrayList<Tag> newestVersions = new ArrayList<Tag>();
+		ArrayList<Tag> allFiles = (ArrayList<Tag>) files.clone();
 
-		ArrayList<Tag> newestVersions = (ArrayList<Tag>) files.clone();
 		
-		Collections.sort(newestVersions, comp_id);
+		TreeSet<Integer> removeIDs = new TreeSet<Integer>();
 		
+		for(Tag t : allFiles){
+			Tag_File file = (Tag_File) t;
+			
+			if(file.parent_ID != 0){
+				removeIDs.add(file.parent_ID);
+				println("file.parent_ID: " + file.parent_ID);
+			}
+		}
 		
+		for(Tag file : files){
+			if(!removeIDs.contains(file.id)){
+				newestVersions.add(file);
+			}
+			
+		}
 		
+//		for(int id : removeIDs){
+//			println("delete: " + id + " " + getTagFileByID(files, id).id);
+//			newestVersions.remove(getTagFileByID(newestVersions, id));
+//		}
+		
+		for(Tag t : newestVersions){
+			
+			println(t.id);
+		}
 
-		// Tag oldest = null;
-		// Timestamp comp = new Timestamp(System.currentTimeMillis());
-		// for (Tag file : files) {
-		// // println("getOldestTagFile: file.name: " + file.name);
-		// if (((Tag_File) file).creation_time.before(comp)) {
-		// comp = ((Tag_File) file).creation_time;
-		// oldest = file;
-		// }
-		// }
-		// return oldest;
 
 		return newestVersions;
 	}
