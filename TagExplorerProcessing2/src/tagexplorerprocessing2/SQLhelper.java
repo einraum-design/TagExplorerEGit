@@ -557,9 +557,9 @@ public class SQLhelper {
 
 				msql.execute("INSERT INTO tag_binding (file_ID, type, tag_ID, time) VALUES (\"" + file.id + "\", \""
 						+ tag.type + "\", \"" + tag.id + "\", \"" + new Timestamp(System.currentTimeMillis()) + "\")");
-				System.out.println("Added Tag Binding");
+				System.out.println("SQLhelper.bindTag(): Added Tag Binding");
 			} else {
-				System.out.println("File-Tag binding exists already");
+				System.out.println("SQLhelper.bindTag(): File-Tag binding exists already");
 			}
 		}
 	}
