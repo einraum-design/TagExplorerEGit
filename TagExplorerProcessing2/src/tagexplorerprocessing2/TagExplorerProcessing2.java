@@ -239,12 +239,12 @@ public class TagExplorerProcessing2 extends PApplet {
 		plifShader.set("MixRatio", 0.2f);
 		plifShader.set("SpecularVal", 0.2f);
 
-		// modelTextur
-		// pg.beginDraw();
-		// pg.fill(25, 0, 0);
-		// pg.rect(0, 0, pg.width, pg.height);
-		// pg.shader(transition2);
-		// pg.endDraw();
+//		 modelTextur
+		 pg.beginDraw();
+		 pg.fill(25, 0, 0);
+		 pg.rect(0, 0, pg.width, pg.height);
+		 pg.shader(transition2);
+		 pg.endDraw();
 
 		// control p5 Promt
 		// removeController by Button cancel
@@ -381,7 +381,12 @@ public class TagExplorerProcessing2 extends PApplet {
 				// balls statt 3D-shapes
 				renderer.pushMatrix();
 				renderer.translate(file.x, file.y, file.z);
+				
 				renderer.shape(ball);
+				
+				
+//				file.renderPlane(this, renderer);
+				
 				renderer.popMatrix();
 
 				if (mouseOver(renderer, file, 30, 30)) {

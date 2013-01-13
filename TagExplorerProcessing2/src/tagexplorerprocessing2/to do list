@@ -2,9 +2,6 @@ next todo:
 
 
 
-main.getNewestTagFile(ArrayList<Tag> files) { !!!
-
-
 Shiftpositionierung der Attribute von MenuPlane (Fileter.render()) und HoverPlane (Tag.render())
 
 savePrevImage EXCEPTION!
@@ -14,27 +11,3 @@ in updateFiles: set z wert nach erstellungszeitpunk bei origin - ansonsten / ber
 
 
 Java Abfrage der gefilten Dateien, countMatches -> setVisible or not / positions werden nicht komplett neu gesetzt
-
-
-	// noch nicht fertig!
-	private ArrayList<Tag> getNewestTagFile(ArrayList<Tag> files) {
-
-		ArrayList<Tag> newestVersions = (ArrayList<Tag>) files.clone();
-
-		TreeSet<Integer> removeIDs = new TreeSet<Integer>();
-		
-		for(Tag t : newestVersions){
-			Tag_File file = (Tag_File) t;
-			
-			if(file.parent_ID != 0){
-				removeIDs.add(file.parent_ID);
-			}
-		}
-		
-//		for(int id : removeIDs){
-//			newestVersions.remove(o)
-//		}
-
-
-		return newestVersions;
-	}

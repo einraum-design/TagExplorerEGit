@@ -3,6 +3,9 @@ package tagexplorerprocessing2;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
+import processing.core.PApplet;
+import processing.core.PConstants;
+import processing.core.PGraphics;
 import processing.core.PShape;
 
 public class Tag_File extends Tag {
@@ -108,6 +111,21 @@ public class Tag_File extends Tag {
 				+ ", attributeBindings=" + attributeBindings + ", fileBindings=" + fileBindings + ", versionBindings="
 				+ versionBindings + ", accesses=" + accesses + ", viewName=" + viewName + ", id=" + id + ", name=" + name
 				+ ", type=" + type + ", x=" + x + ", y=" + y + ", z=" + z + "]";
+	}
+	
+	public void renderPlane(TagExplorerProcessing2 p5, PGraphics renderer){
+//		if(shape == null){// || shape.getFamily() == PConstants.GROUP){
+//			shape = p5.createShape(PConstants.RECT, x - 50, y - 50, 100, 100);
+//			shape.texture(p5.pg);
+//			shape.noStroke();
+//			
+//			System.out.println("Tag_File.renderPlane() : Createt Tag Plane");
+//		}
+//		
+//		
+//		renderer.shape(shape);
+		renderer.fill(0);
+		renderer.text(name, -40, -30);
 	}
 
 	
