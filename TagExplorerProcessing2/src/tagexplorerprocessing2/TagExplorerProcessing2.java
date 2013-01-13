@@ -121,7 +121,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	// }
 
 	public void setup() {
-		size(1800, 600, P3D);
+		size(1800, 900, P3D);
 		// frame.setLocation(1970, 50);
 		smooth(4);
 
@@ -134,6 +134,9 @@ public class TagExplorerProcessing2 extends PApplet {
 		cp5_Promt = new ControlP5(this);
 		cp5_Menu = new ControlP5(this);
 
+		// FrameRate
+		cp5_Menu.addFrameRate().setInterval(10).setPosition(width - 100, 10).setColor(color(50)); // .setFont(font)
+
 		menuPlane = new MenuPlane(this);
 
 		mainscreen = createGraphics(width, height - 40, P3D);
@@ -141,7 +144,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		// mainscreen.smooth(4);
 
 		// camera
-		cam_eye = new Vec3D(mainscreen.width / 2.0f, mainscreen.height / 2.0f - 250, (mainscreen.height / 2.0f)
+		cam_eye = new Vec3D(mainscreen.width / 2.0f, mainscreen.height / 2.0f, (mainscreen.height / 2.0f)
 				/ tan(PI * 30.0f / 180.0f));
 		cam_target = new Vec3D(mainscreen.width / 2.0f, mainscreen.height / 2.0f, 0);
 		cam_up = new Vec3D(0, 1, 0);
@@ -162,8 +165,8 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		ball = createShape(SPHERE, 10);
 		ball.noStroke();
-		ball.fill(155, 100);
-		ball.emissive(150, 0, 0);
+		ball.fill(155);
+		ball.emissive(0, 0, 0);
 
 		// ball.shininess(0);
 
@@ -224,21 +227,17 @@ public class TagExplorerProcessing2 extends PApplet {
 		} else {
 			mouseActive = false;
 		}
-		
-		
+
 		// println("mouseActive: " + mouseActive);
 
 		calcBillboardRotation();
 		transition.set("shaderTime", (millis() / 1000.0f));
 		transition2.set("shaderTime", (millis() / 1000.0f));
 
-		// plifShader.set("shininess", 5.1f);
-		// plifShader.set("BaseColor", .4f, .4f, 1.0f);
-		// plifShader.set("EnvMap", 0);
-		// plifShader.set("MixRatio", 0.2f);
-		// plifShader.set("SpecularVal", 0.2f);
-		// plifShader.set("Xunitvec", 1, 0, 0);
-		// plifShader.set("Yunitvec", 0, 1, 0);
+		plifShader.set("shininess", 5.1f);
+		plifShader.set("EnvMap", 0);
+		plifShader.set("MixRatio", 0.2f);
+		plifShader.set("SpecularVal", 0.2f);
 
 		// modelTextur
 		// pg.beginDraw();
@@ -247,7 +246,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		// pg.shader(transition2);
 		// pg.endDraw();
 
-		// control p5
+		// control p5 Promt
 		// removeController by Button cancel
 		if (removeController) {
 			removeController();
@@ -263,7 +262,6 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		// Hover Plane Dateiinfos
 		if (hoverPlane != null) {
-
 			if (hoverPlane.mouseOver()) {
 				hoverPlane.render();
 				// println("render hoverplane");
@@ -276,9 +274,6 @@ public class TagExplorerProcessing2 extends PApplet {
 			}
 		}
 
-		// logging
-		fill(0);
-		text(frameRate, width - 120, 16);
 		// macht hintergrund für 3D Objekte weiß!
 		fill(255);
 
@@ -318,13 +313,11 @@ public class TagExplorerProcessing2 extends PApplet {
 		renderer.resetShader();
 		renderer.hint(ENABLE_DEPTH_MASK);
 
-		// turn lights on
-		renderer.lights();
 		// renderer.directionalLight(0, 255, 0, 0, -1, 0);
 
 		// renderer.rotateY(mainScreenYRotation);
 		// renderer.translate(-50, 0, 0);
-
+		// renderer.camera();
 		renderer.camera(cam_eye.x, cam_eye.y, cam_eye.z, cam_target.x, cam_target.y, cam_target.z, cam_up.x, cam_up.y,
 				cam_up.z);
 
@@ -344,7 +337,8 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		drawFiles(renderer);
 		drawTags(renderer);
-//		drawSprings(renderer);
+		// drawSprings(renderer);
+		drawSpringsLINES(renderer);
 
 		// draw interaction
 		stroke(255, 0, 0);
@@ -373,7 +367,9 @@ public class TagExplorerProcessing2 extends PApplet {
 		PShape s = createShape(GROUP);
 
 		if (filePhysics.particles != null) {
-			// shader(plifShader);
+
+			// renderer.shader(plifShader);
+
 			for (int i = 0; i < filePhysics.particles.size(); i++) {
 				Tag_File file = (Tag_File) filePhysics.particles.get(i);
 
@@ -398,7 +394,10 @@ public class TagExplorerProcessing2 extends PApplet {
 			if (drawShapes) {
 				renderer.shape(s);
 			}
-			// resetShader();
+			// renderer.resetShader();
+
+			// turn lights on
+			renderer.lights();
 		}
 	}
 
@@ -416,6 +415,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 			if (mouseOver(renderer, tag, 30, 30)) {
 				if (hoverPlane == null) {
+					// tag.lock();
 					hoverPlane = new HoverPlane(this, tag, (int) mainscreen.screenX(tag.x, tag.y, tag.z),
 							(int) mainscreen.screenY(tag.x, tag.y, tag.z));
 					// println("Create hoverPlane");
@@ -424,32 +424,81 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 	}
 
+	public PShape generateTypeSprings(ConnectionType type) {
+		PShape lines = createShape(LINES);
+		lines.stroke(0);
+		lines.strokeWeight(1);
+
+		for (int i = 0; i < physics.springs.size(); i++) {
+			Connection sp = (Connection) physics.springs.get(i);
+
+			if (sp.type == type) {
+
+				Vec3D vec1 = new Vec3D(sp.a.x, sp.a.y, sp.a.z);
+				Vec3D vec2 = new Vec3D(sp.b.x, sp.b.y, sp.b.z);
+
+				float dist = vec1.distanceTo(vec2) / 2;
+				Vec3D middle = (vec1.add(vec2)).scale(0.5f);
+				Vec3D peak = new Vec3D(middle.x, middle.y - dist, middle.z);
+
+				lines.vertex(sp.a.x, sp.a.y, sp.a.z);
+
+				lines.vertex(peak.x, peak.y, peak.z);
+				lines.vertex(peak.x, peak.y, peak.z);
+
+				lines.vertex(sp.b.x, sp.b.y, sp.b.z);
+			}
+		}
+
+		lines.end();
+		return lines;
+	}
+
+	public void drawSpringsLINES(PGraphics renderer) {
+
+		PShape shape = createShape(GROUP);
+
+		PShape shapeVersions = generateTypeSprings(ConnectionType.VERSION);
+		shapeVersions.stroke(255, 0, 0);
+		PShape shapeFilebindings = generateTypeSprings(ConnectionType.FILEBINDING);
+		shapeFilebindings.stroke(0, 255, 0);
+		PShape shapeTagbindings = generateTypeSprings(ConnectionType.TAGBINDING);
+		shapeTagbindings.stroke(0, 0, 255);
+
+		shape.addChild(shapeVersions);
+		shape.addChild(shapeFilebindings);
+		shape.addChild(shapeTagbindings);
+
+		renderer.shape(shape);
+	}
+
 	public void drawSprings(PGraphics renderer) {
 		PShape shape = createShape(GROUP);
 
 		for (int i = 0; i < physics.springs.size(); i++) {
 			Connection sp = (Connection) physics.springs.get(i);
 
-			PShape s = createArc(sp.a, sp.b);
+			// PShape s = createArc(sp.a, sp.b);
 
 			switch (sp.type) {
 			case VERSION:
-				s.stroke(255, 0, 0);
+				// s.stroke(255, 0, 0);
+				renderer.stroke(255, 0, 0);
 				break;
 			case FILEBINDING:
-				s.stroke(0, 255, 0);
+				// s.stroke(0, 255, 0);
+				renderer.stroke(0, 255, 0);
 				break;
 			case TAGBINDING:
-				s.stroke(0, 0, 255);
+				// s.stroke(0, 0, 255);
+				renderer.stroke(0, 0, 255);
 				break;
 			}
 
 			// shape(s);
-			shape.addChild(s);
-
-			// renderer.stroke(255);
-			// renderer.strokeWeight(1);
-			// renderer.line(sp.a.x, sp.a.y, sp.a.z, sp.b.x, sp.b.y, sp.b.z);
+			// shape.addChild(s);
+			renderer.strokeWeight(1);
+			renderer.line(sp.a.x, sp.a.y, sp.a.z, sp.b.x, sp.b.y, sp.b.z);
 		}
 
 		// filePhysics hat keine Springs
@@ -503,9 +552,8 @@ public class TagExplorerProcessing2 extends PApplet {
 		myLine.end();
 		return (myLine);
 	}
-	
-	
-	public void drawShapes(boolean onOff){
+
+	public void drawShapes(boolean onOff) {
 		drawShapes = onOff;
 		updateShowFiles();
 	}
@@ -574,7 +622,7 @@ public class TagExplorerProcessing2 extends PApplet {
 			timeline.oldest = null;
 		}
 
-		setParticlesPosition(filePhysics, showFiles);
+		setParticlesPosition2D(filePhysics, showFiles);
 	}
 
 	private ArrayList<Tag> getFullMatches(ArrayList<Tag> files) {
@@ -712,6 +760,33 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 	}
 
+	private void setParticlesPosition2D(VerletPhysics physics, ArrayList<Tag> files) {
+		physics.particles.clear();
+
+		int count = getSizeWithoutVersion(files);
+
+		int dist = 120;
+
+		int xShiftCount = 0;
+
+		int yShiftCount = 0;
+
+		int perRow = 10;
+
+		for (int i = 0; i < files.size(); i++) {
+
+			dropParticles(physics, xShiftCount * dist - (dist * (perRow - 1) / 2), yShiftCount * dist, 0, files.get(i),
+					true); // links/rechts
+
+			xShiftCount++;
+			if (xShiftCount >= perRow) {
+				yShiftCount++;
+				xShiftCount = 0;
+			}
+
+		}
+	}
+
 	private void setParticlesPosition(VerletPhysics physics, ArrayList<Tag> files) {
 		// drop Particles
 		// set Position
@@ -734,8 +809,9 @@ public class TagExplorerProcessing2 extends PApplet {
 		// System.out.println("count: " + count);
 
 		for (int i = 0; i < files.size(); i++) {
-			println("setParticlesPosition(): " + files.get(i).name + " " + files.get(i).id + " "
-					+ ((Tag_File) files.get(i)).parent_ID);
+			// println("setParticlesPosition(): " + files.get(i).name + " " +
+			// files.get(i).id + " "
+			// + ((Tag_File) files.get(i)).parent_ID);
 
 			// wenn versionen nicht ausgeblendet sind && parent_ID -> set x & y
 			// wert nach parent.
@@ -744,17 +820,17 @@ public class TagExplorerProcessing2 extends PApplet {
 				Tag_File parent = (Tag_File) getTagByID(files.get(i).type, ((Tag_File) files.get(i)).parent_ID);
 
 				// dropParticles(physics, parent.x, parent.y, 0, files.get(i));
-				dropParticles(physics, parent.x, parent.y - 40, 0, files.get(i));
+				dropParticles(physics, parent.x, parent.y - 40, 0, files.get(i), true);
 
 				// springs to partent anhand parent file
 				// dropSpring(physics, (Tag_File) files.get(i), parent);
 			}
 
-			// ist origin File Version
+			// ist origin File Version ODER neueste Version!
 			else {
-				dropParticles(physics, shiftCount * dist - (dist * (count - 1) / 2), 0, 0, files.get(i)); // links/rechts
-																											// von
-																											// 0
+				dropParticles(physics, shiftCount * dist - (dist * (count - 1) / 2), 0, 0, files.get(i), true); // links/rechts
+				// von
+				// 0
 				shiftCount++;
 			}
 		}
