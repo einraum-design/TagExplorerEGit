@@ -49,6 +49,8 @@ public class TagExplorerProcessing2 extends PApplet {
 	PFont font;
 	ControlP5 cp5_Promt;
 	ControlP5 cp5_Menu;
+	ControlP5 cp5_Test;
+	
 
 	ArrayList<Tag> attributes = null;
 	ArrayList<Tag> files = null;
@@ -133,6 +135,10 @@ public class TagExplorerProcessing2 extends PApplet {
 		// ControlP5
 		cp5_Promt = new ControlP5(this);
 		cp5_Menu = new ControlP5(this);
+		cp5_Test = new ControlP5(this);
+		
+		cp5_Test.addToggle("versions", false, width-60, 20, 10, 10);
+		
 
 		// FrameRate
 		cp5_Menu.addFrameRate().setInterval(10).setPosition(width - 100, 10).setColor(color(50)); // .setFont(font)
@@ -241,9 +247,10 @@ public class TagExplorerProcessing2 extends PApplet {
 
 //		 modelTextur
 		 pg.beginDraw();
+		 pg.shader(transition2);
 		 pg.fill(25, 0, 0);
 		 pg.rect(0, 0, pg.width, pg.height);
-		 pg.shader(transition2);
+		 pg.resetShader();
 		 pg.endDraw();
 
 		// control p5 Promt
@@ -384,10 +391,9 @@ public class TagExplorerProcessing2 extends PApplet {
 				
 				renderer.shape(ball);
 				
+				renderer.popMatrix();
 				
 //				file.renderPlane(this, renderer);
-				
-				renderer.popMatrix();
 
 				if (mouseOver(renderer, file, 30, 30)) {
 					if (hoverPlane == null) {
@@ -628,6 +634,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 
 		setParticlesPosition2D(filePhysics, showFiles);
+		//setParticlesPosition(filePhysics, showFiles);
 	}
 
 	private ArrayList<Tag> getFullMatches(ArrayList<Tag> files) {
@@ -768,7 +775,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	private void setParticlesPosition2D(VerletPhysics physics, ArrayList<Tag> files) {
 		physics.particles.clear();
 
-		int count = getSizeWithoutVersion(files);
+		//int count = getSizeWithoutVersion(files);
 
 		int dist = 120;
 
@@ -1736,5 +1743,14 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	public static void main(String _args[]) {
 		PApplet.main(new String[] { tagexplorerprocessing2.TagExplorerProcessing2.class.getName() });
+	}
+	
+	
+	public void versions(boolean onOff){
+		println("versions: " + onOff);
+		showVersions = !showVersions;
+		updateShowFiles();
+//		updateTags();
+		updateSprings();
 	}
 }

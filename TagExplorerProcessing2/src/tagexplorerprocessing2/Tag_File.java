@@ -114,18 +114,24 @@ public class Tag_File extends Tag {
 	}
 	
 	public void renderPlane(TagExplorerProcessing2 p5, PGraphics renderer){
-//		if(shape == null){// || shape.getFamily() == PConstants.GROUP){
-//			shape = p5.createShape(PConstants.RECT, x - 50, y - 50, 100, 100);
-//			shape.texture(p5.pg);
-//			shape.noStroke();
-//			
-//			System.out.println("Tag_File.renderPlane() : Createt Tag Plane");
-//		}
-//		
-//		
-//		renderer.shape(shape);
+		renderPlane(p5, renderer, 100, 100);
+	}
+	
+	public void renderPlane(TagExplorerProcessing2 p5, PGraphics renderer, int w, int h){
+		if(shape == null){// || shape.getFamily() == PConstants.GROUP){
+			shape = p5.createShape(PConstants.RECT, - w/2, - h/2, w, h);
+			shape.texture(p5.pg);
+			shape.noStroke();
+			
+			System.out.println("Tag_File.renderPlane() : Createt Tag Plane");
+		}
+		
+		
+		renderer.shape(shape, x, y);
 		renderer.fill(0);
-		renderer.text(name, -40, -30);
+//		renderer.textFont(p5.font, 14);
+		renderer.textAlign(PConstants.LEFT);
+		renderer.text(name, x-(w/2-10), y-(h/2-20));
 	}
 
 	
