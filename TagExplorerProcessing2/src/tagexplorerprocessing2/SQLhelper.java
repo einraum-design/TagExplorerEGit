@@ -217,11 +217,10 @@ public class SQLhelper {
 				query += "ID = '" + id + "'";
 				first = false;
 			}
-			
-			
-			if(!query.equals("SELECT * FROM " + tableName + " WHERE ")){
+
+			if (!query.equals("SELECT * FROM " + tableName + " WHERE ")) {
 				msql.query(query);
-	
+
 				// get Tags
 				while (msql.next()) {
 					Tag t = getSpecificTags(tableName);
@@ -229,7 +228,7 @@ public class SQLhelper {
 						tags.add(t);
 					}
 				}
-			} else{
+			} else {
 				// wenn keine Ÿbrig bleiben!
 				System.out.println("queryTagListFiltered(): Filter ergeben keinen Treffer!");
 			}
@@ -442,34 +441,118 @@ public class SQLhelper {
 
 	public void setAccessTimeNow(Tag_File file) {
 		if (msql2.connect()) {
-			//System.out.println("setAccessTimeNow: " + file.name);
-			
+			// System.out.println("setAccessTimeNow: " + file.name);
+
 			Timestamp now = new Timestamp(System.currentTimeMillis());
-			
+
 			// letzter zugriff mindestens 5 sekunden her!
-			if(now.getTime() - p5.getNewestDate(file).getTime() > 5000){
+			if (now.getTime() - p5.getNewestDate(file).getTime() > 5000) {
 				System.out.println("setAccessTimeNow: open! " + file.name);
-				
+
 				if (p5.user != null) {
 					msql2.execute("INSERT INTO accesses (fileID, date, comment, userID) VALUES (" + file.id + ", \""
-							+ now + "\", \"" + "comment" + "\", \""
-							+ p5.user.id + "\")");
+							+ now + "\", \"" + "comment" + "\", \"" + p5.user.id + "\")");
 				} else {
-					msql2.execute("INSERT INTO accesses (fileID, date, comment) VALUES (" + file.id + ", \""
-							+ now + "\", \"" + "per mouseclick" + "\")");
+					msql2.execute("INSERT INTO accesses (fileID, date, comment) VALUES (" + file.id + ", \"" + now
+							+ "\", \"" + "per mouseclick" + "\")");
 				}
-				
+
 				file.addAccess(new Access(now, "per mouseclick"));
-				if(p5.drawAccessShapes){
+				if (p5.drawAccessShapes) {
 					file.setShape(p5.generateShape(file));
-					
+
 				}
-				if(p5.showTimeline){
+				if (p5.showTimeline) {
 					file.z = -p5.timeline.mapExp(p5.getNewestDate(file));
 				}
 			}
 
 		}
+	}
+
+//	public ArrayList<Timestamp> getFilterTime(Tag tag) {
+//		ArrayList<Timestamp> lastFiltered = new ArrayList<Timestamp>();
+//
+//		Timestamp startTime = null;
+//		Timestamp endTime = null;
+//
+//		if (msql2.connect()) {
+//			msql.query("SELECT * FROM filter_time WHERE type = \"" + tag.type + "\" && tag_ID = " + tag.id
+//					+ " ORDER BY ID DESC LIMIT 1");
+//			if (msql.next()) {
+//				startTime = msql.getTimestamp("start_time");
+//				if (startTime != null) {
+////					System.out.println(startTime.toGMTString());
+//					lastFiltered.add(startTime);
+//				} else{
+//					lastFiltered.add(null);
+//				}
+//				endTime = msql.getTimestamp("end_time");
+//				if (endTime != null) {
+////					System.out.println(endTime.toGMTString());
+//					lastFiltered.add(endTime);
+//				}else{
+//					lastFiltered.add(null);
+//				}
+//			} else {
+//				System.out.println("SQL.getFilterTime() : no FilterTime yet");
+//			}
+//		} else {
+//			System.out.println("SQL.getFilterTime() -> cannot connect!");
+//		}
+//		return lastFiltered;
+//	}
+
+	public Timestamp getFilterTime(Tag tag, String startTime) {
+
+		Timestamp time = null;
+
+		if (msql2.connect()) {
+			msql.query("SELECT * FROM filter_time WHERE type = \"" + tag.type + "\" && tag_ID = " + tag.id
+					+ " ORDER BY ID DESC LIMIT 1");
+			if (msql.next()) {
+				Timestamp _time = msql.getTimestamp("start_time");
+				if (startTime != null) {
+//					System.out.println(startTime.toGMTString());
+					time = _time;
+				} else{
+					return null;
+				}
+			} else {
+				System.out.println("SQL.getFilterTime() : no FilterTime yet");
+			}
+		} else {
+			System.out.println("SQL.getFilterTime() -> cannot connect!");
+		}
+		return time;
+	}
+
+	
+	public void setFilterTime(Tag tag, boolean start) {
+
+		// Type ist in type
+
+		if (msql2.connect()) {
+
+			Timestamp now = new Timestamp(System.currentTimeMillis());
+
+			String startOrEndTime;
+			if (start) {
+				String execu = "INSERT INTO filter_time (tag_ID, type, start_time) VALUES (" + tag.id + ", \""
+						+ tag.type + "\", \"" + now + "\")";
+				System.out.println(execu);
+				msql2.execute(execu);
+			} else {
+				String execu = "UPDATE filter_time SET end_time = '" + now + "' WHERE tag_ID = " + tag.id
+						+ " ORDER BY ID DESC LIMIT 1";
+				System.out.println(execu);
+				msql2.execute(execu);
+			}
+
+		} else {
+			System.out.println("SQL.setFilterTime() -> cannot connect!");
+		}
+
 	}
 
 	private FileType getFileType(String fileName) {
@@ -568,8 +651,8 @@ public class SQLhelper {
 			}
 		}
 	}
-	
-	public void unbindTag(Tag_File file, Tag tag){
+
+	public void unbindTag(Tag_File file, Tag tag) {
 		if (checkConnection()) {
 			msql.execute("DELETE FROM tag_binding WHERE file_ID = \"" + file.id + "\" AND tag_ID = \"" + tag.id + "\"");
 		} else {

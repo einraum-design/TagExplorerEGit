@@ -1,5 +1,7 @@
 package tagexplorerprocessing2;
 
+import java.sql.Timestamp;
+
 import toxi.physics.VerletParticle;
 
 public class Tag extends VerletParticle {
@@ -8,6 +10,9 @@ public class Tag extends VerletParticle {
 	String type = "tag";
 //	TagField tagField;
 	int bindCount = 0;
+	
+	Timestamp lastStartFilterTime = null;
+	Timestamp lastEndFilterTime = null;
 	
 	public Tag(){
 		super(0, 0, 0);

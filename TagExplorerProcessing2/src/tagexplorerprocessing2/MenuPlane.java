@@ -42,6 +42,8 @@ public class MenuPlane extends Plane {
 		int xShift = 0;
 		int yShift = 0;
 		for (Filter filter : p5.filterList) {
+			
+			// zeichnet Tag Button mit Button_Symbol
 			xShift += filter.render(p5, 10 + xShift, 10 + yShift) + 3;
 
 			if (xShift > p5.width - 200) {
@@ -70,6 +72,23 @@ public class MenuPlane extends Plane {
 					
 					// add to filterList
 					p5.filterList.add(new Filter(tag, true));
+					
+					// get lastTime Tag used as Filter: Timestamp
+					
+//					ArrayList<Timestamp> lastTime = p5.SQL.getFilterTime(tag);
+//					System.out.println("lastTime.size() = " + lastTime.size());
+//					if(lastTime.get(0) != null){
+						tag.lastStartFilterTime = p5.SQL.getFilterTime(tag, "start_time");
+//						System.out.println("tag.lastStartFilterTime " + tag.lastStartFilterTime);
+//					}
+//					if(lastTime.get(1) != null){
+						tag.lastEndFilterTime = p5.SQL.getFilterTime(tag, "end_time");
+//						System.out.println("tag.lastEndFilterTime " + tag.lastEndFilterTime);
+//					}
+					
+					// Save Timestamp and TagID and TagType -> SQL filter_time
+					p5.SQL.setFilterTime(tag, true); // startFilter
+					
 					p5.updateShowFiles();
 					p5.updateTags();
 					p5.updateSprings();

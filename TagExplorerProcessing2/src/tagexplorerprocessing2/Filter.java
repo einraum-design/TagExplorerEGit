@@ -24,6 +24,13 @@ public class Filter {
 		p5.fill(0);
 		p5.textAlign(p5.LEFT, p5.CENTER);
 		p5.text(tag.name, x + 5, y + h / 2);
+		
+		
+		// wieder ausblenden!
+		if(tag.lastStartFilterTime != null){
+			p5.text(tag.lastStartFilterTime.toGMTString(), x + 5, y + h / 2 + 50);
+		}
+		
 
 		Button_Symbol b = new Button_Symbol(p5, p5.closeImg, x + w - p5.closeImg.width - 5, y + h / 2
 				- p5.closeImg.height / 2);
@@ -44,6 +51,7 @@ public class Filter {
 
 			ArrayList<Filter> myFilters = (ArrayList<Filter>) p5.filterList.clone();
 			myFilters.remove(this);
+			p5.SQL.setFilterTime(this.tag, false);
 			p5.filterList = myFilters;
 
 			System.out.println("Filter.removeFromFilterList: updateShowFile & Springs in Filter");

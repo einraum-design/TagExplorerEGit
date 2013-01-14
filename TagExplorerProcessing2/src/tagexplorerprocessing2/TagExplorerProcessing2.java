@@ -72,6 +72,8 @@ public class TagExplorerProcessing2 extends PApplet {
 	boolean setZTimeAxis = false;
 	boolean position1D = false;
 	boolean position2D = true;
+	
+//	boolean 
 
 	// Timestamp oldestTime;
 
@@ -675,6 +677,9 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		// setzt shape oder null
 		setShape();
+		
+		setZTimeAxis(setZTimeAxis); // macht auch updateSprings
+		
 	}
 
 	private ArrayList<Tag> getFullMatches(ArrayList<Tag> files) {
@@ -697,6 +702,13 @@ public class TagExplorerProcessing2 extends PApplet {
 
 			// count matches mit filterList
 			for (Filter f : filterList) {
+				
+				// davor/danach bis wann?
+//				if(f.tag instanceof Tag_Event){
+//					
+//				}
+				
+				
 				if (f.inOut) {
 					if (file.attributeBindings.contains(f.tag)) {
 						file.matches++;
@@ -1712,6 +1724,14 @@ public class TagExplorerProcessing2 extends PApplet {
 	public static void main(String _args[]) {
 		PApplet.main(new String[] { tagexplorerprocessing2.TagExplorerProcessing2.class.getName() });
 	}
+	
+	public void stop(){
+		// Do whatever you want here.
+		for(Filter f : filterList){
+			SQL.setFilterTime(f.tag, false);
+		}
+		super.stop();
+	}
 
 	
 	
@@ -1719,7 +1739,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		println("showVersions(): " + onOff);
 		showVersions = onOff;
 		updateShowFiles();
-		setZTimeAxis(setZTimeAxis); // macht auch updateShowFiles & updateSprings
+		
 
 	}
 
@@ -1741,7 +1761,6 @@ public class TagExplorerProcessing2 extends PApplet {
 			drawAccessShapes = false;
 		}
 		updateShowFiles();
-		setZTimeAxis(setZTimeAxis);
 	}
 
 	public void setZTimeAxis(boolean onOff) {
@@ -1764,7 +1783,6 @@ public class TagExplorerProcessing2 extends PApplet {
 			cp5_Test.get(Toggle.class, "position2D").setState(false);
 		}
 		updateShowFiles();
-		setZTimeAxis(setZTimeAxis);
 	}
 
 	public void position2D(boolean onOff) {
@@ -1773,6 +1791,5 @@ public class TagExplorerProcessing2 extends PApplet {
 			cp5_Test.get(Toggle.class, "position1D").setState(false);
 		}
 		updateShowFiles();
-		setZTimeAxis(setZTimeAxis);
 	}
 }
