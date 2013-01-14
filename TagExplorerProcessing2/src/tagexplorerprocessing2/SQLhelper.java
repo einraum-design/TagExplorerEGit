@@ -460,7 +460,7 @@ public class SQLhelper {
 				}
 				
 				file.addAccess(new Access(now, "per mouseclick"));
-				if(p5.drawVersionShapes){
+				if(p5.drawAccessShapes){
 					file.setShape(p5.generateShape(file));
 					
 				}
