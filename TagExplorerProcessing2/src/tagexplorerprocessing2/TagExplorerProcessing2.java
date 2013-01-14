@@ -34,8 +34,8 @@ import toxi.physics.VerletPhysics;
 import toxi.physics.VerletSpring;
 
 public class TagExplorerProcessing2 extends PApplet {
-	
-	//ff
+
+	// ff
 
 	WatchDir watcher;
 
@@ -72,8 +72,8 @@ public class TagExplorerProcessing2 extends PApplet {
 	boolean setZTimeAxis = false;
 	boolean position1D = false;
 	boolean position2D = true;
-	
-//	boolean 
+
+	// boolean
 
 	// Timestamp oldestTime;
 
@@ -265,12 +265,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		// plifShader.set("SpecularVal", 0.2f);
 
 		// modelTextur
-		pg.beginDraw();
-		pg.shader(transition2);
-		pg.fill(25, 0, 0);
-		pg.rect(0, 0, pg.width, pg.height);
-		pg.resetShader();
-		pg.endDraw();
+		drawPGTexture();
 
 		// control p5 Promt
 		// removeController by Button cancel
@@ -318,6 +313,15 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		physics.update();
 		filePhysics.update();
+	}
+	
+	public void drawPGTexture(){
+		pg.beginDraw();
+		pg.shader(transition2);
+		pg.fill(25, 0, 0);
+		pg.rect(0, 0, pg.width, pg.height);
+		pg.resetShader();
+		pg.endDraw();
 	}
 
 	private void drawMainscreen(PGraphics renderer) {
@@ -677,9 +681,9 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		// setzt shape oder null
 		setShape();
-		
+
 		setZTimeAxis(setZTimeAxis); // macht auch updateSprings
-		
+
 	}
 
 	private ArrayList<Tag> getFullMatches(ArrayList<Tag> files) {
@@ -702,13 +706,12 @@ public class TagExplorerProcessing2 extends PApplet {
 
 			// count matches mit filterList
 			for (Filter f : filterList) {
-				
+
 				// davor/danach bis wann?
-//				if(f.tag instanceof Tag_Event){
-//					
-//				}
-				
-				
+				// if(f.tag instanceof Tag_Event){
+				//
+				// }
+
 				if (f.inOut) {
 					if (file.attributeBindings.contains(f.tag)) {
 						file.matches++;
@@ -824,13 +827,21 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		for (int i = 0; i < files.size(); i++) {
 
-			dropParticle(physics, xShiftCount * dist - (dist * (perRow - 1) / 2), yShiftCount * dist, files.get(i),
-					true); // links/rechts
+			if (showVersions && ((Tag_File) files.get(i)).parent_ID != 0) {
 
-			xShiftCount++;
-			if (xShiftCount >= perRow) {
-				yShiftCount++;
-				xShiftCount = 0;
+				// get parent
+				Tag_File parent = (Tag_File) getTagByID(files.get(i).type, ((Tag_File) files.get(i)).parent_ID);
+				dropParticle(physics, parent.x, parent.y, files.get(i), true);
+			} else {
+
+				dropParticle(physics, xShiftCount * dist - (dist * (perRow - 1) / 2), yShiftCount * dist, files.get(i),
+						true); // links/rechts
+
+				xShiftCount++;
+				if (xShiftCount >= perRow) {
+					yShiftCount++;
+					xShiftCount = 0;
+				}
 			}
 
 		}
@@ -874,7 +885,8 @@ public class TagExplorerProcessing2 extends PApplet {
 			else {
 				dropParticle(physics, shiftCount * dist - ((dist * (count - 1)) / 2.0f), 0, files.get(i), true); // links/rechts
 
-//				println("i: " + i + " x: " + (shiftCount * dist) + "verschiebeung um " + -(dist * (count - 1) / 2.0f));
+				// println("i: " + i + " x: " + (shiftCount * dist) +
+				// "verschiebeung um " + -(dist * (count - 1) / 2.0f));
 				// von 0
 				shiftCount++;
 			}
@@ -898,7 +910,6 @@ public class TagExplorerProcessing2 extends PApplet {
 
 			for (Tag t : files) {
 				Tag_File file = (Tag_File) t;
-
 				PShape shape = createShape(PConstants.RECT, file.x - 100 / 2, file.y - 100 / 2, 100, 100);
 				shape.texture(pg);
 				shape.noStroke();
@@ -913,6 +924,22 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 	}
 
+	public void setShape(Tag_File file) {
+		// nachdem positionen festgelegt sind
+		if (drawAccessShapes) {
+			file.setShape(generateShape(file));
+			System.out.println("file.setShape(generateShape(file)) -> VersionShapee");
+		} else if (draw2DShape) {// || shape.getFamily() == PConstants.GROUP){
+			PShape shape = createShape(PConstants.RECT, file.x - 100 / 2, file.y - 100 / 2, 100, 100);
+			shape.texture(pg);
+			shape.noStroke();
+			file.setShape(shape);
+			System.out.println("file.setShape(generateShape(file)) : Created Tag Plane");
+		} else {
+			file.shape = null;
+		}
+	}
+
 	// ohne z
 	public void dropParticle(VerletPhysics physics, float x, float y, Tag t) {
 		t.x = x;
@@ -922,7 +949,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		physics.addParticle(t);
 	}
-	
+
 	// ohne z
 	public void dropParticle(VerletPhysics physics, float x, float y, Tag t, boolean lock) {
 		t.x = x;
@@ -934,6 +961,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		physics.addParticle(t);
 	}
+
 	public void dropParticle(VerletPhysics physics, float x, float y, float z, Tag t) {
 		t.x = x;
 		t.y = y;
@@ -1724,22 +1752,19 @@ public class TagExplorerProcessing2 extends PApplet {
 	public static void main(String _args[]) {
 		PApplet.main(new String[] { tagexplorerprocessing2.TagExplorerProcessing2.class.getName() });
 	}
-	
-	public void stop(){
+
+	public void stop() {
 		// Do whatever you want here.
-		for(Filter f : filterList){
+		for (Filter f : filterList) {
 			SQL.setFilterTime(f.tag, false);
 		}
 		super.stop();
 	}
 
-	
-	
 	public void showVersions(boolean onOff) {
 		println("showVersions(): " + onOff);
 		showVersions = onOff;
 		updateShowFiles();
-		
 
 	}
 

@@ -82,8 +82,11 @@ public class HoverPlane extends Plane {
 
 			// System.out.println(p5.mouseActive +"&&" + p5.mousePressed + "&&"
 			// + openButton.mouseOver());
-			if (p5.mouseActive && p5.mousePressed && openButton.mouseOver()) {
+			if (p5.mouseActive && p5.mousePressed && openButton.mouseOver() && ((Tag_File)tag).delete_time == null) {
 				p5.SQL.setAccessTimeNow((Tag_File) tag);
+				
+				p5.setShape((Tag_File) tag);
+				
 				p5.lastClick = new Timestamp(System.currentTimeMillis());
 				p5.mouseActive = false;
 				System.out.println("ResetLastClick in HoverPlane.render()");
