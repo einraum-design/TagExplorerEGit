@@ -460,8 +460,13 @@ public class SQLhelper {
 				}
 				
 				file.addAccess(new Access(now, "per mouseclick"));
-				file.setShape(p5.generateShape(file));
-				file.z = -p5.timeline.mapExp(p5.getNewestDate(file));
+				if(p5.drawVersionShapes){
+					file.setShape(p5.generateShape(file));
+					
+				}
+				if(p5.showTimeline){
+					file.z = -p5.timeline.mapExp(p5.getNewestDate(file));
+				}
 			}
 
 		}

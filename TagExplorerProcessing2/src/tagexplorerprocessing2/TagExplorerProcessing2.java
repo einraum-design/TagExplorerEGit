@@ -18,6 +18,7 @@ import controlP5.ControlP5;
 import controlP5.Controller;
 import controlP5.Textfield;
 import processing.core.PApplet;
+import processing.core.PConstants;
 import processing.core.PFont;
 import processing.core.PGraphics;
 import processing.core.PImage;
@@ -50,7 +51,6 @@ public class TagExplorerProcessing2 extends PApplet {
 	ControlP5 cp5_Promt;
 	ControlP5 cp5_Menu;
 	ControlP5 cp5_Test;
-	
 
 	ArrayList<Tag> attributes = null;
 	ArrayList<Tag> files = null;
@@ -60,7 +60,15 @@ public class TagExplorerProcessing2 extends PApplet {
 	Tag_File oldest_showFile = null;
 
 	boolean showVersions = false;
-	boolean drawShapes = false;
+	boolean drawVersionShapes = false;
+	
+	boolean draw2DShape = false;
+	
+	boolean showTimeline = false;
+	
+	boolean setZTimeAxis = false;
+	boolean position1D = false;
+	boolean position2D = true;
 
 	// Timestamp oldestTime;
 
@@ -123,7 +131,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	// }
 
 	public void setup() {
-		size(1800, 900, P3D);
+		size(1280, 1024, P3D);
 		// frame.setLocation(1970, 50);
 		smooth(4);
 
@@ -136,10 +144,17 @@ public class TagExplorerProcessing2 extends PApplet {
 		cp5_Promt = new ControlP5(this);
 		cp5_Menu = new ControlP5(this);
 		cp5_Test = new ControlP5(this);
-		
-		cp5_Test.addToggle("versions", false, width-60, 20, 10, 10);
-		
 
+		cp5_Test.addToggle("showVersions", false, width - 120, 20, 10, 10).getCaptionLabel().setColor(color(0));
+		cp5_Test.addToggle("drawVersionShapes", false, width - 120, 50, 10, 10).getCaptionLabel().setColor(color(0));
+//		cp5_Test.addToggle("showTimeline", false, width - 120, 80, 10, 10).getCaptionLabel().setColor(color(0));
+		cp5_Test.addToggle("draw2DShape", false, width - 120, 110, 10, 10).getCaptionLabel().setColor(color(0));
+		cp5_Test.addToggle("setZTimeAxis", false, width - 120, 140, 10, 10).getCaptionLabel().setColor(color(0));
+		cp5_Test.addToggle("position1D", false, width - 120, 170, 10, 10).getCaptionLabel().setColor(color(0));
+		cp5_Test.addToggle("position2D", true, width - 120, 200, 10, 10).getCaptionLabel().setColor(color(0));
+
+		
+		
 		// FrameRate
 		cp5_Menu.addFrameRate().setInterval(10).setPosition(width - 100, 10).setColor(color(50)); // .setFont(font)
 
@@ -240,18 +255,18 @@ public class TagExplorerProcessing2 extends PApplet {
 		transition.set("shaderTime", (millis() / 1000.0f));
 		transition2.set("shaderTime", (millis() / 1000.0f));
 
-		plifShader.set("shininess", 5.1f);
-		plifShader.set("EnvMap", 0);
-		plifShader.set("MixRatio", 0.2f);
-		plifShader.set("SpecularVal", 0.2f);
+		// plifShader.set("shininess", 5.1f);
+		// plifShader.set("EnvMap", 0);
+		// plifShader.set("MixRatio", 0.2f);
+		// plifShader.set("SpecularVal", 0.2f);
 
-//		 modelTextur
-		 pg.beginDraw();
-		 pg.shader(transition2);
-		 pg.fill(25, 0, 0);
-		 pg.rect(0, 0, pg.width, pg.height);
-		 pg.resetShader();
-		 pg.endDraw();
+		// modelTextur
+		pg.beginDraw();
+		pg.shader(transition2);
+		pg.fill(25, 0, 0);
+		pg.rect(0, 0, pg.width, pg.height);
+		pg.resetShader();
+		pg.endDraw();
 
 		// control p5 Promt
 		// removeController by Button cancel
@@ -296,6 +311,11 @@ public class TagExplorerProcessing2 extends PApplet {
 		// reset mouseHover & interation status
 		interaction = false;
 		hoverPoint = null;
+		
+//		fill(0);
+//		text("showVersions", width - 120, 20);
+//		text("drawVersionShapes", width - 120, 40);
+//		text("showTimeline", width - 120, 70);
 
 		physics.update();
 		filePhysics.update();
@@ -358,7 +378,9 @@ public class TagExplorerProcessing2 extends PApplet {
 			}
 		}
 
-		timeline.render(renderer);
+		if(showTimeline){
+			timeline.render(renderer);
+		}
 
 		renderer.popMatrix();
 		renderer.endDraw();
@@ -376,25 +398,39 @@ public class TagExplorerProcessing2 extends PApplet {
 		if (filePhysics.particles != null) {
 
 			// renderer.shader(plifShader);
-
+			boolean drawShape = false;
 			for (int i = 0; i < filePhysics.particles.size(); i++) {
 				Tag_File file = (Tag_File) filePhysics.particles.get(i);
 
-				if (drawShapes) {
+				// versionsShape
+				if(file.shape != null){
+					drawShape = true;
+				//if (drawVersionShapes || draw2DShape) {
 					s.addChild(file.shape);
+					
+					if(draw2DShape){
+						renderer.pushMatrix();
+						renderer.translate(file.x, file.y, file.z);
+						file.renderFileName(this, renderer);
+						renderer.popMatrix();
+					}
 				}
-				// renderer.shape(file.shape);
 
 				// balls statt 3D-shapes
-				renderer.pushMatrix();
-				renderer.translate(file.x, file.y, file.z);
-				
-				renderer.shape(ball);
-				
-				renderer.popMatrix();
-				
-//				file.renderPlane(this, renderer);
+				else {
+					renderer.pushMatrix();
+					renderer.translate(file.x, file.y, file.z);
+					renderer.shape(ball);
+					// Plane mit Text
+					file.renderFileName(this, renderer);
+					renderer.popMatrix();
+					
+					
+				}
 
+				
+
+				// erstelle Hoverplane
 				if (mouseOver(renderer, file, 30, 30)) {
 					if (hoverPlane == null) {
 						hoverPlane = new HoverPlane(this, file, (int) mainscreen.screenX(file.x, file.y, file.z),
@@ -402,7 +438,7 @@ public class TagExplorerProcessing2 extends PApplet {
 					}
 				}
 			}
-			if (drawShapes) {
+			if (drawShape) {
 				renderer.shape(s);
 			}
 			// renderer.resetShader();
@@ -564,11 +600,6 @@ public class TagExplorerProcessing2 extends PApplet {
 		return (myLine);
 	}
 
-	public void drawShapes(boolean onOff) {
-		drawShapes = onOff;
-		updateShowFiles();
-	}
-
 	// ///////// init Methods //////////////////////
 	public void initFilesFromDB() {
 		ArrayList<Tag> files = new ArrayList<Tag>();
@@ -585,7 +616,7 @@ public class TagExplorerProcessing2 extends PApplet {
 			updateVersionBinding((Tag_File) t);
 		}
 
-		oldest_showFile = ((Tag_File) getOldestTagFile(this.files));
+		//oldest_showFile = ((Tag_File) getOldestTagFile(this.files));
 		// return files;
 	}
 
@@ -621,7 +652,7 @@ public class TagExplorerProcessing2 extends PApplet {
 			showFiles = files;
 		}
 
-		if (showVersions) {
+		if (!showVersions) {
 			showFiles = getNewestTagFileVersions(showFiles);
 		}
 		oldest_showFile = (Tag_File) getOldestTagFile(showFiles);
@@ -633,8 +664,23 @@ public class TagExplorerProcessing2 extends PApplet {
 			timeline.oldest = null;
 		}
 
-		setParticlesPosition2D(filePhysics, showFiles);
-		//setParticlesPosition(filePhysics, showFiles);
+		if (position1D) {
+			setParticlesPosition(filePhysics, showFiles);
+			System.out.println("setParticlesPosition() linie");
+			
+		} else if(position2D) {
+			System.out.println("setParticlesPosition2D() raster");
+			setParticlesPosition2D(filePhysics, showFiles);
+			
+		} // setParticlesPosition(filePhysics, showFiles);
+		else{
+			System.out.println("DEFAULT: setParticlesPosition2D() raster");
+			setParticlesPosition2D(filePhysics, showFiles);
+			
+		}
+		
+		// setzt shape oder null
+		setShape();
 	}
 
 	private ArrayList<Tag> getFullMatches(ArrayList<Tag> files) {
@@ -683,16 +729,6 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	// setzt bindCount & available Tags & setzt Patikelpositionen neu
 	public void updateTags() {
-		// ArrayList<Tag> tags = new ArrayList<Tag>();
-		//
-		// tags = SQL.queryTagList("keywords");
-		// tags.addAll(SQL.queryTagList("locations"));
-		// tags.addAll(SQL.queryTagList("projects"));
-		// tags.addAll(SQL.queryTagList("users"));
-		//
-		// // tags.addAll(SQL.queryTagList("files"));
-		// // tags nicht Ÿberscheiben, sondern nur abgleichen!
-		// this.attributes = tags;
 
 		attributes = initTagsFromDB();
 
@@ -714,28 +750,23 @@ public class TagExplorerProcessing2 extends PApplet {
 		// get mit showFiles verknŸpfte Tags & HŠufigkeit
 		this.availableTags = getTagcountAndTags(showFiles);
 
-		for (Tag tag : availableTags) {
-			System.out.println(tag.name + " " + tag.bindCount);
-		}
+//		for (Tag tag : availableTags) {
+//			System.out.println(tag.name + " " + tag.bindCount);
+//		}
 
 		physics.particles.clear();
 
 		int count = attributes.size();
 		float dist;
 		if (count > 1) {
-			dist = ((float) height - 40) / (count - 1);
+			dist = ((float) height) / (count - 1);
 		} else {
 			dist = 0;
 		}
 
+		// dropParticles
 		for (int i = 0; i < attributes.size(); i++) {
-			// dropParticles(physics, i * dist - (dist * (count - 1) / 2), 0,
-			// 50, tags.get(i));
-
-			dropParticles(physics, i * dist - (dist * (count - 1) / 2), 0, 20, attributes.get(i), true);
-
-			// dropParticles(physics, width - 150, i * dist + 20, 0,
-			// tags.get(i));
+			dropParticle(physics, i * dist - (dist * (count - 1) / 2), 0, 20, attributes.get(i), true);
 		}
 	}
 
@@ -775,7 +806,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	private void setParticlesPosition2D(VerletPhysics physics, ArrayList<Tag> files) {
 		physics.particles.clear();
 
-		//int count = getSizeWithoutVersion(files);
+		// int count = getSizeWithoutVersion(files);
 
 		int dist = 120;
 
@@ -787,7 +818,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		for (int i = 0; i < files.size(); i++) {
 
-			dropParticles(physics, xShiftCount * dist - (dist * (perRow - 1) / 2), yShiftCount * dist, 0, files.get(i),
+			dropParticle(physics, xShiftCount * dist - (dist * (perRow - 1) / 2), yShiftCount * dist, 0, files.get(i),
 					true); // links/rechts
 
 			xShiftCount++;
@@ -803,7 +834,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		// drop Particles
 		// set Position
 		physics.particles.clear();
-
+		
 		int count = getSizeWithoutVersion(files);
 
 		float dist;
@@ -817,60 +848,69 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		int shiftCount = 0;
 
-		// System.out.println("files.size(): " + files.size());
-		// System.out.println("count: " + count);
 
 		for (int i = 0; i < files.size(); i++) {
-			// println("setParticlesPosition(): " + files.get(i).name + " " +
-			// files.get(i).id + " "
-			// + ((Tag_File) files.get(i)).parent_ID);
-
 			// wenn versionen nicht ausgeblendet sind && parent_ID -> set x & y
 			// wert nach parent.
 			if (showVersions && ((Tag_File) files.get(i)).parent_ID != 0) {
 				// get parent
 				Tag_File parent = (Tag_File) getTagByID(files.get(i).type, ((Tag_File) files.get(i)).parent_ID);
 
-				// dropParticles(physics, parent.x, parent.y, 0, files.get(i));
-				dropParticles(physics, parent.x, parent.y - 40, 0, files.get(i), true);
-
-				// springs to partent anhand parent file
-				// dropSpring(physics, (Tag_File) files.get(i), parent);
+				dropParticle(physics, parent.x, parent.y - 40, 0, files.get(i), true);
 			}
 
 			// ist origin File Version ODER neueste Version!
 			else {
-				dropParticles(physics, shiftCount * dist - (dist * (count - 1) / 2), 0, 0, files.get(i), true); // links/rechts
+				dropParticle(physics, shiftCount * dist - (dist * (count - 1) / 2), 0, 0, files.get(i), true); // links/rechts
 				// von
 				// 0
 				shiftCount++;
 			}
 		}
 
-		if (drawShapes) {
-			for (Tag t : files) {
-				Tag_File file = (Tag_File) t;
-				file.setShape(generateShape(file));
-			}
-		}
-
-		// set z position creation time
-		setZNewestTime();
+		// set z position creation time -> setZTimeAxis()
+//		if(showTimeline){
+//			setZNewestTime();
+//		}
+	}
+	
+	
+	public void setShape(){
+		// nachdem positionen festgelegt sind
+				if (drawVersionShapes) {
+					for (Tag t : files) {
+						Tag_File file = (Tag_File) t;
+						file.setShape(generateShape(file));
+					}
+					System.out.println("file.setShape(generateShape(file)) -> VersionShapee");
+				} else if(draw2DShape){// || shape.getFamily() == PConstants.GROUP){
+					PShape shape = createShape(PConstants.RECT, - 100/2, - 100/2, 100, 100);
+					shape.texture(pg);
+					shape.noStroke();
+					for (Tag t : files) {
+						Tag_File file = (Tag_File) t;
+						file.setShape(shape, file.x, file.y);
+					}
+					System.out.println("file.setShape(generateShape(file)) : Created Tag Plane");
+				} else{
+					for (Tag t : files) {
+						Tag_File file = (Tag_File) t;
+						file.shape = null;
+					}
+				}
 	}
 
-	public void dropParticles(VerletPhysics physics, float x, float y, float z, Tag t) {
+	public void dropParticle(VerletPhysics physics, float x, float y, float z, Tag t) {
 		t.x = x;
 		t.y = y;
 		t.z = z;
 
 		// t.lock();
 
-		// System.out.println(t.name + " " + x + " " + y + " " + z + " " + t.x +
-		// " " + t.y + " " + t.z);
 		physics.addParticle(t);
 	}
 
-	public void dropParticles(VerletPhysics physics, float x, float y, float z, Tag t, boolean lock) {
+	public void dropParticle(VerletPhysics physics, float x, float y, float z, Tag t, boolean lock) {
 		t.x = x;
 		t.y = y;
 		t.z = z;
@@ -879,8 +919,6 @@ public class TagExplorerProcessing2 extends PApplet {
 			t.lock();
 		}
 
-		// System.out.println(t.name + " " + x + " " + y + " " + z + " " + t.x +
-		// " " + t.y + " " + t.z);
 		physics.addParticle(t);
 	}
 
@@ -899,6 +937,11 @@ public class TagExplorerProcessing2 extends PApplet {
 
 			// println("aktuelle anzeige file:" + file.name);
 			file.z = -timeline.mapExp(getNewestDate(file));
+		}
+	}
+	void resetZshowFiles() {
+		for (Tag t : showFiles) {
+			t.z = 0;
 		}
 	}
 
@@ -987,7 +1030,6 @@ public class TagExplorerProcessing2 extends PApplet {
 		return oldest;
 	}
 
-	// noch nicht fertig!
 	private ArrayList<Tag> getNewestTagFileVersions(ArrayList<Tag> files) {
 		ArrayList<Tag> newestVersions = new ArrayList<Tag>();
 		ArrayList<Tag> allFiles = (ArrayList<Tag>) files.clone();
@@ -999,7 +1041,6 @@ public class TagExplorerProcessing2 extends PApplet {
 
 			if (file.parent_ID != 0) {
 				removeIDs.add(file.parent_ID);
-				println("file.parent_ID: " + file.parent_ID);
 			}
 		}
 
@@ -1009,17 +1050,6 @@ public class TagExplorerProcessing2 extends PApplet {
 			}
 
 		}
-
-		// for(int id : removeIDs){
-		// println("delete: " + id + " " + getTagFileByID(files, id).id);
-		// newestVersions.remove(getTagFileByID(newestVersions, id));
-		// }
-
-		for (Tag t : newestVersions) {
-
-			println(t.id);
-		}
-
 		return newestVersions;
 	}
 
@@ -1058,6 +1088,9 @@ public class TagExplorerProcessing2 extends PApplet {
 		// file.updateViewName();
 	}
 
+	
+	
+	// Version shape
 	public PShape generateShape(Tag_File file) {
 		PShape s = createShape(GROUP);
 		// file.creation_time;
@@ -1178,17 +1211,6 @@ public class TagExplorerProcessing2 extends PApplet {
 		return s;
 	}
 
-	// verwende timeline.mapExpe(long time);
-	// public float mapExp(long time) {
-	//
-	// float val = map(sqrt(System.currentTimeMillis() - time), 0,
-	// sqrt(System.currentTimeMillis() - timeline.oldest.getTime()), 0, 2000);
-	// // 150
-	// // hand
-	// // gesetzt!
-	//
-	// return val;
-	// }
 
 	// ///////// INPUT ///////////////////
 	public void mousePressed() {
@@ -1206,30 +1228,7 @@ public class TagExplorerProcessing2 extends PApplet {
 				startTag = t;
 			}
 		}
-
-		// if (b != null) {
-		// println("dispose");
-		// // PromtNewFile pro = promts.get(0);
-		// b.dispose();
-		// b = null;
-		//
-		// // pro = null;
-		// // pro.markForDisposal();
-		// // promts.remove(p);
-		// }
 	}
-
-	// public void handleTextEvents(GEditableTextControl textcontrol, GEvent
-	// event) {
-	// println("textEvent");
-	// }
-
-	// public void mouseDragged() {
-	// if (mouseOver(50, 50, 100, 100)) {
-	// mainScreenYRotation += 0.01;
-	// System.out.println("mainScreenYRotation: " + mainScreenYRotation);
-	// }
-	// }
 
 	public void mouseReleased() {
 		lastClick = new Timestamp(System.currentTimeMillis());
@@ -1287,13 +1286,6 @@ public class TagExplorerProcessing2 extends PApplet {
 			}
 		}
 		startTag = null;
-
-		// if(b != null){
-		// b = null;
-		// b.markForDisposal();
-		//
-		// // b.dispose();
-		// }
 	}
 
 	// boolean mouseOver(float x, float y, int w, int h) {
@@ -1446,9 +1438,6 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 	}
 
-	// GTextField b = null;
-	ArrayList<PromtNewFile> promts = new ArrayList<PromtNewFile>();
-
 	// ///////////// Tag handling /////////////////////
 
 	// ////////// Tag Creation /////////////////////
@@ -1474,30 +1463,6 @@ public class TagExplorerProcessing2 extends PApplet {
 		return file;
 	}
 
-	// public void fileSelected(File selection) {
-	//
-	// if (selection == null) {
-	// println("Window was closed or the user hit cancel.");
-	// } else {
-	// // println("Create new File: url: " + url);
-	//
-	// Tag_File file = createNewFile("files", selection);
-	//
-	// if (file != null) {
-	// if (user != null) {
-	// // System.out.println(file.toString());
-	// SQL.bindTag(file, user);
-	// }
-	//
-	// // update File
-	// updateFileTagBinding(file);
-	// files.add(file);
-	// updateShowFiles();
-	// updateSprings();
-	// }
-	// }
-	//
-	// }
 
 	// nicht mehr gebraucht alte Promts
 	public void locationInput(String theText) {
@@ -1566,6 +1531,8 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 	}
 
+	
+	// in HoverPlane neuen Tag erzeugen
 	public Tag createNewTag(String theText, String type) {
 		// System.out.println("function locationInput");
 		Tag tag = null;
@@ -1601,27 +1568,6 @@ public class TagExplorerProcessing2 extends PApplet {
 		// }
 	}
 
-	// public void handleButtonEvents(GButton button, GEvent event) {
-	// println("buttonEvent: " + event.toString());
-	//
-	// for (PromtNewFile p : promts) {
-	//
-	// if (button == p.btnCancel) {
-	//
-	// return;
-	// }
-	// }
-	// }
-	//
-	// public void handlePanelEvents(GPanel panel, GEvent event) {
-	// println("panelEvent: " + event.toString());
-	// for (PromtNewFile p : promts) {
-	//
-	// if (panel == p) {
-	// println("hello p");
-	// }
-	// }
-	// }
 
 	// ///////////// Promt Location ////////////
 	Promt p = null;
@@ -1744,13 +1690,73 @@ public class TagExplorerProcessing2 extends PApplet {
 	public static void main(String _args[]) {
 		PApplet.main(new String[] { tagexplorerprocessing2.TagExplorerProcessing2.class.getName() });
 	}
-	
-	
-	public void versions(boolean onOff){
-		println("versions: " + onOff);
+
+	public void showVersions(boolean onOff) {
+		println("showVersions(): " + onOff);
 		showVersions = !showVersions;
 		updateShowFiles();
-//		updateTags();
+		// updateTags();
+		updateSprings();
+	}
+
+	public void drawVersionShapes(boolean onOff) {
+		println("drawVersionShapes: " + onOff);
+		showTimeline = true;
+		drawVersionShapes = onOff;
+		if(drawVersionShapes){
+			setZTimeAxis(true);
+			draw2DShape = false;
+		}
+		
+		// wird in setZTimeAxis geupdated
+//		 updateShowFiles();
+////		 updateTags();
+//		 setZNewestTime();
+//		 updateSprings(); 
+	}
+	
+	public void draw2DShape(boolean onOff){
+		draw2DShape = onOff;
+		if(draw2DShape){
+			drawVersionShapes =false;
+		}
+		
+		updateShowFiles();
+//		 updateTags();
+		updateSprings();
+	}
+
+//	public void showTimeline(boolean onOff) {
+//		println("showTimeline: " + onOff);
+//		showTimeline = onOff;
+//	}
+	
+	public void setZTimeAxis(boolean onOff) {
+		println("setZTimeAxis: " + onOff);
+		setZTimeAxis = onOff;
+		
+		if(onOff){
+			showTimeline = true;
+			setZNewestTime();
+			updateSprings();
+		} else{
+			showTimeline = false;
+			resetZshowFiles();
+			updateSprings();
+			
+		}
+	}
+	
+	
+	
+	public void position1D(boolean onOff){
+		position1D = onOff;
+		updateShowFiles();
+		updateSprings();
+	}
+	public void position2D(boolean onOff){
+		position2D = onOff;
+		updateShowFiles();
 		updateSprings();
 	}
 }

@@ -61,6 +61,11 @@ public class Tag_File extends Tag {
 		this.shape = shape;
 	}
 	
+	public void setShape(PShape shape, float x, float y){		
+		this.shape = shape;
+		this.shape.translate(x, y);
+	}
+	
 	public void setFileType(FileType fileType){
 		this.fileType = fileType;
 	}
@@ -113,25 +118,19 @@ public class Tag_File extends Tag {
 				+ ", type=" + type + ", x=" + x + ", y=" + y + ", z=" + z + "]";
 	}
 	
-	public void renderPlane(TagExplorerProcessing2 p5, PGraphics renderer){
+	public void renderFileName(TagExplorerProcessing2 p5, PGraphics renderer){
 		renderPlane(p5, renderer, 100, 100);
 	}
 	
 	public void renderPlane(TagExplorerProcessing2 p5, PGraphics renderer, int w, int h){
-		if(shape == null){// || shape.getFamily() == PConstants.GROUP){
-			shape = p5.createShape(PConstants.RECT, - w/2, - h/2, w, h);
-			shape.texture(p5.pg);
-			shape.noStroke();
-			
-			System.out.println("Tag_File.renderPlane() : Createt Tag Plane");
-		}
 		
 		
-		renderer.shape(shape, x, y);
+		
+//		renderer.shape(shape, x, y);
 		renderer.fill(0);
 //		renderer.textFont(p5.font, 14);
 		renderer.textAlign(PConstants.LEFT);
-		renderer.text(name, x-(w/2-10), y-(h/2-20));
+		renderer.text(name, -(w/2-10), -(h/2-20));
 	}
 
 	

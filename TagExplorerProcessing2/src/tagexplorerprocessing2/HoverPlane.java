@@ -251,7 +251,7 @@ public class HoverPlane extends Plane {
 
 		cp5.addTextfield(name).setValue(value).setPosition(x, y).setSize(w - 120, 18)
 				.setFont(p5.createFont("arial", 14)).setFocus(false).setColorCursor(0)
-				.setColorBackground(p5.color(255)).setColorActive(p5.color(0, 255, 50)).setLabelVisible(false)
+				.setColorBackground(p5.color(255)).setColorActive(p5.color(0, 255, 50))
 				.setColor(p5.color(0)).getCaptionLabel().setVisible(false);
 		// cp5.get(Textfield.class, inputFieldName).getLabel().
 	}
