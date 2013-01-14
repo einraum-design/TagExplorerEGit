@@ -35,7 +35,7 @@ import toxi.physics.VerletSpring;
 
 public class TagExplorerProcessing2 extends PApplet {
 	
-	//testFastForward egit
+	//ff
 
 	WatchDir watcher;
 
