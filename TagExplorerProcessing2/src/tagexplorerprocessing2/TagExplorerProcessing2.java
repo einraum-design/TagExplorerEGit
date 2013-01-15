@@ -3,15 +3,11 @@ package tagexplorerprocessing2;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import controlP5.ControlP5;
@@ -24,14 +20,12 @@ import processing.core.PFont;
 import processing.core.PGraphics;
 import processing.core.PImage;
 import processing.core.PShape;
-import processing.core.PVector;
 import processing.opengl.PShader;
 
 import tagexplorerprocessing2.Connection.ConnectionType;
 import toxi.geom.Vec3D;
 import toxi.physics.VerletParticle;
 import toxi.physics.VerletPhysics;
-import toxi.physics.VerletSpring;
 
 public class TagExplorerProcessing2 extends PApplet {
 
@@ -76,6 +70,8 @@ public class TagExplorerProcessing2 extends PApplet {
 	boolean enableVersionBinding = false;
 	boolean enableTagBinding = false;
 	boolean enableFileBinding = false;
+
+	ArrayList<Button_LabelToggle> testButton = new ArrayList<Button_LabelToggle>();
 
 	// boolean
 
@@ -126,6 +122,8 @@ public class TagExplorerProcessing2 extends PApplet {
 	// Images
 	PImage closeImg;
 	PImage openImg;
+	PImage texture_VIDEO;
+	PImage texture_connection;
 
 	Tag_Comparator_Id comp_id;
 
@@ -149,24 +147,53 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		loadImages();
 
+		// Fill the tables for arcs
+		sinLUT = new float[SINCOS_LENGTH];
+		cosLUT = new float[SINCOS_LENGTH];
+		for (int i = 0; i < SINCOS_LENGTH; i++) {
+			sinLUT[i] = (float) Math.sin(i * DEG_TO_RAD * SINCOS_PRECISION);
+			cosLUT[i] = (float) Math.cos(i * DEG_TO_RAD * SINCOS_PRECISION);
+		}
+
 		// ControlP5
 		cp5_Promt = new ControlP5(this);
 		cp5_Menu = new ControlP5(this);
 		cp5_Test = new ControlP5(this);
 
-		cp5_Test.addToggle("showVersions", false, width - 120, 20, 10, 10).getCaptionLabel().setColor(color(0));
-		cp5_Test.addToggle("drawAccessShapes", false, width - 120, 60, 10, 10).getCaptionLabel().setColor(color(0));
-		cp5_Test.addToggle("draw2DShape", false, width - 120, 90, 10, 10).getCaptionLabel().setColor(color(0));
-		cp5_Test.addToggle("setZTimeAxis", false, width - 120, 130, 10, 10).getCaptionLabel().setColor(color(0));
-		cp5_Test.addToggle("position1D", false, width - 120, 170, 10, 10).getCaptionLabel().setColor(color(0));
-		cp5_Test.addToggle("position2D", true, width - 120, 200, 10, 10).getCaptionLabel().setColor(color(0));
+		// cp5_Test.addToggle("showVersions", false, width - 120, 20, 10,
+		// 10).getCaptionLabel().setColor(color(0));
+		// cp5_Test.addToggle("drawAccessShapes", false, width - 120, 60, 10,
+		// 10).getCaptionLabel().setColor(color(0));
+		// cp5_Test.addToggle("draw2DShape", false, width - 120, 90, 10,
+		// 10).getCaptionLabel().setColor(color(0));
+		// cp5_Test.addToggle("setZTimeAxis", false, width - 120, 130, 10,
+		// 10).getCaptionLabel().setColor(color(0));
+		// cp5_Test.addToggle("position1D", false, width - 120, 170, 10,
+		// 10).getCaptionLabel().setColor(color(0));
+		// cp5_Test.addToggle("position2D", true, width - 120, 200, 10,
+		// 10).getCaptionLabel().setColor(color(0));
+		//
+		// cp5_Test.addToggle("last", false, width - 120, 240, 10,
+		// 10).getCaptionLabel().setColor(color(0));
+		//
+		// cp5_Test.addToggle("enableVersionBinding", false, width - 120, 280,
+		// 10, 10).getCaptionLabel()
+		// .setColor(color(0));
+		// cp5_Test.addToggle("enableTagBinding", false, width - 120, 310, 10,
+		// 10).getCaptionLabel().setColor(color(0));
+		// cp5_Test.addToggle("enableFileBinding", false, width - 120, 340, 10,
+		// 10).getCaptionLabel().setColor(color(0));
 
-		cp5_Test.addToggle("last", false, width - 120, 240, 10, 10).getCaptionLabel().setColor(color(0));
-
-		cp5_Test.addToggle("enableVersionBinding", false, width - 120, 280, 10, 10).getCaptionLabel()
-				.setColor(color(0));
-		cp5_Test.addToggle("enableTagBinding", false, width - 120, 310, 10, 10).getCaptionLabel().setColor(color(0));
-		cp5_Test.addToggle("enableFileBinding", false, width - 120, 340, 10, 10).getCaptionLabel().setColor(color(0));
+		testButton.add(new Button_LabelToggle(this, "showVersions", false, 10, 20, width - 120, 20));
+		testButton.add(new Button_LabelToggle(this, "drawAccessShapes", false, 10, 20, width - 120, 50));
+		testButton.add(new Button_LabelToggle(this, "draw2DShape", false, 10, 20, width - 120, 80));
+		testButton.add(new Button_LabelToggle(this, "setZTimeAxis", false, 10, 20, width - 120, 120));
+		testButton.add(new Button_LabelToggle(this, "position1D", false, 10, 20, width - 120, 160));
+		testButton.add(new Button_LabelToggle(this, "position2D", false, 10, 20, width - 120, 190));
+		testButton.add(new Button_LabelToggle(this, "last", false, 10, 20, width - 120, 230));
+		testButton.add(new Button_LabelToggle(this, "enableVersionBinding", false, 10, 20, width - 120, 270));
+		testButton.add(new Button_LabelToggle(this, "enableTagBinding", false, 10, 20, width - 120, 300));
+		testButton.add(new Button_LabelToggle(this, "enableFileBinding", false, 10, 20, width - 120, 330));
 
 		// FrameRate
 		cp5_Menu.addFrameRate().setInterval(10).setPosition(width - 100, 10).setColor(color(50)); // .setFont(font)
@@ -322,6 +349,60 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		physics.update();
 		filePhysics.update();
+
+		for (Button_LabelToggle b : testButton) {
+			b.render();
+
+			if (mouseActive && b.mouseOver() && mousePressed) {
+
+				switch (b.label) {
+				case "showVersions":
+					b.toggle();
+					showVersions(b.onOff);
+					break;
+				case "drawAccessShapes":
+					b.toggle();
+					drawAccessShapes(b.onOff);
+					break;
+				case "draw2DShape":
+					b.toggle();
+					draw2DShape(b.onOff);
+					break;
+				// case "showTimeline":
+				// b.toggle();
+				// showTimeline(b.onOff);
+				// break;
+				case "setZTimeAxis":
+					b.toggle();
+					setZTimeAxis(b.onOff);
+					break;
+				case "position1D":
+					b.toggle();
+					position1D(b.onOff);
+					break;
+				case "position2D":
+					b.toggle();
+					position2D(b.onOff);
+					break;
+				case "enableVersionBinding":
+					b.toggle();
+					enableVersionBinding(b.onOff);
+					break;
+				case "enableTagBinding":
+					b.toggle();
+					enableTagBinding(b.onOff);
+					break;
+				case "enableFileBinding":
+					b.toggle();
+					enableFileBinding(b.onOff);
+					break;
+
+				}
+
+				lastClick = new Timestamp(System.currentTimeMillis());
+				mouseActive = false;
+			}
+		}
 	}
 
 	public void drawPGTexture() {
@@ -340,17 +421,15 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		renderer.background(255);
 
-		renderer.hint(DISABLE_DEPTH_MASK);
-		renderer.fill(255);
-		renderer.shader(transition);
-
-		// renderer.pushMatrix();
-		// renderer.translate(0, 0, -2100);
-		renderer.rectMode(CENTER);
-		renderer.rect(renderer.width / 2, renderer.height / 2, renderer.width * 20, renderer.height * 20);
-		// renderer.popMatrix();
-		renderer.resetShader();
-		renderer.hint(ENABLE_DEPTH_MASK);
+		// renderer.hint(DISABLE_DEPTH_MASK);
+		// renderer.fill(255);
+		// renderer.shader(transition);
+		//
+		// renderer.rectMode(CENTER);
+		// renderer.rect(renderer.width / 2, renderer.height / 2, renderer.width
+		// * 20, renderer.height * 20);
+		// renderer.resetShader();
+		// renderer.hint(ENABLE_DEPTH_MASK);
 
 		// renderer.directionalLight(0, 255, 0, 0, -1, 0);
 
@@ -405,6 +484,9 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	public void drawFiles(PGraphics renderer) {
 
+		// turn lights on
+		//renderer.lights();
+
 		PShape s = createShape(GROUP);
 
 		if (filePhysics.particles != null) {
@@ -419,12 +501,12 @@ public class TagExplorerProcessing2 extends PApplet {
 					drawShape = true;
 					s.addChild(file.shape);
 
-					if (draw2DShape) {
-						renderer.pushMatrix();
-						renderer.translate(file.x, file.y, file.z);
-						file.renderFileName(this, renderer);
-						renderer.popMatrix();
-					}
+					// if (draw2DShape) {
+					// renderer.pushMatrix();
+					// renderer.translate(file.x, file.y, file.z);
+					// file.renderFileName(this, renderer);
+					// renderer.popMatrix();
+					// }
 				}
 
 				// balls statt 3D-shapes
@@ -450,9 +532,6 @@ public class TagExplorerProcessing2 extends PApplet {
 				renderer.shape(s);
 			}
 			// renderer.resetShader();
-
-			// turn lights on
-			renderer.lights();
 		}
 	}
 
@@ -513,23 +592,23 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		PShape shape = createShape(GROUP);
 
-//		if (enableVersionBinding) {
-			PShape shapeVersions = generateTypeSprings(ConnectionType.VERSION);
-			shapeVersions.stroke(255, 0, 0);
-			shape.addChild(shapeVersions);
-//		}
+		// if (enableVersionBinding) {
+		PShape shapeVersions = generateTypeSprings(ConnectionType.VERSION);
+		shapeVersions.stroke(255, 0, 0);
+		shape.addChild(shapeVersions);
+		// }
 
-//		if (enableFileBinding) {
-			PShape shapeFilebindings = generateTypeSprings(ConnectionType.FILEBINDING);
-			shapeFilebindings.stroke(0, 255, 0);
-			shape.addChild(shapeFilebindings);
-//		}
+		// if (enableFileBinding) {
+		PShape shapeFilebindings = generateTypeSprings(ConnectionType.FILEBINDING);
+		shapeFilebindings.stroke(0, 255, 0);
+		shape.addChild(shapeFilebindings);
+		// }
 
-//		if (enableTagBinding) {
-			PShape shapeTagbindings = generateTypeSprings(ConnectionType.TAGBINDING);
-			shapeTagbindings.stroke(0, 0, 255);
-			shape.addChild(shapeTagbindings);
-//		}
+		// if (enableTagBinding) {
+		PShape shapeTagbindings = generateTypeSprings(ConnectionType.TAGBINDING);
+		shapeTagbindings.stroke(0, 0, 255);
+		shape.addChild(shapeTagbindings);
+		// }
 
 		renderer.shape(shape);
 	}
@@ -905,7 +984,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		if (count > 1) {
 			// dist = ((float) height - 40) / (count - 1);
 			// dist = ((float) width - 40) / (count - 1);
-			dist = 60;
+			dist = 120;
 		} else {
 			dist = 0;
 		}
@@ -919,7 +998,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 				// get parent
 				Tag_File parent = (Tag_File) getTagByID(files.get(i).type, ((Tag_File) files.get(i)).parent_ID);
-				dropParticle(physics, parent.x, parent.y - 40, files.get(i), false);
+				dropParticle(physics, parent.x, parent.y - 120, files.get(i), false);
 			}
 
 			// ist neueste Version!
@@ -944,17 +1023,14 @@ public class TagExplorerProcessing2 extends PApplet {
 		if (drawAccessShapes) {
 			for (Tag t : files) {
 				Tag_File file = (Tag_File) t;
-				file.setShape(generateShape(file));
+				file.setShape(generateAccessShape(file));
 			}
 			System.out.println("file.setShape(generateShape(file)) -> VersionShapee");
 		} else if (draw2DShape) {// || shape.getFamily() == PConstants.GROUP){
 
 			for (Tag t : files) {
 				Tag_File file = (Tag_File) t;
-				PShape shape = createShape(PConstants.RECT, file.x - 100 / 2, file.y - 100 / 2, 100, 100);
-				shape.texture(pg);
-				shape.noStroke();
-				file.setShape(shape);
+				file.setShape(generate2DShape(file));
 			}
 			System.out.println("file.setShape(generateShape(file)) : Created Tag Planes");
 		} else {
@@ -968,13 +1044,10 @@ public class TagExplorerProcessing2 extends PApplet {
 	public void setShape(Tag_File file) {
 		// nachdem positionen festgelegt sind
 		if (drawAccessShapes) {
-			file.setShape(generateShape(file));
+			file.setShape(generateAccessShape(file));
 			System.out.println("file.setShape(generateShape(file)) -> VersionShapee");
 		} else if (draw2DShape) {// || shape.getFamily() == PConstants.GROUP){
-			PShape shape = createShape(PConstants.RECT, file.x - 100 / 2, file.y - 100 / 2, 100, 100);
-			shape.texture(pg);
-			shape.noStroke();
-			file.setShape(shape);
+			file.setShape(generate2DShape(file));
 			System.out.println("file.setShape(generateShape(file)) : Created Tag Plane");
 		} else {
 			file.shape = null;
@@ -998,7 +1071,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		if (lock) {
 			t.lock();
-		} else{
+		} else {
 			t.unlock();
 		}
 
@@ -1045,6 +1118,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 			// shape2D
 			if (draw2DShape) {
+				// setzt shape z-wert
 				file.shape.translate(0, 0, file.z);
 			}
 		}
@@ -1052,9 +1126,13 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	void resetZshowFiles() {
 		for (Tag t : showFiles) {
+			// setzt shape wieder auf z = 0;
+			if (draw2DShape) {
+				((Tag_File) t).shape.resetMatrix();
+				((Tag_File) t).shape.translate(t.x, t.y, 0);
+			}
 			t.z = 0;
 		}
-		setShape();
 	}
 
 	public Tag getTagByID(String tableName, int id) {
@@ -1200,8 +1278,127 @@ public class TagExplorerProcessing2 extends PApplet {
 		// file.updateViewName();
 	}
 
-	// Version shape
-	public PShape generateShape(Tag_File file) {
+	public PGraphics generateTexture(Tag_File file) {
+		int texW = 100;
+		int texH = 100;
+		PGraphics textu = createGraphics(texW, texH, P2D);
+		textu.beginDraw();
+
+		// background mach rŠnder von Textur!
+		textu.background(255, 0);
+		// textu.image(loadImage("../data/texture_VIDEO.png"), 0, 0);
+		textu.image(texture_VIDEO, 0, 0);
+		// textu.fill(255, 0, 0);
+		// textu.ellipse(0, 0, 50, 50);
+
+		textu.fill(255, 0, 0);
+		textu.beginShape();
+		textu.vertex(0, 0);
+		textu.vertex(20, 0);
+		textu.vertex(20, 20);
+		textu.endShape();
+		if (file.attributeBindings.size() > 0) {
+			int parts = file.attributeBindings.size() * 2;
+
+			arc(textu, textu.width / 2, textu.height / 2, 0, 150, 40, 10);
+			
+			
+			arc(textu, textu.width / 2, textu.height / 2, 190, 350, 40, 10);
+			
+			arc(textu, textu.width / 2, textu.height / 2, 350, 400, 30, 5);
+			// arc(textu, textu.width / 2, textu.height / 2, 270 - 1 / (parts *
+			// 2), 270 + 1 / (parts * 2), 40, 10);
+
+			println("arc drawn?");
+			// for (int i = 0; i < file.attributeBindings.size(); i++) {
+			//
+			// }
+		}
+
+		// switch(file.fileType){
+		// case IMAGE:
+		// break;
+		// case MESSAGE:
+		// break;
+		// case TEXT:
+		// break;
+		// case WEB:
+		// break;
+		// case FONT:
+		// break;
+		// case VIDEO:
+		// textu.texture(texture_VIDEO);
+		// break;
+		// case AUDIO:
+		// break;
+		// case LAYOUT:
+		// break;
+		// case VECTOR:
+		// break;
+		// default:
+		// break;
+		// }
+		textu.endDraw();
+
+		return textu;
+	}
+
+	// Draw solid arc
+	float sinLUT[];
+	float cosLUT[];
+	float SINCOS_PRECISION = 1.0f;
+	int SINCOS_LENGTH = (int) ((360.0f / SINCOS_PRECISION));
+
+//	public void arc(float x, float y, float deg, float rad, float w) {
+//		int a = (int) (deg / SINCOS_PRECISION);
+//		beginShape(QUAD_STRIP);
+//		for (int i = 0; i < a; i++) {
+//			vertex(cosLUT[i % SINCOS_LENGTH] * (rad) + x, sinLUT[i % SINCOS_LENGTH] * (rad) + y);
+//			vertex(cosLUT[i % SINCOS_LENGTH] * (rad + w) + x, sinLUT[i % SINCOS_LENGTH] * (rad + w) + y);
+//		}
+//		endShape();
+//	}
+
+	public void arc(PGraphics textu, float x, float y, float startDeg, float endDeg, float rad, float w) {
+		int a = (int) (startDeg / SINCOS_PRECISION);
+		int b = (int) (endDeg / SINCOS_PRECISION);
+		textu.beginShape(QUAD_STRIP);
+		for (int i = a; i < b; i++) {
+			textu.vertex(sinLUT[i % SINCOS_LENGTH] * (rad) + x, -cosLUT[i % SINCOS_LENGTH] * (rad) + y);
+			textu.vertex(sinLUT[i % SINCOS_LENGTH] * (rad + w) + x, -cosLUT[i % SINCOS_LENGTH] * (rad + w) + y);
+		}
+		textu.endShape();
+	}
+
+	// public PShape gernerateShapeTRIANGLES(Tag_File file){
+	// PShape shape = createShape(GROUP);
+	//
+	// return shape;
+	// }
+
+	public PShape generate2DShape(Tag_File file) {
+		PShape s = createShape();
+		s.noStroke();
+
+		PGraphics tex = generateTexture((Tag_File) file);
+		s.texture(tex);
+
+		// s.vertex(- 50, + 50, 0, tex.width, 0);
+		// s.vertex( + 50, + 50, 0, 0, 0);
+		// s.vertex( + 50, - 50, 0, 0, tex.height);
+		// s.vertex( - 50, - 50, 0, tex.width, tex.height);
+
+		s.vertex(-50, -50, 0, 0, 0);
+		s.vertex(+50, -50, 0, tex.width, 0);
+		s.vertex(+50, +50, 0, tex.width, tex.height);
+		s.vertex(-50, +50, 0, 0, tex.height);
+
+		s.end(CLOSE);
+		return s;
+	}
+
+	// Access shape
+	public PShape generateAccessShape(Tag_File file) {
 		PShape s = createShape(GROUP);
 		// file.creation_time;
 		PShape start = makeRect(file, file.creation_time);
@@ -1230,94 +1427,143 @@ public class TagExplorerProcessing2 extends PApplet {
 	public PShape makeRect(Tag file, Timestamp ts) {
 		float z = -timeline.mapExp(System.currentTimeMillis() - ts.getTime());
 
-		// image(pg, 0, 500, 100, 100);
-
 		PShape s = createShape();
-		s.fill(0, 0, 255);
 		s.noStroke();
-		s.texture(pg);
-		// s.texture(env_plif);
-		s.vertex(file.x + 10, file.y + 10, z, 0, 0);
-		s.vertex(file.x + 10, file.y - 10, z, 0, pg.height);
-		s.vertex(file.x - 10, file.y - 10, z, pg.width, pg.height);
-		s.vertex(file.x - 10, file.y + 10, z, pg.width, 0);
-		s.end(CLOSE);
 
+		PGraphics tex = generateTexture((Tag_File) file);
+		s.texture(tex);
+		// s.texture(pg);
+		// s.texture(env_plif);
+
+		s.vertex(file.x - 50, file.y - 50, z, 0, 0);
+		s.vertex(file.x + 50, file.y - 50, z, tex.width, 0);
+		s.vertex(file.x + 50, file.y + 50, z, tex.width, tex.height);
+		s.vertex(file.x - 50, file.y + 50, z, 0, tex.height);
+		
+		s.end(CLOSE);
 		return s;
 	}
 
-	// public PShape generateConnection(PShape s1, PShape s2) {
-	//
-	// int count = s1.getVertexCount();
-	//
-	// PShape s = createShape(TRIANGLE_STRIP);
-	//
-	// s.fill(0, 255, 255);
-	// s.noStroke();
-	// for (int i = 0; i < count; i++) {
-	// println(s1.getVertexX(i) + " ," + s1.getVertexY(i) + " ," +
-	// s1.getVertexZ(i));
-	// s.vertex(s1.getVertexX(i), s1.getVertexY(i), s1.getVertexZ(i));
-	// println(s2.getVertexX(i) + " ," + s2.getVertexY(i) + " ," +
-	// s2.getVertexZ(i));
-	// s.vertex(s2.getVertexX(i), s2.getVertexY(i), s2.getVertexZ(i));
-	// }
-	// s.vertex(s1.getVertexX(0), s1.getVertexY(0), s1.getVertexZ(0));
-	// s.vertex(s2.getVertexX(0), s2.getVertexY(0), s2.getVertexZ(0));
-	// s.end();
-	//
-	// return s;
-	// }
-	public PShape generateConnection(PShape s1, PShape s2) {
+	public PShape generateConnectionTRIANGLES(PShape s1, PShape s2) {
 
-		int count = s1.getVertexCount();
+		PShape s = createShape(TRIANGLES);
+
+		// println("s1.getVertexCount(): " + s1.getVertexCount());
+		s.fill(0, 255, 0);
+
+		// Stroke fŸr Connections wieder Ausblenden!
+		s.stroke(0);
+
+		for (int i = 0; i < s1.getVertexCount(); i++) {
+			// int i = 0;
+
+			if (i < s1.getVertexCount() - 1) {
+				s.vertex(s1.getVertexX(i), s1.getVertexY(i), s1.getVertexZ(i));
+				s.vertex(s2.getVertexX(i), s2.getVertexY(i), s2.getVertexZ(i));
+				s.vertex(s1.getVertexX(i + 1), s1.getVertexY(i + 1), s1.getVertexZ(i + 1));
+
+				s.vertex(s1.getVertexX(i + 1), s1.getVertexY(i + 1), s1.getVertexZ(i + 1));
+				s.vertex(s2.getVertexX(i), s2.getVertexY(i), s2.getVertexZ(i));
+				s.vertex(s2.getVertexX(i + 1), s2.getVertexY(i + 1), s2.getVertexZ(i + 1));
+
+			}
+			// wieder schlie§en
+			else {
+				s.vertex(s1.getVertexX(i), s1.getVertexY(i), s1.getVertexZ(i));
+				s.vertex(s2.getVertexX(i), s2.getVertexY(i), s2.getVertexZ(i));
+				s.vertex(s1.getVertexX(0), s1.getVertexY(0), s1.getVertexZ(0));
+
+				s.vertex(s1.getVertexX(0), s1.getVertexY(0), s1.getVertexZ(0));
+				s.vertex(s2.getVertexX(i), s2.getVertexY(i), s2.getVertexZ(i));
+				s.vertex(s2.getVertexX(0), s2.getVertexY(0), s2.getVertexZ(0));
+			}
+		}
+
+		s.end(CLOSE);
+		return s;
+	}
+
+	public PShape generateConnectionQUADS(PShape s1, PShape s2) {
+
+		PShape s = createShape(QUADS);
+
+		// println("s1.getVertexCount(): " + s1.getVertexCount());
+		s.fill(0, 255, 0);
+
+		// Stroke fŸr Connections wieder Ausblenden!
+		s.stroke(0);
+
+		for (int i = 0; i < s1.getVertexCount(); i++) {
+			// int i = 0;
+
+			if (i < s1.getVertexCount() - 1) {
+				Vec3D vec1 = new Vec3D(s2.getVertexX(i), s2.getVertexY(i), s2.getVertexZ(i)).sub(new Vec3D(s1
+						.getVertexX(i), s1.getVertexY(i), s1.getVertexZ(i)));
+				Vec3D vec2 = new Vec3D(s2.getVertexX(i + 1), s2.getVertexY(i + 1), s2.getVertexZ(i + 1)).sub(new Vec3D(
+						s2.getVertexX(i), s2.getVertexY(i), s2.getVertexZ(i)));
+
+				Vec3D normal = vec1.cross(vec2);
+				normal.normalize();
+
+				normal(normal.x, normal.y, normal.z);
+
+				s.vertex(s1.getVertexX(i), s1.getVertexY(i), s1.getVertexZ(i));
+				s.vertex(s2.getVertexX(i), s2.getVertexY(i), s2.getVertexZ(i));
+				s.vertex(s2.getVertexX(i + 1), s2.getVertexY(i + 1), s2.getVertexZ(i + 1));
+				s.vertex(s1.getVertexX(i + 1), s1.getVertexY(i + 1), s1.getVertexZ(i + 1));
+			}
+			// wieder schlie§en
+			else {
+
+				Vec3D vec1 = new Vec3D(s2.getVertexX(i), s2.getVertexY(i), s2.getVertexZ(i)).sub(new Vec3D(s1
+						.getVertexX(i), s1.getVertexY(i), s1.getVertexZ(i)));
+				Vec3D vec2 = new Vec3D(s2.getVertexX(0), s2.getVertexY(0), s2.getVertexZ(0)).sub(new Vec3D(s2
+						.getVertexX(i), s2.getVertexY(i), s2.getVertexZ(i)));
+
+				Vec3D normal = vec1.cross(vec2);
+				normal.normalize();
+
+				normal(normal.x, normal.y, normal.z);
+
+				s.vertex(s1.getVertexX(i), s1.getVertexY(i), s1.getVertexZ(i));
+				s.vertex(s2.getVertexX(i), s2.getVertexY(i), s2.getVertexZ(i));
+				s.vertex(s2.getVertexX(0), s2.getVertexY(0), s2.getVertexZ(0));
+				s.vertex(s1.getVertexX(0), s1.getVertexY(0), s1.getVertexZ(0));
+			}
+		}
+
+		s.end(CLOSE);
+		return s;
+	}
+
+	public PShape generateConnection(PShape s1, PShape s2) {
 
 		PShape s = createShape(GROUP);
 
-		s.fill(0, 255, 255);
-		s.noStroke();
+		for (int i = 0; i < s1.getVertexCount(); i++) {
+			PShape r = createShape();
+			r.texture(texture_connection);
+			r.fill(0, 0, 255);
+			r.noStroke();
 
-		PShape r = createShape();
-		r.fill(0, 0, 255);
-		r.noStroke();
-		r.vertex(s1.getVertexX(0), s1.getVertexY(0), s1.getVertexZ(0));
-		r.vertex(s1.getVertexX(0 + 1), s1.getVertexY(0 + 1), s1.getVertexZ(0 + 1));
-		r.vertex(s2.getVertexX(0 + 1), s2.getVertexY(0 + 1), s2.getVertexZ(0 + 1));
-		r.vertex(s2.getVertexX(0), s2.getVertexY(0), s2.getVertexZ(0));
-		r.end(CLOSE);
-		s.addChild(r);
-
-		r = createShape();
-		r.fill(0, 0, 255);
-		r.noStroke();
-		r.vertex(s1.getVertexX(1), s1.getVertexY(1), s1.getVertexZ(1));
-		r.vertex(s1.getVertexX(1 + 1), s1.getVertexY(1 + 1), s1.getVertexZ(1 + 1));
-		r.vertex(s2.getVertexX(1 + 1), s2.getVertexY(1 + 1), s2.getVertexZ(1 + 1));
-		r.vertex(s2.getVertexX(1), s2.getVertexY(1), s2.getVertexZ(1));
-		r.end(CLOSE);
-		s.addChild(r);
-
-		r = createShape();
-		r.fill(0, 0, 255);
-		r.noStroke();
-		r.vertex(s1.getVertexX(2), s1.getVertexY(2), s1.getVertexZ(2));
-		r.vertex(s1.getVertexX(2 + 1), s1.getVertexY(2 + 1), s1.getVertexZ(2 + 1));
-		r.vertex(s2.getVertexX(2 + 1), s2.getVertexY(2 + 1), s2.getVertexZ(2 + 1));
-		r.vertex(s2.getVertexX(2), s2.getVertexY(2), s2.getVertexZ(2));
-		r.end(CLOSE);
-		s.addChild(r);
-
-		r = createShape();
-		r.fill(0, 0, 255);
-		r.noStroke();
-		r.vertex(s1.getVertexX(3), s1.getVertexY(3), s1.getVertexZ(3));
-		r.vertex(s1.getVertexX(0), s1.getVertexY(0), s1.getVertexZ(0));
-		r.vertex(s2.getVertexX(0), s2.getVertexY(0), s2.getVertexZ(0));
-		r.vertex(s2.getVertexX(3), s2.getVertexY(3), s2.getVertexZ(3));
-		r.end(CLOSE);
-
-		s.addChild(r);
-
+			if (i < s1.getVertexCount() - 1) {
+				r.vertex(s1.getVertexX(i), s1.getVertexY(i), s1.getVertexZ(i), 0, 0);
+				r.vertex(s2.getVertexX(i), s2.getVertexY(i), s2.getVertexZ(i), texture_connection.width, 0);
+				r.vertex(s2.getVertexX(i + 1), s2.getVertexY(i + 1), s2.getVertexZ(i + 1), texture_connection.width,
+						texture_connection.height);
+				r.vertex(s1.getVertexX(i + 1), s1.getVertexY(i + 1), s1.getVertexZ(i + 1), 0, texture_connection.height);
+			}
+			// wieder schlie§en
+			else {
+				r.vertex(s1.getVertexX(i), s1.getVertexY(i), s1.getVertexZ(i), 0, 0);
+				r.vertex(s2.getVertexX(i), s2.getVertexY(i), s2.getVertexZ(i), texture_connection.width, 0);
+				r.vertex(s2.getVertexX(0), s2.getVertexY(0), s2.getVertexZ(0), texture_connection.width,
+						texture_connection.height);
+				r.vertex(s1.getVertexX(0), s1.getVertexY(0), s1.getVertexZ(0), 0, texture_connection.height);
+			}
+			r.end(CLOSE);
+			s.addChild(r);
+		}
 		return s;
 	}
 
@@ -1396,15 +1642,6 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 		startTag = null;
 	}
-
-	// boolean mouseOver(float x, float y, int w, int h) {
-	// boolean over = false;
-	// if (mouseX > x - w / 2.0f && mouseX < x + w / 2.0f
-	// && mouseY > y - h / 2.0f && mouseY < y + h / 2.0f) {
-	// over = true;
-	// }
-	// return over;
-	// }
 
 	boolean interaction = false;
 	Vec3D hoverPoint = null;
@@ -1791,6 +2028,8 @@ public class TagExplorerProcessing2 extends PApplet {
 	void loadImages() {
 		closeImg = loadImage("../data/close.png");
 		openImg = loadImage("../data/open.png");
+		texture_VIDEO = loadImage("../data/texture_VIDEO.png");
+		texture_connection = loadImage("../data/texture_connection.png");
 	}
 
 	public static void main(String _args[]) {
@@ -1816,24 +2055,38 @@ public class TagExplorerProcessing2 extends PApplet {
 		println("drawAccessShapes: " + onOff);
 		drawAccessShapes = onOff;
 		if (drawAccessShapes) {
-			cp5_Test.get(Toggle.class, "draw2DShape").setState(false);
+
 			draw2DShape = false;
-			cp5_Test.get(Toggle.class, "setZTimeAxis").setState(true);
-			setZTimeAxis(true);
+			setButtonState("draw2DShape", false);
+
+			setShape();
+
+			// fallse keine zTime Ordnung ist
+			if (setZTimeAxis == false) {
+				setZTimeAxis(true);
+				setButtonState("setZTimeAxis", true);
+			}
 		}
-		updateShowFiles();
+
+		// updateShowFiles();
 	}
 
 	public void draw2DShape(boolean onOff) {
 		draw2DShape = onOff;
 		if (draw2DShape) {
-			cp5_Test.get(Toggle.class, "drawAccessShapes").setState(false);
+			// cp5_Test.get(Toggle.class, "drawAccessShapes").setState(false);
 			drawAccessShapes = false;
+
+			// vor setZTimeAxis!
+			setShape();
+
+			setButtonState("drawAccessShapes", false);
+			setZTimeAxis(setZTimeAxis);
 		}
-		updateShowFiles();
 	}
 
 	public void setZTimeAxis(boolean onOff) {
+
 		println("setZTimeAxis: " + onOff);
 		setZTimeAxis = onOff;
 
@@ -1842,8 +2095,15 @@ public class TagExplorerProcessing2 extends PApplet {
 			println("setZTimeAxis: " + setZTimeAxis + " setZNewestTime()!!!");
 			setZNewestTime();
 		} else {
+			// drawAccessShape nur im ZTime Modus!
+			if (drawAccessShapes) {
+				draw2DShape(true);
+				setButtonState("drawAccessShape", false);
+			}
+
 			showTimeline = false;
 			println("setZTimeAxis: " + setZTimeAxis + " resetZshowFiles()");
+
 			resetZshowFiles();
 
 		}
@@ -1853,7 +2113,9 @@ public class TagExplorerProcessing2 extends PApplet {
 	public void position1D(boolean onOff) {
 		position1D = onOff;
 		if (position1D) {
-			cp5_Test.get(Toggle.class, "position2D").setState(false);
+			// cp5_Test.get(Toggle.class, "position2D").setState(false);
+			position2D = false;
+			setButtonState("position2D", false);
 		}
 		updateShowFiles();
 	}
@@ -1861,29 +2123,39 @@ public class TagExplorerProcessing2 extends PApplet {
 	public void position2D(boolean onOff) {
 		position2D = onOff;
 		if (position2D) {
-			cp5_Test.get(Toggle.class, "position1D").setState(false);
+			// cp5_Test.get(Toggle.class, "position1D").setState(false);
+			position1D = false;
+			setButtonState("position1D", false);
 		}
 		updateShowFiles();
 	}
 
 	public void enableVersionBinding(boolean onOff) {
 		enableVersionBinding = onOff;
-//		if (enableVersionBinding) {
-//		}
+		// if (enableVersionBinding) {
+		// }
 		updateSprings();
 	}
 
 	public void enableTagBinding(boolean onOff) {
 		enableTagBinding = onOff;
-//		if (enableTagBinding) {
-//		}
+		// if (enableTagBinding) {
+		// }
 		updateSprings();
 	}
 
 	public void enableFileBinding(boolean onOff) {
 		enableFileBinding = onOff;
-//		if (enableFileBinding) {
-//		}
+		// if (enableFileBinding) {
+		// }
 		updateSprings();
+	}
+
+	public void setButtonState(String buttonName, boolean onOff) {
+		for (Button_LabelToggle b : testButton) {
+			if (b.label.equals(buttonName)) {
+				b.onOff = onOff;
+			}
+		}
 	}
 }

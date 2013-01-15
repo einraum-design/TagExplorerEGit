@@ -349,7 +349,7 @@ public class WatchDir extends Thread {
 		SQL.setDBDeletTime(newest);
 		
 		
-		newest.setShape(p5.generateShape(newest));
+		newest.setShape(p5.generateAccessShape(newest));
 	}
 
 	public Tag_File getParent(Tag_File file) {
