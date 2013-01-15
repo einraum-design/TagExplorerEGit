@@ -27,6 +27,9 @@ import toxi.geom.Vec3D;
 import toxi.physics.VerletParticle;
 import toxi.physics.VerletPhysics;
 
+
+// Anleitung jogl installation: http://www.3dcoding.de/2009/05/installation-von-eclipse-mit-jogl-unterstutzung/
+
 public class TagExplorerProcessing2 extends PApplet {
 
 	// ff
@@ -138,7 +141,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	// }
 
 	public void setup() {
-		size(1280, 1024, P3D);
+		size(1920, 1024, P3D);
 		// frame.setLocation(1970, 50);
 		smooth(4);
 
@@ -267,6 +270,9 @@ public class TagExplorerProcessing2 extends PApplet {
 		attributes = initTagsFromDB();
 		initFilesFromDB();
 		updateShowFiles();
+		
+		
+		
 		updateTags();
 		updateSprings();
 
@@ -275,6 +281,9 @@ public class TagExplorerProcessing2 extends PApplet {
 				mouseWheel(mwe.getWheelRotation());
 			}
 		});
+		
+		// init file.textur
+				initTextures();
 
 		lastClick = new Timestamp(System.currentTimeMillis());
 	}
@@ -421,15 +430,14 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		renderer.background(255);
 
-		// renderer.hint(DISABLE_DEPTH_MASK);
-		// renderer.fill(255);
-		// renderer.shader(transition);
-		//
-		// renderer.rectMode(CENTER);
-		// renderer.rect(renderer.width / 2, renderer.height / 2, renderer.width
-		// * 20, renderer.height * 20);
-		// renderer.resetShader();
-		// renderer.hint(ENABLE_DEPTH_MASK);
+		 renderer.hint(DISABLE_DEPTH_MASK);
+		 renderer.fill(255);
+		 renderer.shader(transition);
+		
+		 renderer.rectMode(CENTER);
+		 renderer.rect(renderer.width / 2, renderer.height / 2, renderer.width * 20, renderer.height * 20);
+		 renderer.resetShader();
+		 renderer.hint(ENABLE_DEPTH_MASK);
 
 		// renderer.directionalLight(0, 255, 0, 0, -1, 0);
 
@@ -737,6 +745,13 @@ public class TagExplorerProcessing2 extends PApplet {
 		// oldest_showFile = ((Tag_File) getOldestTagFile(this.files));
 		// return files;
 	}
+	
+	public void initTextures(){
+		for(Tag t : files){
+			Tag_File file = (Tag_File) t;
+			file.textur = generateTexture((Tag_File) file);
+		}
+	}
 
 	public ArrayList<Tag> initTagsFromDB() {
 		ArrayList<Tag> tags = new ArrayList<Tag>();
@@ -998,12 +1013,12 @@ public class TagExplorerProcessing2 extends PApplet {
 
 				// get parent
 				Tag_File parent = (Tag_File) getTagByID(files.get(i).type, ((Tag_File) files.get(i)).parent_ID);
-				dropParticle(physics, parent.x, parent.y - 120, files.get(i), false);
+				dropParticle(physics, parent.x, parent.y - 120, files.get(i), true);
 			}
 
 			// ist neueste Version!
 			else {
-				dropParticle(physics, shiftCount * dist - ((dist * (count - 1)) / 2.0f), 0, files.get(i), false); // links/rechts
+				dropParticle(physics, shiftCount * dist - ((dist * (count - 1)) / 2.0f), 0, files.get(i), true); // links/rechts
 
 				// println("i: " + i + " x: " + (shiftCount * dist) +
 				// "verschiebeung um " + -(dist * (count - 1) / 2.0f));
@@ -1119,7 +1134,8 @@ public class TagExplorerProcessing2 extends PApplet {
 			// shape2D
 			if (draw2DShape) {
 				// setzt shape z-wert
-				file.shape.translate(0, 0, file.z);
+				file.shape.resetMatrix();
+				file.shape.translate(file.x, file.y, file.z);
 			}
 		}
 	}
@@ -1292,15 +1308,17 @@ public class TagExplorerProcessing2 extends PApplet {
 		// textu.ellipse(0, 0, 50, 50);
 
 		textu.fill(255, 0, 0);
-		textu.beginShape();
-		textu.vertex(0, 0);
-		textu.vertex(20, 0);
-		textu.vertex(20, 20);
-		textu.endShape();
+		textu.noStroke();
+//		textu.beginShape();
+//		
+//		textu.vertex(0, 0);
+//		textu.vertex(20, 0);
+//		textu.vertex(20, 20);
+//		textu.endShape();
 		if (file.attributeBindings.size() > 0) {
 			int parts = file.attributeBindings.size();
 
-			println("arc drawn?");
+			//println("arc drawn?");
 			for (int i = 0; i < file.attributeBindings.size(); i++) {
 				arc(textu, textu.width / 2, textu.height / 2,
 						(360 - (1.0f / (parts * 4)) * 360) + i * (360.0f / parts), (360 + (1.0f / (parts * 4)) * 360)
@@ -1358,6 +1376,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		int a = (int) (startDeg / SINCOS_PRECISION);
 		int b = (int) (endDeg / SINCOS_PRECISION);
 		textu.beginShape(QUAD_STRIP);
+		
 		for (int i = a; i < b; i++) {
 			textu.vertex(sinLUT[i % SINCOS_LENGTH] * (rad) + x, -cosLUT[i % SINCOS_LENGTH] * (rad) + y);
 			textu.vertex(sinLUT[i % SINCOS_LENGTH] * (rad + w) + x, -cosLUT[i % SINCOS_LENGTH] * (rad + w) + y);
@@ -1374,9 +1393,9 @@ public class TagExplorerProcessing2 extends PApplet {
 	public PShape generate2DShape(Tag_File file) {
 		PShape s = createShape();
 		s.noStroke();
-
-		PGraphics tex = generateTexture((Tag_File) file);
-		s.texture(tex);
+		
+		//PGraphics tex = generateTexture((Tag_File) file);
+		s.texture(file.textur);
 
 		// s.vertex(- 50, + 50, 0, tex.width, 0);
 		// s.vertex( + 50, + 50, 0, 0, 0);
@@ -1384,9 +1403,9 @@ public class TagExplorerProcessing2 extends PApplet {
 		// s.vertex( - 50, - 50, 0, tex.width, tex.height);
 
 		s.vertex(-50, -50, 0, 0, 0);
-		s.vertex(+50, -50, 0, tex.width, 0);
-		s.vertex(+50, +50, 0, tex.width, tex.height);
-		s.vertex(-50, +50, 0, 0, tex.height);
+		s.vertex(+50, -50, 0, file.textur.width, 0);
+		s.vertex(+50, +50, 0, file.textur.width, file.textur.height);
+		s.vertex(-50, +50, 0, 0, file.textur.height);
 
 		s.end(CLOSE);
 		return s;
@@ -1403,7 +1422,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		for (Access c : file.getAccesses()) {
 			next = makeRect(file, c.date);
 			s.addChild(next);
-			s.addChild(generateConnection(start, next));
+			s.addChild(generateConnectionQUADS(start, next));
 			start = next;
 		}
 
@@ -1413,7 +1432,7 @@ public class TagExplorerProcessing2 extends PApplet {
 			println("generateShape(): deleted file: " + file.name);
 
 			// PShape[] shapes = s.getChildren();
-			s.addChild(generateConnection(start, next));
+			s.addChild(generateConnectionQUADS(start, next));
 
 		}
 		return s;
@@ -1425,15 +1444,15 @@ public class TagExplorerProcessing2 extends PApplet {
 		PShape s = createShape();
 		s.noStroke();
 
-		PGraphics tex = generateTexture((Tag_File) file);
-		s.texture(tex);
+		//PGraphics tex = generateTexture((Tag_File) file);
+		s.texture(((Tag_File)file).textur);
 		// s.texture(pg);
 		// s.texture(env_plif);
 
 		s.vertex(file.x - 50, file.y - 50, z, 0, 0);
-		s.vertex(file.x + 50, file.y - 50, z, tex.width, 0);
-		s.vertex(file.x + 50, file.y + 50, z, tex.width, tex.height);
-		s.vertex(file.x - 50, file.y + 50, z, 0, tex.height);
+		s.vertex(file.x + 50, file.y - 50, z, ((Tag_File)file).textur.width, 0);
+		s.vertex(file.x + 50, file.y + 50, z, ((Tag_File)file).textur.width, ((Tag_File)file).textur.height);
+		s.vertex(file.x - 50, file.y + 50, z, 0, ((Tag_File)file).textur.height);
 
 		s.end(CLOSE);
 		return s;
@@ -1481,49 +1500,59 @@ public class TagExplorerProcessing2 extends PApplet {
 	public PShape generateConnectionQUADS(PShape s1, PShape s2) {
 
 		PShape s = createShape(QUADS);
+		
+		s.texture(texture_connection);
 
 		// println("s1.getVertexCount(): " + s1.getVertexCount());
 		s.fill(0, 255, 0);
 
 		// Stroke fŸr Connections wieder Ausblenden!
-		s.stroke(0);
+		s.noStroke();
 
 		for (int i = 0; i < s1.getVertexCount(); i++) {
 			// int i = 0;
 
 			if (i < s1.getVertexCount() - 1) {
-				Vec3D vec1 = new Vec3D(s2.getVertexX(i), s2.getVertexY(i), s2.getVertexZ(i)).sub(new Vec3D(s1
-						.getVertexX(i), s1.getVertexY(i), s1.getVertexZ(i)));
-				Vec3D vec2 = new Vec3D(s2.getVertexX(i + 1), s2.getVertexY(i + 1), s2.getVertexZ(i + 1)).sub(new Vec3D(
-						s2.getVertexX(i), s2.getVertexY(i), s2.getVertexZ(i)));
+//				Vec3D vec1 = new Vec3D(s2.getVertexX(i), s2.getVertexY(i), s2.getVertexZ(i)).sub(new Vec3D(s1
+//						.getVertexX(i), s1.getVertexY(i), s1.getVertexZ(i)));
+//				Vec3D vec2 = new Vec3D(s2.getVertexX(i + 1), s2.getVertexY(i + 1), s2.getVertexZ(i + 1)).sub(new Vec3D(
+//						s2.getVertexX(i), s2.getVertexY(i), s2.getVertexZ(i)));
+//				Vec3D normal = vec1.cross(vec2);
+//				normal.normalize();
+//				normal(normal.x, normal.y, normal.z);
 
-				Vec3D normal = vec1.cross(vec2);
-				normal.normalize();
-
-				normal(normal.x, normal.y, normal.z);
-
-				s.vertex(s1.getVertexX(i), s1.getVertexY(i), s1.getVertexZ(i));
-				s.vertex(s2.getVertexX(i), s2.getVertexY(i), s2.getVertexZ(i));
-				s.vertex(s2.getVertexX(i + 1), s2.getVertexY(i + 1), s2.getVertexZ(i + 1));
-				s.vertex(s1.getVertexX(i + 1), s1.getVertexY(i + 1), s1.getVertexZ(i + 1));
+//				s.vertex(s1.getVertexX(i), s1.getVertexY(i), s1.getVertexZ(i));
+//				s.vertex(s2.getVertexX(i), s2.getVertexY(i), s2.getVertexZ(i));
+//				s.vertex(s2.getVertexX(i + 1), s2.getVertexY(i + 1), s2.getVertexZ(i + 1));
+//				s.vertex(s1.getVertexX(i + 1), s1.getVertexY(i + 1), s1.getVertexZ(i + 1));
+				
+				s.vertex(s1.getVertexX(i), s1.getVertexY(i), s1.getVertexZ(i), 0, 0);
+				s.vertex(s2.getVertexX(i), s2.getVertexY(i), s2.getVertexZ(i), texture_connection.width, 0);
+				s.vertex(s2.getVertexX(i + 1), s2.getVertexY(i + 1), s2.getVertexZ(i + 1), texture_connection.width,
+						texture_connection.height);
+				s.vertex(s1.getVertexX(i + 1), s1.getVertexY(i + 1), s1.getVertexZ(i + 1), 0, texture_connection.height);
 			}
 			// wieder schlie§en
 			else {
 
-				Vec3D vec1 = new Vec3D(s2.getVertexX(i), s2.getVertexY(i), s2.getVertexZ(i)).sub(new Vec3D(s1
-						.getVertexX(i), s1.getVertexY(i), s1.getVertexZ(i)));
-				Vec3D vec2 = new Vec3D(s2.getVertexX(0), s2.getVertexY(0), s2.getVertexZ(0)).sub(new Vec3D(s2
-						.getVertexX(i), s2.getVertexY(i), s2.getVertexZ(i)));
+//				Vec3D vec1 = new Vec3D(s2.getVertexX(i), s2.getVertexY(i), s2.getVertexZ(i)).sub(new Vec3D(s1
+//						.getVertexX(i), s1.getVertexY(i), s1.getVertexZ(i)));
+//				Vec3D vec2 = new Vec3D(s2.getVertexX(0), s2.getVertexY(0), s2.getVertexZ(0)).sub(new Vec3D(s2
+//						.getVertexX(i), s2.getVertexY(i), s2.getVertexZ(i)));
+//				Vec3D normal = vec1.cross(vec2);
+//				normal.normalize();
+//				normal(normal.x, normal.y, normal.z);
 
-				Vec3D normal = vec1.cross(vec2);
-				normal.normalize();
-
-				normal(normal.x, normal.y, normal.z);
-
-				s.vertex(s1.getVertexX(i), s1.getVertexY(i), s1.getVertexZ(i));
-				s.vertex(s2.getVertexX(i), s2.getVertexY(i), s2.getVertexZ(i));
-				s.vertex(s2.getVertexX(0), s2.getVertexY(0), s2.getVertexZ(0));
-				s.vertex(s1.getVertexX(0), s1.getVertexY(0), s1.getVertexZ(0));
+//				s.vertex(s1.getVertexX(i), s1.getVertexY(i), s1.getVertexZ(i));
+//				s.vertex(s2.getVertexX(i), s2.getVertexY(i), s2.getVertexZ(i));
+//				s.vertex(s2.getVertexX(0), s2.getVertexY(0), s2.getVertexZ(0));
+//				s.vertex(s1.getVertexX(0), s1.getVertexY(0), s1.getVertexZ(0));
+				
+				s.vertex(s1.getVertexX(i), s1.getVertexY(i), s1.getVertexZ(i), 0, 0);
+				s.vertex(s2.getVertexX(i), s2.getVertexY(i), s2.getVertexZ(i), texture_connection.width, 0);
+				s.vertex(s2.getVertexX(0), s2.getVertexY(0), s2.getVertexZ(0), texture_connection.width,
+						texture_connection.height);
+				s.vertex(s1.getVertexX(0), s1.getVertexY(0), s1.getVertexZ(0), 0, texture_connection.height);
 			}
 		}
 
@@ -1776,7 +1805,17 @@ public class TagExplorerProcessing2 extends PApplet {
 			cam_eye.y += 20;
 			// println("cam_eye.y = " + cam_eye.y);
 			break;
+		case 'y':
+			cam_eye.z -= 20;
+			// println("cam_eye.y = " + cam_eye.y);
+			break;
+		case 'x':
+			cam_eye.z += 20;
+			// println("cam_eye.y = " + cam_eye.y);
+			break;
 		}
+		
+		
 	}
 
 	// ///////////// Tag handling /////////////////////
@@ -2016,7 +2055,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	}
 
 	void mouseWheel(int delta) {
-		// println("mousewheel: " + delta);
+		println("mousewheel: " + delta);
 		cam_eye.z += delta;
 	}
 

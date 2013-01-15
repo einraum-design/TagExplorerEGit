@@ -28,6 +28,7 @@ public class Tag_File extends Tag {
 	int matches = 0;
 	boolean newest = false;
 	
+	PGraphics textur;
 	PShape shape;
 
 	ArrayList<Tag> attributeBindings = new ArrayList<Tag>();
