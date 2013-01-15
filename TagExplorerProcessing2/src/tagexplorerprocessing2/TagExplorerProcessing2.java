@@ -73,6 +73,10 @@ public class TagExplorerProcessing2 extends PApplet {
 	boolean position1D = false;
 	boolean position2D = true;
 
+	boolean enableVersionBinding = false;
+	boolean enableTagBinding = false;
+	boolean enableFileBinding = false;
+
 	// boolean
 
 	// Timestamp oldestTime;
@@ -151,13 +155,18 @@ public class TagExplorerProcessing2 extends PApplet {
 		cp5_Test = new ControlP5(this);
 
 		cp5_Test.addToggle("showVersions", false, width - 120, 20, 10, 10).getCaptionLabel().setColor(color(0));
-		cp5_Test.addToggle("drawAccessShapes", false, width - 120, 50, 10, 10).getCaptionLabel().setColor(color(0));
-		// cp5_Test.addToggle("showTimeline", false, width - 120, 80, 10,
-		// 10).getCaptionLabel().setColor(color(0));
-		cp5_Test.addToggle("draw2DShape", false, width - 120, 110, 10, 10).getCaptionLabel().setColor(color(0));
-		cp5_Test.addToggle("setZTimeAxis", false, width - 120, 140, 10, 10).getCaptionLabel().setColor(color(0));
+		cp5_Test.addToggle("drawAccessShapes", false, width - 120, 60, 10, 10).getCaptionLabel().setColor(color(0));
+		cp5_Test.addToggle("draw2DShape", false, width - 120, 90, 10, 10).getCaptionLabel().setColor(color(0));
+		cp5_Test.addToggle("setZTimeAxis", false, width - 120, 130, 10, 10).getCaptionLabel().setColor(color(0));
 		cp5_Test.addToggle("position1D", false, width - 120, 170, 10, 10).getCaptionLabel().setColor(color(0));
 		cp5_Test.addToggle("position2D", true, width - 120, 200, 10, 10).getCaptionLabel().setColor(color(0));
+
+		cp5_Test.addToggle("last", false, width - 120, 240, 10, 10).getCaptionLabel().setColor(color(0));
+
+		cp5_Test.addToggle("enableVersionBinding", false, width - 120, 280, 10, 10).getCaptionLabel()
+				.setColor(color(0));
+		cp5_Test.addToggle("enableTagBinding", false, width - 120, 310, 10, 10).getCaptionLabel().setColor(color(0));
+		cp5_Test.addToggle("enableFileBinding", false, width - 120, 340, 10, 10).getCaptionLabel().setColor(color(0));
 
 		// FrameRate
 		cp5_Menu.addFrameRate().setInterval(10).setPosition(width - 100, 10).setColor(color(50)); // .setFont(font)
@@ -314,8 +323,8 @@ public class TagExplorerProcessing2 extends PApplet {
 		physics.update();
 		filePhysics.update();
 	}
-	
-	public void drawPGTexture(){
+
+	public void drawPGTexture() {
 		pg.beginDraw();
 		pg.shader(transition2);
 		pg.fill(25, 0, 0);
@@ -504,22 +513,54 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		PShape shape = createShape(GROUP);
 
-		PShape shapeVersions = generateTypeSprings(ConnectionType.VERSION);
-		shapeVersions.stroke(255, 0, 0);
-		PShape shapeFilebindings = generateTypeSprings(ConnectionType.FILEBINDING);
-		shapeFilebindings.stroke(0, 255, 0);
-		PShape shapeTagbindings = generateTypeSprings(ConnectionType.TAGBINDING);
-		shapeTagbindings.stroke(0, 0, 255);
+//		if (enableVersionBinding) {
+			PShape shapeVersions = generateTypeSprings(ConnectionType.VERSION);
+			shapeVersions.stroke(255, 0, 0);
+			shape.addChild(shapeVersions);
+//		}
 
-		shape.addChild(shapeVersions);
-		shape.addChild(shapeFilebindings);
-		shape.addChild(shapeTagbindings);
+//		if (enableFileBinding) {
+			PShape shapeFilebindings = generateTypeSprings(ConnectionType.FILEBINDING);
+			shapeFilebindings.stroke(0, 255, 0);
+			shape.addChild(shapeFilebindings);
+//		}
+
+//		if (enableTagBinding) {
+			PShape shapeTagbindings = generateTypeSprings(ConnectionType.TAGBINDING);
+			shapeTagbindings.stroke(0, 0, 255);
+			shape.addChild(shapeTagbindings);
+//		}
+
+		renderer.shape(shape);
+	}
+
+	public void drawSpringsARCS(PGraphics renderer) {
+		PShape shape = createShape(GROUP);
+
+		for (int i = 0; i < physics.springs.size(); i++) {
+			Connection sp = (Connection) physics.springs.get(i);
+
+			PShape s = createArc(sp.a, sp.b);
+
+			switch (sp.type) {
+			case VERSION:
+				s.stroke(255, 0, 0);
+				break;
+			case FILEBINDING:
+				s.stroke(0, 255, 0);
+				break;
+			case TAGBINDING:
+				s.stroke(0, 0, 255);
+				break;
+			}
+			shape.addChild(s);
+		}
 
 		renderer.shape(shape);
 	}
 
 	public void drawSprings(PGraphics renderer) {
-		PShape shape = createShape(GROUP);
+		// PShape shape = createShape(GROUP);
 
 		for (int i = 0; i < physics.springs.size(); i++) {
 			Connection sp = (Connection) physics.springs.get(i);
@@ -568,7 +609,6 @@ public class TagExplorerProcessing2 extends PApplet {
 		// shape.addChild(s);
 		//
 		// }
-		renderer.shape(shape);
 	}
 
 	PShape createArc(Vec3D vec1, Vec3D vec2) {
@@ -788,14 +828,14 @@ public class TagExplorerProcessing2 extends PApplet {
 			Tag_File file = (Tag_File) tf;
 
 			// File -> Tag Springs:
-			if (file.attributeBindings.size() > 0) {
+			if (enableTagBinding && file.attributeBindings.size() > 0) {
 				for (Tag t : file.attributeBindings) {
 					dropSpring(physics, file, t, ConnectionType.TAGBINDING);
 				}
 			}
 
 			// File -> File Springs:
-			if (file.fileBindings.size() > 0) {
+			if (enableFileBinding && file.fileBindings.size() > 0) {
 				for (Tag t : file.fileBindings) {
 					// wenn file in showFiles ist!
 					if (showFiles.contains(t)) {
@@ -805,7 +845,7 @@ public class TagExplorerProcessing2 extends PApplet {
 			}
 
 			// File -> File Springs:
-			if (file.versionBindings.size() > 0) {
+			if (enableVersionBinding && file.versionBindings.size() > 0) {
 				for (Tag t : file.versionBindings) {
 					dropSpring(physics, file, t, ConnectionType.VERSION);
 				}
@@ -879,12 +919,12 @@ public class TagExplorerProcessing2 extends PApplet {
 
 				// get parent
 				Tag_File parent = (Tag_File) getTagByID(files.get(i).type, ((Tag_File) files.get(i)).parent_ID);
-				dropParticle(physics, parent.x, parent.y - 40, files.get(i), true);
+				dropParticle(physics, parent.x, parent.y - 40, files.get(i), false);
 			}
 
 			// ist neueste Version!
 			else {
-				dropParticle(physics, shiftCount * dist - ((dist * (count - 1)) / 2.0f), 0, files.get(i), true); // links/rechts
+				dropParticle(physics, shiftCount * dist - ((dist * (count - 1)) / 2.0f), 0, files.get(i), false); // links/rechts
 
 				// println("i: " + i + " x: " + (shiftCount * dist) +
 				// "verschiebeung um " + -(dist * (count - 1) / 2.0f));
@@ -958,6 +998,8 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		if (lock) {
 			t.lock();
+		} else{
+			t.unlock();
 		}
 
 		physics.addParticle(t);
@@ -1779,7 +1821,7 @@ public class TagExplorerProcessing2 extends PApplet {
 			cp5_Test.get(Toggle.class, "setZTimeAxis").setState(true);
 			setZTimeAxis(true);
 		}
-		updateShowFiles();		
+		updateShowFiles();
 	}
 
 	public void draw2DShape(boolean onOff) {
@@ -1803,7 +1845,7 @@ public class TagExplorerProcessing2 extends PApplet {
 			showTimeline = false;
 			println("setZTimeAxis: " + setZTimeAxis + " resetZshowFiles()");
 			resetZshowFiles();
-			
+
 		}
 		updateSprings();
 	}
@@ -1822,5 +1864,26 @@ public class TagExplorerProcessing2 extends PApplet {
 			cp5_Test.get(Toggle.class, "position1D").setState(false);
 		}
 		updateShowFiles();
+	}
+
+	public void enableVersionBinding(boolean onOff) {
+		enableVersionBinding = onOff;
+//		if (enableVersionBinding) {
+//		}
+		updateSprings();
+	}
+
+	public void enableTagBinding(boolean onOff) {
+		enableTagBinding = onOff;
+//		if (enableTagBinding) {
+//		}
+		updateSprings();
+	}
+
+	public void enableFileBinding(boolean onOff) {
+		enableFileBinding = onOff;
+//		if (enableFileBinding) {
+//		}
+		updateSprings();
 	}
 }
