@@ -485,7 +485,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	public void drawFiles(PGraphics renderer) {
 
 		// turn lights on
-		//renderer.lights();
+		// renderer.lights();
 
 		PShape s = createShape(GROUP);
 
@@ -1298,21 +1298,14 @@ public class TagExplorerProcessing2 extends PApplet {
 		textu.vertex(20, 20);
 		textu.endShape();
 		if (file.attributeBindings.size() > 0) {
-			int parts = file.attributeBindings.size() * 2;
-
-			arc(textu, textu.width / 2, textu.height / 2, 0, 150, 40, 10);
-			
-			
-			arc(textu, textu.width / 2, textu.height / 2, 190, 350, 40, 10);
-			
-			arc(textu, textu.width / 2, textu.height / 2, 350, 400, 30, 5);
-			// arc(textu, textu.width / 2, textu.height / 2, 270 - 1 / (parts *
-			// 2), 270 + 1 / (parts * 2), 40, 10);
+			int parts = file.attributeBindings.size();
 
 			println("arc drawn?");
-			// for (int i = 0; i < file.attributeBindings.size(); i++) {
-			//
-			// }
+			for (int i = 0; i < file.attributeBindings.size(); i++) {
+				arc(textu, textu.width / 2, textu.height / 2,
+						(360 - (1.0f / (parts * 4)) * 360) + i * (360.0f / parts), (360 + (1.0f / (parts * 4)) * 360)
+								+ i * (360.0f / parts), 30, 5);
+			}
 		}
 
 		// switch(file.fileType){
@@ -1349,15 +1342,17 @@ public class TagExplorerProcessing2 extends PApplet {
 	float SINCOS_PRECISION = 1.0f;
 	int SINCOS_LENGTH = (int) ((360.0f / SINCOS_PRECISION));
 
-//	public void arc(float x, float y, float deg, float rad, float w) {
-//		int a = (int) (deg / SINCOS_PRECISION);
-//		beginShape(QUAD_STRIP);
-//		for (int i = 0; i < a; i++) {
-//			vertex(cosLUT[i % SINCOS_LENGTH] * (rad) + x, sinLUT[i % SINCOS_LENGTH] * (rad) + y);
-//			vertex(cosLUT[i % SINCOS_LENGTH] * (rad + w) + x, sinLUT[i % SINCOS_LENGTH] * (rad + w) + y);
-//		}
-//		endShape();
-//	}
+	// public void arc(float x, float y, float deg, float rad, float w) {
+	// int a = (int) (deg / SINCOS_PRECISION);
+	// beginShape(QUAD_STRIP);
+	// for (int i = 0; i < a; i++) {
+	// vertex(cosLUT[i % SINCOS_LENGTH] * (rad) + x, sinLUT[i % SINCOS_LENGTH] *
+	// (rad) + y);
+	// vertex(cosLUT[i % SINCOS_LENGTH] * (rad + w) + x, sinLUT[i %
+	// SINCOS_LENGTH] * (rad + w) + y);
+	// }
+	// endShape();
+	// }
 
 	public void arc(PGraphics textu, float x, float y, float startDeg, float endDeg, float rad, float w) {
 		int a = (int) (startDeg / SINCOS_PRECISION);
@@ -1439,7 +1434,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		s.vertex(file.x + 50, file.y - 50, z, tex.width, 0);
 		s.vertex(file.x + 50, file.y + 50, z, tex.width, tex.height);
 		s.vertex(file.x - 50, file.y + 50, z, 0, tex.height);
-		
+
 		s.end(CLOSE);
 		return s;
 	}
