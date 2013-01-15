@@ -58,6 +58,9 @@ public class TagExplorerProcessing2 extends PApplet {
 	ArrayList<Tag> availableTags = new ArrayList<Tag>();
 
 	Tag_File oldest_showFile = null;
+	
+	Timestamp minTime = null;
+	Timestamp maxTime = null;
 
 	boolean showVersions = false;
 	boolean drawAccessShapes = false;
@@ -73,6 +76,8 @@ public class TagExplorerProcessing2 extends PApplet {
 	boolean enableVersionBinding = false;
 	boolean enableTagBinding = false;
 	boolean enableFileBinding = false;
+	
+	boolean setMinTime = false;
 
 	ArrayList<Button_LabelToggle> testButton = new ArrayList<Button_LabelToggle>();
 
@@ -91,6 +96,10 @@ public class TagExplorerProcessing2 extends PApplet {
 	Vec3D cam_eye;
 	Vec3D cam_target;
 	Vec3D cam_up;
+	
+	Vec3D cam_eye_target;
+
+	
 
 	float xBillboardRotation = 0;
 	float yBillboardRotation = 0;
@@ -197,6 +206,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		testButton.add(new Button_LabelToggle(this, "enableVersionBinding", false, 10, 20, width - 120, 270));
 		testButton.add(new Button_LabelToggle(this, "enableTagBinding", false, 10, 20, width - 120, 300));
 		testButton.add(new Button_LabelToggle(this, "enableFileBinding", false, 10, 20, width - 120, 330));
+		testButton.add(new Button_LabelToggle(this, "setMinTime", false, 10, 20, width - 120, 370));
 
 		// FrameRate
 		cp5_Menu.addFrameRate().setInterval(10).setPosition(width - 100, 10).setColor(color(50)); // .setFont(font)
@@ -209,6 +219,9 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		// camera
 		cam_eye = new Vec3D(mainscreen.width / 2.0f, mainscreen.height / 2.0f, (mainscreen.height / 2.0f)
+				/ tan(PI * 30.0f / 180.0f));
+		
+		cam_eye_target = new Vec3D(mainscreen.width / 2.0f, mainscreen.height / 2.0f, (mainscreen.height / 2.0f)
 				/ tan(PI * 30.0f / 180.0f));
 		cam_target = new Vec3D(mainscreen.width / 2.0f, mainscreen.height / 2.0f, 0);
 		cam_up = new Vec3D(0, 1, 0);
@@ -282,15 +295,22 @@ public class TagExplorerProcessing2 extends PApplet {
 			}
 		});
 		
-		// init file.textur
-				initTextures();
+		
 
 		lastClick = new Timestamp(System.currentTimeMillis());
 	}
 
 	// /////////// draw ////////////////////
-
+	boolean first = true;
 	public void draw() {
+		
+		if(first){
+			// init file.textur
+			initTextures();
+			first = false;
+		}
+		
+		background(255);
 		// set Mouse active nach jeweils 600 millis;
 		if (System.currentTimeMillis() > lastClick.getTime() + 600) {
 			mouseActive = true;
@@ -320,7 +340,14 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 
 		// draw mainscene
-		drawMainscreen(mainscreen);
+		
+		if(minTime == null){
+			drawMainscreen(mainscreen);
+		} else {
+//			drawMainscreen(mainscreen); // alte mit blur
+//			drawMainscreen(mainscreen); // aktuelle
+		}
+		
 
 		// MenuPlane
 		menuPlane.render();
@@ -405,7 +432,10 @@ public class TagExplorerProcessing2 extends PApplet {
 					b.toggle();
 					enableFileBinding(b.onOff);
 					break;
-
+				case "setMinTime":
+					b.toggle();
+					setMinTime(b.onOff);
+					break;
 				}
 
 				lastClick = new Timestamp(System.currentTimeMillis());
@@ -428,7 +458,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		renderer.beginDraw();
 		renderer.smooth(4);
 
-		renderer.background(255);
+		//renderer.background(255);
 
 		 renderer.hint(DISABLE_DEPTH_MASK);
 		 renderer.fill(255);
@@ -444,7 +474,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		// renderer.rotateY(mainScreenYRotation);
 		// renderer.translate(-50, 0, 0);
 		// renderer.camera();
-		renderer.camera(cam_eye.x, cam_eye.y, cam_eye.z, cam_target.x, cam_target.y, cam_target.z, cam_up.x, cam_up.y,
+		renderer.camera(interpolate(cam_eye.x, cam_eye_target.x), interpolate(cam_eye.y, cam_eye_target.y), interpolate(cam_eye.z, cam_eye_target.z), cam_target.x, cam_target.y, cam_target.z, cam_up.x, cam_up.y,
 				cam_up.z);
 
 		renderer.pushMatrix();
@@ -493,7 +523,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	public void drawFiles(PGraphics renderer) {
 
 		// turn lights on
-		// renderer.lights();
+//		 renderer.lights();
 
 		PShape s = createShape(GROUP);
 
@@ -749,7 +779,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	public void initTextures(){
 		for(Tag t : files){
 			Tag_File file = (Tag_File) t;
-			file.textur = generateTexture((Tag_File) file);
+			file.setTextur(generateTexture((Tag_File) file));
 		}
 	}
 
@@ -784,11 +814,12 @@ public class TagExplorerProcessing2 extends PApplet {
 			// alle files
 			showFiles = files;
 		}
-
+		
 		// nur neueste werden showFiles
 		if (!showVersions) {
 			showFiles = getNewestTagFileVersions(showFiles);
 		}
+		
 		oldest_showFile = (Tag_File) getOldestTagFile(showFiles);
 
 		// set Timeline Wertebereich
@@ -1790,27 +1821,27 @@ public class TagExplorerProcessing2 extends PApplet {
 		// // }
 		// break;
 		case 'a':
-			cam_eye.x -= 20;
+			cam_eye_target.x -= 50;
 			// println("cam_eye.x = " + cam_eye.x);
 			break;
 		case 'd':
-			cam_eye.x += 20;
+			cam_eye_target.x += 50;
 			// println("cam_eye.x = " + cam_eye.x);
 			break;
 		case 'w':
-			cam_eye.y -= 20;
+			cam_eye_target.y -= 50;
 			// println("cam_eye.y = " + cam_eye.y);
 			break;
 		case 's':
-			cam_eye.y += 20;
+			cam_eye_target.y += 50;
 			// println("cam_eye.y = " + cam_eye.y);
 			break;
 		case 'y':
-			cam_eye.z -= 20;
+			cam_eye_target.z -= 50;
 			// println("cam_eye.y = " + cam_eye.y);
 			break;
 		case 'x':
-			cam_eye.z += 20;
+			cam_eye_target.z += 50;
 			// println("cam_eye.y = " + cam_eye.y);
 			break;
 		}
@@ -2184,6 +2215,16 @@ public class TagExplorerProcessing2 extends PApplet {
 		// }
 		updateSprings();
 	}
+	
+	public void setMinTime(boolean onOff){
+		setMinTime = onOff;
+		if(setMinTime){
+			minTime = new Timestamp(System.currentTimeMillis() - 30L * 24 * 60 * 60 * 1000); // "1 month"
+		} else{
+			minTime = null;
+		}
+		updateShowFiles();
+	}
 
 	public void setButtonState(String buttonName, boolean onOff) {
 		for (Button_LabelToggle b : testButton) {
@@ -2191,5 +2232,13 @@ public class TagExplorerProcessing2 extends PApplet {
 				b.onOff = onOff;
 			}
 		}
+	}
+	
+	public float interpolate(float aktuell, float target){
+		
+		if(abs(aktuell - target) > 0.1f){
+			aktuell += (target-aktuell)/60;
+		}
+		return aktuell;
 	}
 }

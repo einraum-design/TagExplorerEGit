@@ -112,6 +112,8 @@ public class HoverPlane extends Plane {
 			if(bindetTags.size() != ((Tag_File) this.tag).attributeBindings.size()){
 				((Tag_File) this.tag).attributeBindings = bindetTags;
 				// wenn attribut geändert wurden:
+				((Tag_File) this.tag).setTextur(p5.generateTexture((Tag_File) this.tag));
+				p5.setShape((Tag_File) this.tag);
 				p5.updateSprings();
 			}
 		}

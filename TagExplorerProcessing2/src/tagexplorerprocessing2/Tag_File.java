@@ -29,6 +29,8 @@ public class Tag_File extends Tag {
 	boolean newest = false;
 	
 	PGraphics textur;
+	
+
 	PShape shape;
 
 	ArrayList<Tag> attributeBindings = new ArrayList<Tag>();
@@ -97,6 +99,14 @@ public class Tag_File extends Tag {
 	
 	public void setAccesses(ArrayList<Access> accesses){
 		this.accesses = accesses;
+	}
+	
+	public PGraphics getTextur() {
+		return textur;
+	}
+
+	public void setTextur(PGraphics textur) {
+		this.textur = textur;
 	}
 
 	public void updateViewName() {
