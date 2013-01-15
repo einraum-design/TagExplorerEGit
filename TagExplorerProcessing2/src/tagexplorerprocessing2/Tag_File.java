@@ -61,10 +61,10 @@ public class Tag_File extends Tag {
 		this.shape = shape;
 	}
 	
-	public void setShape(PShape shape, float x, float y){		
-		this.shape = shape;
-		this.shape.translate(x, y);
-	}
+//	public void setShape(PShape shape, float x, float y){		
+//		this.shape = shape;
+//		this.shape.translate(x, y);
+//	}
 	
 	public void setFileType(FileType fileType){
 		this.fileType = fileType;

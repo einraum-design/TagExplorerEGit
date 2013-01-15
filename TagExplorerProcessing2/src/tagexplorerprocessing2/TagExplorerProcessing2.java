@@ -663,7 +663,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		} else {
 			timeline.oldest = null;
 		}
-
+		println("before setParticelPositions : setZTimeAxis = " + setZTimeAxis);
 		if (position1D) {
 			setParticlesPosition1D(filePhysics, showFiles);
 			System.out.println("setParticlesPosition() 1D");
@@ -682,6 +682,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		// setzt shape oder null
 		setShape();
 
+		println("setZTimeAxis = " + setZTimeAxis);
 		setZTimeAxis(setZTimeAxis); // macht auch updateSprings
 
 	}
@@ -915,7 +916,7 @@ public class TagExplorerProcessing2 extends PApplet {
 				shape.noStroke();
 				file.setShape(shape);
 			}
-			System.out.println("file.setShape(generateShape(file)) : Created Tag Plane");
+			System.out.println("file.setShape(generateShape(file)) : Created Tag Planes");
 		} else {
 			for (Tag t : files) {
 				Tag_File file = (Tag_File) t;
@@ -1011,6 +1012,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		for (Tag t : showFiles) {
 			t.z = 0;
 		}
+		setShape();
 	}
 
 	public Tag getTagByID(String tableName, int id) {
@@ -1774,9 +1776,10 @@ public class TagExplorerProcessing2 extends PApplet {
 		if (drawAccessShapes) {
 			cp5_Test.get(Toggle.class, "draw2DShape").setState(false);
 			draw2DShape = false;
+			cp5_Test.get(Toggle.class, "setZTimeAxis").setState(true);
+			setZTimeAxis(true);
 		}
-		updateShowFiles();
-		setZTimeAxis(true);
+		updateShowFiles();		
 	}
 
 	public void draw2DShape(boolean onOff) {
@@ -1794,10 +1797,13 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		if (onOff) {
 			showTimeline = true;
+			println("setZTimeAxis: " + setZTimeAxis + " setZNewestTime()!!!");
 			setZNewestTime();
 		} else {
 			showTimeline = false;
+			println("setZTimeAxis: " + setZTimeAxis + " resetZshowFiles()");
 			resetZshowFiles();
+			
 		}
 		updateSprings();
 	}
