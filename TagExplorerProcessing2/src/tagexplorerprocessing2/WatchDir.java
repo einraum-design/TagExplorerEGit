@@ -222,6 +222,8 @@ public class WatchDir extends Thread {
 			p5.updateFileTagBinding(file);
 			p5.updateFileFileBinding(file);
 			p5.updateVersionBinding(file);
+			
+			file.setTextur(null);
 			file.updateViewName();
 			// muss vor files.add erzeugt werden!
 			//p5.generateShape(file);

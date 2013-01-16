@@ -314,6 +314,16 @@ public class TagExplorerProcessing2 extends PApplet {
 			first = false;
 
 		}
+		
+		
+		// bei neu hinzugefügten Files textur generieren
+		for(Tag t : showFiles){
+			Tag_File file = (Tag_File) t;
+			if(file.textur == null){
+				file.setTextur(generateTexture(file));
+				setShape(file);
+			}
+		}
 
 		background(255);
 		// set Mouse active nach jeweils 600 millis;
@@ -352,7 +362,7 @@ public class TagExplorerProcessing2 extends PApplet {
 			// drawMainscreen(mainscreen); // alte mit blur
 			// drawMainscreen(mainscreen); // aktuelle
 		}
-		
+
 		// drawApplications
 		drawApplications();
 
@@ -609,16 +619,16 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 	}
 
-	public void drawApplications() { //PGraphics renderer
-		
+	public void drawApplications() { // PGraphics renderer
+
 		pushMatrix();
-		translate(width/2, height - 200, 0);
+		translate(width / 2, height - 200, 0);
 		for (int i = 0; i < appPhysics.particles.size(); i++) {
-			Tag_App app = (Tag_App)appPhysics.particles.get(i);
-			
+			Tag_App app = (Tag_App) appPhysics.particles.get(i);
+
 			image(app.img, app.x, app.y, 100, 100);
 		}
-		
+
 		popMatrix();
 	}
 
@@ -815,13 +825,11 @@ public class TagExplorerProcessing2 extends PApplet {
 		for (Tag t : applications) {
 			Tag_App app = (Tag_App) t;
 			app.setImage(loadImage(VersionBuilder.versionsVerzeichnis + "applications/" + app.imgName));
-			
+
 			// update App-Tag Bindings
 			updateAppTagBindings(app);
 		}
-		
-		
-		
+
 		// setPosition und filter
 		updateApplications();
 	}
@@ -924,8 +932,8 @@ public class TagExplorerProcessing2 extends PApplet {
 		int shiftCount = 0;
 
 		for (int i = 0; i < showApplications.size(); i++) {
-			dropParticle(appPhysics, shiftCount * dist - ((dist * (showApplications.size() - 1)) / 2.0f), 0, showApplications.get(i),
-					true); // links/rechts
+			dropParticle(appPhysics, shiftCount * dist - ((dist * (showApplications.size() - 1)) / 2.0f), 0,
+					showApplications.get(i), true); // links/rechts
 			shiftCount++;
 		}
 
@@ -1190,6 +1198,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	public void setShape() {
 		// nachdem positionen festgelegt sind
+
 		if (drawAccessShapes) {
 			for (Tag t : files) {
 				Tag_File file = (Tag_File) t;
@@ -1289,8 +1298,10 @@ public class TagExplorerProcessing2 extends PApplet {
 			// shape2D
 			if (draw2DShape) {
 				// setzt shape z-wert
-				file.shape.resetMatrix();
-				file.shape.translate(file.x, file.y, file.z);
+				if (file.shape != null) {
+					file.shape.resetMatrix();
+					file.shape.translate(file.x, file.y, file.z);
+				}
 			}
 		}
 	}
@@ -1299,8 +1310,10 @@ public class TagExplorerProcessing2 extends PApplet {
 		for (Tag t : showFiles) {
 			// setzt shape wieder auf z = 0;
 			if (draw2DShape) {
-				((Tag_File) t).shape.resetMatrix();
-				((Tag_File) t).shape.translate(t.x, t.y, 0);
+				if(((Tag_File) t).shape != null){
+					((Tag_File) t).shape.resetMatrix();
+					((Tag_File) t).shape.translate(t.x, t.y, 0);
+				}
 			}
 			t.z = 0;
 		}
@@ -1448,8 +1461,8 @@ public class TagExplorerProcessing2 extends PApplet {
 		file.setVersionBindings(SQL.getBindedFileList(file, ConnectionType.VERSION));
 		// file.updateViewName();
 	}
-	
-	void updateAppTagBindings(Tag_App app){
+
+	void updateAppTagBindings(Tag_App app) {
 		app.setAttributeBindings(SQL.getBindedTagList(app));
 	}
 
@@ -1553,6 +1566,11 @@ public class TagExplorerProcessing2 extends PApplet {
 		PShape s = createShape();
 		s.noStroke();
 
+		if (file.textur == null) {
+			// wenn shape aus anderem Thread WatchDir erzeugt wird -> Java
+			// Exeption!
+			return null;
+		}
 		// PGraphics tex = generateTexture((Tag_File) file);
 		s.texture(file.textur);
 
@@ -1574,6 +1592,13 @@ public class TagExplorerProcessing2 extends PApplet {
 	public PShape generateAccessShape(Tag_File file) {
 		PShape s = createShape(GROUP);
 		// file.creation_time;
+
+		if (file.textur == null) {
+			// wenn shape aus anderem Thread WatchDir erzeugt wird -> Java
+			// Exeption!
+			return null;
+		}
+
 		PShape start = makeRect(file, file.creation_time);
 		s.addChild(start);
 
@@ -1611,12 +1636,16 @@ public class TagExplorerProcessing2 extends PApplet {
 		// debug
 		println("file.name: " + file.name);
 
-		s.vertex(file.x - 50, file.y - 50, z, 0, 0);
-		s.vertex(file.x + 50, file.y - 50, z, ((Tag_File) file).textur.width, 0);
-		s.vertex(file.x + 50, file.y + 50, z, ((Tag_File) file).textur.width, ((Tag_File) file).textur.height);
-		s.vertex(file.x - 50, file.y + 50, z, 0, ((Tag_File) file).textur.height);
+		float rad = 20;
+		s.vertex(file.x - rad, file.y - rad, z, 0, 0);
+		s.vertex(file.x + rad, file.y - rad, z, ((Tag_File) file).textur.width, 0);
+		s.vertex(file.x + rad, file.y + rad, z, ((Tag_File) file).textur.width, ((Tag_File) file).textur.height);
+		s.vertex(file.x - rad, file.y + rad, z, 0, ((Tag_File) file).textur.height);
 
 		s.end(CLOSE);
+
+		println("file.name after Rect: " + file.name);
+
 		return s;
 	}
 
