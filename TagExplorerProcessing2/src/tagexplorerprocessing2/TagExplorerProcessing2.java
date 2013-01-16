@@ -870,6 +870,7 @@ public class TagExplorerProcessing2 extends PApplet {
 			timeline.setWertebereich(oldest_showFile.creation_time);
 		} else {
 			timeline.oldest = null;
+			println("timeline.oldest = null!");
 		}
 		println("before setParticelPositions : setZTimeAxis = " + setZTimeAxis);
 		if (position1D) {
