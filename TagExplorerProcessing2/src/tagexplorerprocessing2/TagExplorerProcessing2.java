@@ -1145,16 +1145,16 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 	}
 
-	private void setParticlesPosition1D(VerletPhysics physics, ArrayList<Tag> files) {
+	private void setParticlesPosition1D(VerletPhysics physics, ArrayList<Tag> _files) {
 		// drop Particles
 		// set Position
 		physics.particles.clear();
 
 		int count = 0;
 		if (showVersions) {
-			count = getSizeWithoutVersion(files);
+			count = getSizeWithoutVersion(_files);
 		} else {
-			count = showFiles.size();
+			count = _files.size();
 		}
 		// println("count: " + count);
 
@@ -1169,19 +1169,19 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		int shiftCount = 0;
 
-		for (int i = 0; i < files.size(); i++) {
+		for (int i = 0; i < _files.size(); i++) {
 			// wenn versionen nicht ausgeblendet sind && parent_ID -> set x & y
 			// wert nach parent.
-			if (showVersions && ((Tag_File) files.get(i)).parent_ID != 0) {
+			if (showVersions && ((Tag_File) _files.get(i)).parent_ID != 0) {
 
 				// get parent
-				Tag_File parent = (Tag_File) getTagByID(files.get(i).type, ((Tag_File) files.get(i)).parent_ID);
-				dropParticle(physics, parent.x, parent.y - 120, files.get(i), true);
+				Tag_File parent = (Tag_File) getTagByID(_files.get(i).type, ((Tag_File) _files.get(i)).parent_ID);
+				dropParticle(physics, parent.x, parent.y - 120, _files.get(i), true);
 			}
 
 			// ist neueste Version!
 			else {
-				dropParticle(physics, shiftCount * dist - ((dist * (count - 1)) / 2.0f), 0, files.get(i), true); // links/rechts
+				dropParticle(physics, shiftCount * dist - ((dist * (count - 1)) / 2.0f), 0, _files.get(i), true); // links/rechts
 
 				// println("i: " + i + " x: " + (shiftCount * dist) +
 				// "verschiebeung um " + -(dist * (count - 1) / 2.0f));
@@ -1641,6 +1641,43 @@ public class TagExplorerProcessing2 extends PApplet {
 		s.vertex(file.x + rad, file.y - rad, z, ((Tag_File) file).textur.width, 0);
 		s.vertex(file.x + rad, file.y + rad, z, ((Tag_File) file).textur.width, ((Tag_File) file).textur.height);
 		s.vertex(file.x - rad, file.y + rad, z, 0, ((Tag_File) file).textur.height);
+
+		s.end(CLOSE);
+
+		println("file.name after Rect: " + file.name);
+
+		return s;
+	}
+	
+	public PShape makeOcto(Tag file, Timestamp ts) {
+		float z = -timeline.mapExp(System.currentTimeMillis() - ts.getTime());
+
+		PShape s = createShape();
+		s.noStroke();
+
+		// PGraphics tex = generateTexture((Tag_File) file);
+//		s.texture(((Tag_File) file).textur);
+		 s.texture(pg);
+		// s.texture(env_plif);
+
+		// debug
+		println("file.name: " + file.name);
+
+		float rad = 20;
+//		s.vertex(file.x - rad, file.y - rad, z, 0, 0);
+//		s.vertex(file.x + rad, file.y - rad, z, ((Tag_File) file).textur.width, 0);
+//		s.vertex(file.x + rad, file.y + rad, z, ((Tag_File) file).textur.width, ((Tag_File) file).textur.height);
+//		s.vertex(file.x - rad, file.y + rad, z, 0, ((Tag_File) file).textur.height);
+		
+		s.vertex(file.x - rad, file.y - rad/2, z, 0, ((Tag_File) file).textur.height/4);
+		s.vertex(file.x - rad/2, file.y - rad, z, ((Tag_File) file).textur.width/4, 0);
+		s.vertex(file.x + rad/2, file.y - rad, z, ((Tag_File) file).textur.width*3/4, 0);
+		s.vertex(file.x + rad, file.y - rad/2, z, 0, ((Tag_File) file).textur.height/4);
+		
+		s.vertex(file.x + rad, file.y + rad/2, z, 0, ((Tag_File) file).textur.height*3/4);
+		s.vertex(file.x + rad/2, file.y + rad, z, ((Tag_File) file).textur.width*3/4, 1);
+		s.vertex(file.x - rad/2, file.y + rad, z, ((Tag_File) file).textur.width/4, 1);
+		s.vertex(file.x - rad, file.y + rad/2, z, 0, ((Tag_File) file).textur.height*3/4);
 
 		s.end(CLOSE);
 
