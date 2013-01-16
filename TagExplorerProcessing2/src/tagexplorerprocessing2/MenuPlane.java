@@ -73,24 +73,18 @@ public class MenuPlane extends Plane {
 					// add to filterList
 					p5.filterList.add(new Filter(tag, true));
 					
+					// remove from filterList ist in Filter class!
+					
 					// get lastTime Tag used as Filter: Timestamp
-					
-//					ArrayList<Timestamp> lastTime = p5.SQL.getFilterTime(tag);
-//					System.out.println("lastTime.size() = " + lastTime.size());
-//					if(lastTime.get(0) != null){
 						tag.lastStartFilterTime = p5.SQL.getFilterTime(tag, "start_time");
-//						System.out.println("tag.lastStartFilterTime " + tag.lastStartFilterTime);
-//					}
-//					if(lastTime.get(1) != null){
 						tag.lastEndFilterTime = p5.SQL.getFilterTime(tag, "end_time");
-//						System.out.println("tag.lastEndFilterTime " + tag.lastEndFilterTime);
-//					}
-					
+
 					// Save Timestamp and TagID and TagType -> SQL filter_time
 					p5.SQL.setFilterTime(tag, true); // startFilter
 					
 					p5.updateShowFiles();
 					p5.updateTags();
+					p5.updateApplications();
 					p5.updateSprings();
 					p5.lastClick = new Timestamp(System.currentTimeMillis());
 					p5.mouseActive = false;

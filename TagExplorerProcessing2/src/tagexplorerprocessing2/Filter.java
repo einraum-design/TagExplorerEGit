@@ -36,6 +36,7 @@ public class Filter {
 				- p5.closeImg.height / 2);
 		b.render();
 
+		// remove From FilterList
 		if (p5.mouseActive && b.mouseOver() && p5.mousePressed) {
 			removeFromFilterList(p5);
 		}
@@ -57,6 +58,7 @@ public class Filter {
 			System.out.println("Filter.removeFromFilterList: updateShowFile & Springs in Filter");
 			p5.updateShowFiles();
 			p5.updateTags();
+			p5.updateApplications();
 			p5.updateSprings();
 	}
 

@@ -241,19 +241,32 @@ public class SQLhelper {
 	}
 
 	// alle verknüpften Tags finden
-	public ArrayList<Tag> getBindedTagList(Tag_File file) {
+	public ArrayList<Tag> getBindedTagList(Tag tag) {
 		ArrayList<Tag> tagList = new ArrayList<Tag>();
 
 		if (checkConnection()) {
-
-			msql.query("SELECT type, tag_ID FROM tag_binding WHERE file_ID = " + file.id);
+			
 			ArrayList<String> types = new ArrayList<String>();
 			ArrayList<Integer> tagIds = new ArrayList<Integer>();
+			
+			// File
+			if (tag instanceof Tag_File) {
+				Tag_File file = (Tag_File) tag;
+				msql.query("SELECT type, tag_ID FROM tag_binding WHERE file_ID = " + file.id);
+			} 
+			// App
+			else if(tag instanceof Tag_App){
+				Tag_App app = (Tag_App) tag;
+				msql.query("SELECT type, tag_ID FROM app_binding WHERE app_ID = " + app.id);
+			} else{
+				System.out.println("SQL.getBindedTagList() - ERROR Tag ist weder Tag_File noch Tag_App: " + tag.name);
+			}
+			
 			while (msql.next()) {
 				types.add(msql.getString("type"));
 				tagIds.add(msql.getInt("tag_ID"));
 			}
-
+			
 			for (int i = 0; i < types.size(); i++) {
 				msql.query("SELECT * FROM " + types.get(i) + " WHERE ID = " + tagIds.get(i));
 				while (msql.next()) {
@@ -470,38 +483,39 @@ public class SQLhelper {
 		}
 	}
 
-//	public ArrayList<Timestamp> getFilterTime(Tag tag) {
-//		ArrayList<Timestamp> lastFiltered = new ArrayList<Timestamp>();
-//
-//		Timestamp startTime = null;
-//		Timestamp endTime = null;
-//
-//		if (msql2.connect()) {
-//			msql.query("SELECT * FROM filter_time WHERE type = \"" + tag.type + "\" && tag_ID = " + tag.id
-//					+ " ORDER BY ID DESC LIMIT 1");
-//			if (msql.next()) {
-//				startTime = msql.getTimestamp("start_time");
-//				if (startTime != null) {
-////					System.out.println(startTime.toGMTString());
-//					lastFiltered.add(startTime);
-//				} else{
-//					lastFiltered.add(null);
-//				}
-//				endTime = msql.getTimestamp("end_time");
-//				if (endTime != null) {
-////					System.out.println(endTime.toGMTString());
-//					lastFiltered.add(endTime);
-//				}else{
-//					lastFiltered.add(null);
-//				}
-//			} else {
-//				System.out.println("SQL.getFilterTime() : no FilterTime yet");
-//			}
-//		} else {
-//			System.out.println("SQL.getFilterTime() -> cannot connect!");
-//		}
-//		return lastFiltered;
-//	}
+	// public ArrayList<Timestamp> getFilterTime(Tag tag) {
+	// ArrayList<Timestamp> lastFiltered = new ArrayList<Timestamp>();
+	//
+	// Timestamp startTime = null;
+	// Timestamp endTime = null;
+	//
+	// if (msql2.connect()) {
+	// msql.query("SELECT * FROM filter_time WHERE type = \"" + tag.type +
+	// "\" && tag_ID = " + tag.id
+	// + " ORDER BY ID DESC LIMIT 1");
+	// if (msql.next()) {
+	// startTime = msql.getTimestamp("start_time");
+	// if (startTime != null) {
+	// // System.out.println(startTime.toGMTString());
+	// lastFiltered.add(startTime);
+	// } else{
+	// lastFiltered.add(null);
+	// }
+	// endTime = msql.getTimestamp("end_time");
+	// if (endTime != null) {
+	// // System.out.println(endTime.toGMTString());
+	// lastFiltered.add(endTime);
+	// }else{
+	// lastFiltered.add(null);
+	// }
+	// } else {
+	// System.out.println("SQL.getFilterTime() : no FilterTime yet");
+	// }
+	// } else {
+	// System.out.println("SQL.getFilterTime() -> cannot connect!");
+	// }
+	// return lastFiltered;
+	// }
 
 	public Timestamp getFilterTime(Tag tag, String startTime) {
 
@@ -513,9 +527,9 @@ public class SQLhelper {
 			if (msql.next()) {
 				Timestamp _time = msql.getTimestamp("start_time");
 				if (startTime != null) {
-//					System.out.println(startTime.toGMTString());
+					// System.out.println(startTime.toGMTString());
 					time = _time;
-				} else{
+				} else {
 					return null;
 				}
 			} else {
@@ -527,7 +541,6 @@ public class SQLhelper {
 		return time;
 	}
 
-	
 	public void setFilterTime(Tag tag, boolean start) {
 
 		// Type ist in type
@@ -823,6 +836,9 @@ public class SQLhelper {
 			t = tag;
 		} else if (tableName.equals("projects") || tableName.equals("keywords")) {
 			Tag tag = new Tag(tableName, msql.getInt("ID"), msql.getString("name"));
+			t = tag;
+		} else if (tableName.equals("applications")) {
+			Tag tag = new Tag_App(tableName, msql.getInt("ID"), msql.getString("name"), msql.getString("image"));
 			t = tag;
 		} else {
 			System.out.println(tableName + " not yet Listed in queryTagList");
