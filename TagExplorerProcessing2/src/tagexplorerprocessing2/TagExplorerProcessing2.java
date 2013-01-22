@@ -14,6 +14,7 @@ import java.util.TreeSet;
 import controlP5.ControlP5;
 import controlP5.Controller;
 import controlP5.Textfield;
+import de.bezier.data.sql.MySQL;
 import processing.core.PApplet;
 import processing.core.PFont;
 import processing.core.PGraphics;
@@ -253,7 +254,9 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		// ball.shininess(0);
 
-		Path p = FileSystems.getDefault().getPath("/Users/manuel/Documents/Testumgebung/Test");
+		
+		Path p = FileSystems.getDefault().getPath("/Users/manuel/Documents/Testumgebung/UserOrdner");
+		//Path p = FileSystems.getDefault().getPath("/Users/manuel/Documents/Testumgebung/Test");
 
 		// FileSystem Watcher
 		try {
@@ -264,6 +267,9 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 
 		// SQL HELPER
+		
+		//SQL = new SQLhelper(this, "root", "root", "files2_db", "localhost:8889");
+		//SQL = new SQLhelper(this, "root", "root", "files_db", "localhost:8889");
 		SQL = new SQLhelper(this);
 
 		// TIMELINE
@@ -327,7 +333,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		background(255);
 		// set Mouse active nach jeweils 600 millis;
-		if (System.currentTimeMillis() > lastClick.getTime() + 600) {
+		if (System.currentTimeMillis() > lastClick.getTime() + 1200) {
 			mouseActive = true;
 		} else {
 			mouseActive = false;
@@ -1126,7 +1132,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		for (int i = 0; i < files.size(); i++) {
 
 			if (showVersions && ((Tag_File) files.get(i)).parent_ID != 0) {
-
+				println("get parent from: " + files.get(i).name);
 				// get parent
 				Tag_File parent = (Tag_File) getTagByID(files.get(i).type, ((Tag_File) files.get(i)).parent_ID);
 				dropParticle(physics, parent.x, parent.y, files.get(i), true);
@@ -2442,6 +2448,8 @@ public class TagExplorerProcessing2 extends PApplet {
 		if (abs(aktuell - target) > 0.1f) {
 			aktuell += (target - aktuell) / 60.0f;
 			// println("aktuell: " + aktuell);
+		} else {
+			aktuell = target;
 		}
 		return aktuell;
 	}

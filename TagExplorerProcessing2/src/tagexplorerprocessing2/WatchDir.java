@@ -215,6 +215,7 @@ public class WatchDir extends Thread {
 			for (Filter filter : p5.filterList) {
 				if (filter.inOut) {
 					SQL.bindTag(file, filter.tag);
+					System.out.println("bind to new File: " + filter.tag.name);
 				}
 			}
 
@@ -222,11 +223,11 @@ public class WatchDir extends Thread {
 			p5.updateFileTagBinding(file);
 			p5.updateFileFileBinding(file);
 			p5.updateVersionBinding(file);
-			
+
 			file.setTextur(null);
 			file.updateViewName();
 			// muss vor files.add erzeugt werden!
-			//p5.generateShape(file);
+			// p5.generateShape(file);
 			p5.files.add(file);
 			p5.updateShowFiles();
 			p5.updateTags();
@@ -252,7 +253,8 @@ public class WatchDir extends Thread {
 
 		Tag_File parent = getParent(file);
 
-		System.out.println("createNewTagFileVersion(): get parent: " + parent.name + " " + parent.attributeBindings.toString() + " " + parent.id);
+		System.out.println("createNewTagFileVersion(): get parent: " + parent.name + " "
+				+ parent.attributeBindings.toString() + " " + parent.id);
 		for (Tag t : parent.attributeBindings) {
 			SQL.bindTag(file, t);
 		}
@@ -278,6 +280,7 @@ public class WatchDir extends Thread {
 		for (Filter filter : p5.filterList) {
 			if (filter.inOut) {
 				SQL.bindTag(file, filter.tag);
+				System.out.println("bind to new File: " + filter.tag.name);
 			}
 		}
 
@@ -337,11 +340,11 @@ public class WatchDir extends Thread {
 				files.add(file);
 			}
 		}
-		
+
 		// nur delete Time von neuester Version setzen
 		Tag_File newest = files.get(0);
-		for(Tag_File file : files){
-			if(file.id > newest.id){
+		for (Tag_File file : files) {
+			if (file.id > newest.id) {
 				newest = file;
 			}
 		}
@@ -349,8 +352,7 @@ public class WatchDir extends Thread {
 		// System.out.println("file.name: " + file.name);
 		newest.setDeleteTime(new Timestamp(System.currentTimeMillis()));
 		SQL.setDBDeletTime(newest);
-		
-		
+
 		newest.setShape(p5.generateAccessShape(newest));
 	}
 

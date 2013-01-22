@@ -16,7 +16,7 @@ public class HoverPlane extends Plane {
 	Tag tag;
 
 	int w = 0;
-	int h = 130;
+	int h = 200;
 
 	Button_Label openButton;
 
@@ -98,7 +98,7 @@ public class HoverPlane extends Plane {
 			for (Tag tag : ((Tag_File) this.tag).attributeBindings) {
 				xShift += tag.renderTag(p5, (Tag_File) this.tag, (int) x + 10 + xShift, (int) y - h + 35 + yShift) + 3;
 
-				if (xShift > w - 20) {
+				if (xShift > w - 100) {
 					xShift = 0;
 					yShift += 30;
 				}
