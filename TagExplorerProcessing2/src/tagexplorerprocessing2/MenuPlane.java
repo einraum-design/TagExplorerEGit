@@ -7,7 +7,7 @@ import controlP5.Textfield;
 
 public class MenuPlane extends Plane {
 
-	float minH = 30;
+	float minH = 200;
 
 	float h = minH;
 
@@ -23,11 +23,12 @@ public class MenuPlane extends Plane {
 	}
 
 	public void update() {
-		if (mouseOver()) {
-			h = 80;
-		} else {
-			h = minH;
-		}
+		// feste hšhe
+//		if (mouseOver()) {
+//			h = 80;
+//		} else {
+//			h = minH;
+//		}
 
 		updateTextfieldValue(inputFieldName, infoText);
 

@@ -120,12 +120,17 @@ public class Tag_File extends Tag {
 	}
 
 	@Override
+//	public String toString() {
+//		return "Tag_File [fileType=" + fileType + ", size=" + size + ", path=" + path + ", creation_time="
+//				+ creation_time + ", expiration_time=" + expiration_time + ", delete_time=" + delete_time
+//				+ ", parent_ID=" + parent_ID + ", origin_ID=" + origin_ID + ", score=" + score + ", shape=" + shape
+//				+ ", attributeBindings=" + attributeBindings + ", fileBindings=" + fileBindings + ", versionBindings="
+//				+ versionBindings + ", accesses=" + accesses + ", viewName=" + viewName + ", id=" + id + ", name=" + name
+//				+ ", type=" + type + ", x=" + x + ", y=" + y + ", z=" + z + "]";
+//	}
+	
 	public String toString() {
-		return "Tag_File [fileType=" + fileType + ", size=" + size + ", path=" + path + ", creation_time="
-				+ creation_time + ", expiration_time=" + expiration_time + ", delete_time=" + delete_time
-				+ ", parent_ID=" + parent_ID + ", origin_ID=" + origin_ID + ", score=" + score + ", shape=" + shape
-				+ ", attributeBindings=" + attributeBindings + ", fileBindings=" + fileBindings + ", versionBindings="
-				+ versionBindings + ", accesses=" + accesses + ", viewName=" + viewName + ", id=" + id + ", name=" + name
+		return "Tag_File [origin_ID=" + origin_ID + ", shape=" + shape + ", id=" + id + ", name=" + name
 				+ ", type=" + type + ", x=" + x + ", y=" + y + ", z=" + z + "]";
 	}
 	

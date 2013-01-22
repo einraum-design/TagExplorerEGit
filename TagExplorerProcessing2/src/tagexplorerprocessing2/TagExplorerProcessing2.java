@@ -8,6 +8,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -95,11 +96,17 @@ public class TagExplorerProcessing2 extends PApplet {
 	Timestamp lastClick;
 
 	// Camera
-	Vec3D cam_eye;
-	Vec3D cam_target;
-	Vec3D cam_up;
+	// Vec3D cam_eye;
+	// Vec3D cam_target;
+	// Vec3D cam_up;
+	// Vec3D cam_eye_target;
 
-	Vec3D cam_eye_target;
+	Vec3D cam_eye2Dpos;
+	Vec3D cam_eye3Dpos;
+	Vec3D cam_eyeaktuellpos;
+	Vec3D cam_eyetargetpos;
+
+	Vec3D cam_target;
 
 	float xBillboardRotation = 0;
 	float yBillboardRotation = 0;
@@ -139,6 +146,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	PImage texture_connection;
 
 	Tag_Comparator_Id comp_id;
+	Tag_Comparator_Time comp_time;
 
 	// PImage
 
@@ -155,11 +163,11 @@ public class TagExplorerProcessing2 extends PApplet {
 		// frame.setLocation(1970, 50);
 		smooth(4);
 
-		addMouseWheelListener(new MouseWheelListener() {
-			public void mouseWheelMoved(MouseWheelEvent mwe) {
-				mouseWheel(mwe.getWheelRotation());
-			}
-		});
+		// addMouseWheelListener(new MouseWheelListener() {
+		// public void mouseWheelMoved(MouseWheelEvent mwe) {
+		// mouseWheel(mwe.getWheelRotation());
+		// }
+		// });
 
 		font = createFont("arial", 40);
 		textFont(font, 14);
@@ -225,16 +233,32 @@ public class TagExplorerProcessing2 extends PApplet {
 		// mainscreen.smooth(4);
 
 		// camera
-		cam_eye = new Vec3D(mainscreen.width / 2.0f, mainscreen.height / 2.0f, (mainscreen.height / 2.0f)
+		// cam_eye = new Vec3D(mainscreen.width / 2.0f, mainscreen.height /
+		// 2.0f, (mainscreen.height / 2.0f)
+		// / tan(PI * 30.0f / 180.0f));
+		//
+		// cam_eye_target = new Vec3D(mainscreen.width / 2.0f, mainscreen.height
+		// / 2.0f, (mainscreen.height / 2.0f)
+		// / tan(PI * 30.0f / 180.0f));
+		// cam_target = new Vec3D(mainscreen.width / 2.0f, mainscreen.height /
+		// 2.0f, 0);
+		// cam_up = new Vec3D(0, 1, 0);
+		//
+		// mainscreen.camera(cam_eye.x, cam_eye.y, cam_eye.z, cam_target.x,
+		// cam_target.y, cam_target.z, cam_up.x,
+		// cam_up.y, cam_up.z);
+
+		cam_eye2Dpos = new Vec3D(width / 2.0f, height / 2.0f, (height / 2.0f) / tan(PI * 30.0f / 180.0f));
+		cam_eye3Dpos = new Vec3D(width / 2.0f, height * 2, (height / 2.0f) / tan(PI * 30.0f / 180.0f));
+
+		cam_eyeaktuellpos = cam_eye2Dpos;
+		cam_eyetargetpos = cam_eyeaktuellpos;
+
+		cam_target = new Vec3D(width / 2.0f, height / 2.0f, cam_eyeaktuellpos.z - (height / 2.0f)
 				/ tan(PI * 30.0f / 180.0f));
 
-		cam_eye_target = new Vec3D(mainscreen.width / 2.0f, mainscreen.height / 2.0f, (mainscreen.height / 2.0f)
-				/ tan(PI * 30.0f / 180.0f));
-		cam_target = new Vec3D(mainscreen.width / 2.0f, mainscreen.height / 2.0f, 0);
-		cam_up = new Vec3D(0, 1, 0);
-
-		mainscreen.camera(cam_eye.x, cam_eye.y, cam_eye.z, cam_target.x, cam_target.y, cam_target.z, cam_up.x,
-				cam_up.y, cam_up.z);
+		mainscreen.camera(cam_eyeaktuellpos.x, cam_eyeaktuellpos.y, cam_eyeaktuellpos.z, cam_target.x, cam_target.y,
+				cam_target.z, 0, 1, 0);
 
 		transition = loadShader("../shader/transition.glsl");
 		transition.set("res", (float) (mainscreen.width), (float) (mainscreen.height));
@@ -254,9 +278,9 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		// ball.shininess(0);
 
-		
 		Path p = FileSystems.getDefault().getPath("/Users/manuel/Documents/Testumgebung/UserOrdner");
-		//Path p = FileSystems.getDefault().getPath("/Users/manuel/Documents/Testumgebung/Test");
+		// Path p =
+		// FileSystems.getDefault().getPath("/Users/manuel/Documents/Testumgebung/Test");
 
 		// FileSystem Watcher
 		try {
@@ -267,9 +291,11 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 
 		// SQL HELPER
-		
-		//SQL = new SQLhelper(this, "root", "root", "files2_db", "localhost:8889");
-		//SQL = new SQLhelper(this, "root", "root", "files_db", "localhost:8889");
+
+		// SQL = new SQLhelper(this, "root", "root", "files2_db",
+		// "localhost:8889");
+		// SQL = new SQLhelper(this, "root", "root", "files_db",
+		// "localhost:8889");
 		SQL = new SQLhelper(this);
 
 		// TIMELINE
@@ -277,6 +303,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		// Comparator
 		comp_id = new Tag_Comparator_Id();
+		comp_time = new Tag_Comparator_Time();
 
 		// Standartuser: Öffentlich
 		// user = (Tag_User) SQL.queryTagList("users").get(0);
@@ -304,10 +331,10 @@ public class TagExplorerProcessing2 extends PApplet {
 		lastClick = new Timestamp(System.currentTimeMillis());
 	}
 
-	void mouseWheel(int delta) {
-		println("mousewheel: " + delta);
-		cam_eye.z += delta;
-	}
+	// void mouseWheel(int delta) {
+	// println("mousewheel: " + delta);
+	// cam_eye.z += delta;
+	// }
 
 	// /////////// draw ////////////////////
 	boolean first = true;
@@ -320,12 +347,15 @@ public class TagExplorerProcessing2 extends PApplet {
 			first = false;
 
 		}
-		
-		
+
+		// update interpolate cam position
+		cam_eyeaktuellpos = interpolateVec(cam_eyeaktuellpos, cam_eyetargetpos);
+		cam_target.z = cam_eyeaktuellpos.z - (height / 2.0f) / tan(PI * 30.0f / 180.0f);
+
 		// bei neu hinzugefügten Files textur generieren
-		for(Tag t : showFiles){
+		for (Tag t : showFiles) {
 			Tag_File file = (Tag_File) t;
-			if(file.textur == null){
+			if (file.textur == null) {
 				file.setTextur(generateTexture(file));
 				setShape(file);
 			}
@@ -341,7 +371,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		// println("mouseActive: " + mouseActive);
 
-		calcBillboardRotation();
+		// calcBillboardRotation();
 		transition.set("shaderTime", (millis() / 1000.0f));
 		transition2.set("shaderTime", (millis() / 1000.0f));
 
@@ -499,12 +529,16 @@ public class TagExplorerProcessing2 extends PApplet {
 		// renderer.translate(-50, 0, 0);
 		// renderer.camera();
 
-		cam_eye.x = interpolate(cam_eye.x, cam_eye_target.x);
-		cam_eye.y = interpolate(cam_eye.y, cam_eye_target.y);
-		cam_eye.z = interpolate(cam_eye.z, cam_eye_target.z);
+		// cam_eye.x = interpolate(cam_eye.x, cam_eye_target.x);
+		// cam_eye.y = interpolate(cam_eye.y, cam_eye_target.y);
+		// cam_eye.z = interpolate(cam_eye.z, cam_eye_target.z);
+		//
+		// renderer.camera(cam_eye.x, cam_eye.y, cam_eye.z, cam_target.x,
+		// cam_target.y, cam_target.z, cam_up.x, cam_up.y,
+		// cam_up.z);
 
-		renderer.camera(cam_eye.x, cam_eye.y, cam_eye.z, cam_target.x, cam_target.y, cam_target.z, cam_up.x, cam_up.y,
-				cam_up.z);
+		renderer.camera(cam_eyeaktuellpos.x, cam_eyeaktuellpos.y, cam_eyeaktuellpos.z, cam_target.x, cam_target.y,
+				cam_target.z, 0, 1, 0);
 
 		renderer.pushMatrix();
 		renderer.translate(renderer.width / 2, renderer.height / 2, 0);
@@ -558,6 +592,8 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		if (filePhysics.particles != null) {
 
+//			println("filePhysics.particles.size(): " + filePhysics.particles.size());
+
 			// renderer.shader(plifShader);
 			boolean drawShape = false;
 			for (int i = 0; i < filePhysics.particles.size(); i++) {
@@ -568,6 +604,11 @@ public class TagExplorerProcessing2 extends PApplet {
 					drawShape = true;
 					s.addChild(file.shape);
 
+					//	debug
+//					if (mousePressed) {
+//						println((Tag_File) filePhysics.particles.get(i));
+//					}
+
 					// if (draw2DShape) {
 					// renderer.pushMatrix();
 					// renderer.translate(file.x, file.y, file.z);
@@ -575,7 +616,6 @@ public class TagExplorerProcessing2 extends PApplet {
 					// renderer.popMatrix();
 					// }
 				}
-
 				// balls statt 3D-shapes
 				else {
 					renderer.pushMatrix();
@@ -1123,23 +1163,35 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		int dist = 120;
 
+		// bei maxRows yStarOben und yStartUntern noch Programm höhe abziehen
+
+		int perRow = (int) ((mainscreen.width - 2 * 120) / dist);
+		int maxRows = (int) ((mainscreen.height - menuPlane.h) / dist);
+
+		int max1Seite = perRow * maxRows;
+
 		int xShiftCount = 0;
 
 		int yShiftCount = 0;
 
-		int perRow = 10;
+		int yStartOben = mainscreen.height / 2 - (int) menuPlane.h - dist / 2;
+		int yStartUnten = mainscreen.height / 2 - dist / 2;
 
-		for (int i = 0; i < files.size(); i++) {
+		// sortiere nach letztem genutzten Zeitpunkt nur neuesten
+		// FilesVersionen! - es könne älter Versionen neuere Accesses haben!
+		ArrayList<Tag> sortedFiles = getFilesSortedLastAccess(files);
+		println("files.size:" + files.size());
+		println("sortedFiles.size:" + sortedFiles.size());
 
-			if (showVersions && ((Tag_File) files.get(i)).parent_ID != 0) {
-				println("get parent from: " + files.get(i).name);
-				// get parent
-				Tag_File parent = (Tag_File) getTagByID(files.get(i).type, ((Tag_File) files.get(i)).parent_ID);
-				dropParticle(physics, parent.x, parent.y, files.get(i), true);
-			} else {
+		// fülle von unten rechts beginnend mit wenigst interessantem
+		if (getSizeWithoutVersion(files) < max1Seite) {
 
-				dropParticle(physics, xShiftCount * dist - (dist * (perRow - 1) / 2), yShiftCount * dist, files.get(i),
-						true); // links/rechts
+			for (int i = sortedFiles.size() - 1; i >= 0; i--) {
+				// println("sortedFiles name: " + sortedFiles.get(i).name);
+				// positoniere alle neuesten Dateiversionen
+
+				dropParticle(physics, (dist * (perRow - 1) / 2) - xShiftCount * dist, yStartUnten - yShiftCount * dist,
+						sortedFiles.get(i), true); // links/rechts
 
 				xShiftCount++;
 				if (xShiftCount >= perRow) {
@@ -1148,6 +1200,74 @@ public class TagExplorerProcessing2 extends PApplet {
 				}
 			}
 
+			// wenn showVersions alle Versionen an neuester Datei ansetzen
+			if (showVersions) {
+
+				for (int i = 0; i < files.size(); i++) {
+
+					// wenn file nicht in sortedFiles ist:
+					if (!inSortedFiles(files.get(i).id, sortedFiles)) {
+
+						Tag_File position;
+
+						// origin
+
+						if (((Tag_File) files.get(i)).origin_ID == 0) {
+							// suche file mit dessen Id zur positionierung
+							position = (Tag_File) getTagByIDandType(((Tag_File) files.get(i)).id, sortedFiles);
+
+						} // andere Verson
+						else {
+							position = (Tag_File) getTagByIDandType(((Tag_File) files.get(i)).origin_ID, sortedFiles);
+
+						}
+						dropParticle(physics, position.x, position.y, files.get(i), true);
+					}
+				}
+			}
+
+		}
+		// fülle von oben voll
+		else {
+			// println("sortedFiles.size:" + sortedFiles.size());
+
+			// neuest Versionen
+			for (int i = 0; i < sortedFiles.size(); i++) {
+
+				// println("sortedFiles name: " + sortedFiles.get(i).name);
+
+				// jede Datei aus sortedFiles muss positoniert werden
+				dropParticle(physics, xShiftCount * dist - (dist * (perRow - 1) / 2), yShiftCount * dist - yStartOben,
+						sortedFiles.get(i), true); // links/rechts
+
+				xShiftCount++;
+				if (xShiftCount >= perRow) {
+					yShiftCount++;
+					xShiftCount = 0;
+				}
+			}
+
+			// wenn showVersions alle Versionen an neuester Datei ansetzen
+			if (showVersions) {
+
+				for (int i = 0; i < files.size(); i++) {
+					if (!inSortedFiles(files.get(i).id, sortedFiles)) {
+						Tag_File position;
+
+						// origin
+						if (((Tag_File) files.get(i)).origin_ID == 0) {
+							// suche file mit dessen Id zur positionierung
+							position = (Tag_File) getTagByIDandType(((Tag_File) files.get(i)).id, sortedFiles);
+
+						} // andere Verson
+						else {
+							position = (Tag_File) getTagByIDandType(((Tag_File) files.get(i)).origin_ID, sortedFiles);
+
+						}
+						dropParticle(physics, position.x, position.y, files.get(i), true);
+					}
+				}
+			}
 		}
 	}
 
@@ -1316,7 +1436,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		for (Tag t : showFiles) {
 			// setzt shape wieder auf z = 0;
 			if (draw2DShape) {
-				if(((Tag_File) t).shape != null){
+				if (((Tag_File) t).shape != null) {
 					((Tag_File) t).shape.resetMatrix();
 					((Tag_File) t).shape.translate(t.x, t.y, 0);
 				}
@@ -1343,6 +1463,28 @@ public class TagExplorerProcessing2 extends PApplet {
 				}
 			}
 		}
+		return tag;
+	}
+
+	public boolean inSortedFiles(int id, ArrayList<Tag> sortedFiles){
+		for(Tag tag : sortedFiles){
+			if(tag.id == id){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public Tag getTagByIDandType(int originId, ArrayList<Tag> sortedFiles) {
+		Tag tag = null;
+
+		for (Tag _tag : sortedFiles) {
+			Tag_File file = (Tag_File) _tag;
+			if (file.origin_ID == originId || file.id == originId) {
+				tag = _tag;
+			}
+		}
+
 		return tag;
 	}
 
@@ -1419,6 +1561,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		for (Tag t : allFiles) {
 			Tag_File file = (Tag_File) t;
 
+			// parents werden als alt markiert
 			if (file.parent_ID != 0) {
 				removeIDs.add(file.parent_ID);
 			}
@@ -1451,6 +1594,19 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		// System.out.println("getNewestDate: " + newest.toGMTString());
 		return newest;
+	}
+
+	public ArrayList<Tag> getFilesSortedLastAccess(ArrayList<Tag> files) {
+
+		ArrayList<Tag> sortedFiles = new ArrayList<Tag>();
+
+		// nur die neuesten FileVersions // es können neuere Accesses bei alten
+		// versionen bestehen!
+		sortedFiles = getNewestTagFileVersions(files);
+
+		Collections.sort(sortedFiles, comp_time);
+
+		return sortedFiles;
 	}
 
 	void updateFileTagBinding(Tag_File file) {
@@ -1602,6 +1758,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		if (file.textur == null) {
 			// wenn shape aus anderem Thread WatchDir erzeugt wird -> Java
 			// Exeption!
+			println("textur ist null! : " + file.name);
 			return null;
 		}
 
@@ -1633,14 +1790,15 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		PShape s = createShape();
 		s.noStroke();
+		s.fill(0, 200, 100);
 
 		// PGraphics tex = generateTexture((Tag_File) file);
-		s.texture(((Tag_File) file).textur);
+		// s.texture(((Tag_File) file).textur);
 		// s.texture(pg);
 		// s.texture(env_plif);
 
 		// debug
-		println("file.name: " + file.name);
+		// println("file.name: " + file.name);
 
 		float rad = 20;
 		s.vertex(file.x - rad, file.y - rad, z, 0, 0);
@@ -1650,11 +1808,11 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		s.end(CLOSE);
 
-		println("file.name after Rect: " + file.name);
+		// println("file.name after Rect: " + file.name);
 
 		return s;
 	}
-	
+
 	public PShape makeOcto(Tag file, Timestamp ts) {
 		float z = -timeline.mapExp(System.currentTimeMillis() - ts.getTime());
 
@@ -1662,28 +1820,31 @@ public class TagExplorerProcessing2 extends PApplet {
 		s.noStroke();
 
 		// PGraphics tex = generateTexture((Tag_File) file);
-//		s.texture(((Tag_File) file).textur);
-		 s.texture(pg);
+		// s.texture(((Tag_File) file).textur);
+		s.texture(pg);
 		// s.texture(env_plif);
 
 		// debug
 		println("file.name: " + file.name);
 
 		float rad = 20;
-//		s.vertex(file.x - rad, file.y - rad, z, 0, 0);
-//		s.vertex(file.x + rad, file.y - rad, z, ((Tag_File) file).textur.width, 0);
-//		s.vertex(file.x + rad, file.y + rad, z, ((Tag_File) file).textur.width, ((Tag_File) file).textur.height);
-//		s.vertex(file.x - rad, file.y + rad, z, 0, ((Tag_File) file).textur.height);
-		
-		s.vertex(file.x - rad, file.y - rad/2, z, 0, ((Tag_File) file).textur.height/4);
-		s.vertex(file.x - rad/2, file.y - rad, z, ((Tag_File) file).textur.width/4, 0);
-		s.vertex(file.x + rad/2, file.y - rad, z, ((Tag_File) file).textur.width*3/4, 0);
-		s.vertex(file.x + rad, file.y - rad/2, z, 0, ((Tag_File) file).textur.height/4);
-		
-		s.vertex(file.x + rad, file.y + rad/2, z, 0, ((Tag_File) file).textur.height*3/4);
-		s.vertex(file.x + rad/2, file.y + rad, z, ((Tag_File) file).textur.width*3/4, 1);
-		s.vertex(file.x - rad/2, file.y + rad, z, ((Tag_File) file).textur.width/4, 1);
-		s.vertex(file.x - rad, file.y + rad/2, z, 0, ((Tag_File) file).textur.height*3/4);
+		// s.vertex(file.x - rad, file.y - rad, z, 0, 0);
+		// s.vertex(file.x + rad, file.y - rad, z, ((Tag_File)
+		// file).textur.width, 0);
+		// s.vertex(file.x + rad, file.y + rad, z, ((Tag_File)
+		// file).textur.width, ((Tag_File) file).textur.height);
+		// s.vertex(file.x - rad, file.y + rad, z, 0, ((Tag_File)
+		// file).textur.height);
+
+		s.vertex(file.x - rad, file.y - rad / 2, z, 0, ((Tag_File) file).textur.height / 4);
+		s.vertex(file.x - rad / 2, file.y - rad, z, ((Tag_File) file).textur.width / 4, 0);
+		s.vertex(file.x + rad / 2, file.y - rad, z, ((Tag_File) file).textur.width * 3 / 4, 0);
+		s.vertex(file.x + rad, file.y - rad / 2, z, 0, ((Tag_File) file).textur.height / 4);
+
+		s.vertex(file.x + rad, file.y + rad / 2, z, 0, ((Tag_File) file).textur.height * 3 / 4);
+		s.vertex(file.x + rad / 2, file.y + rad, z, ((Tag_File) file).textur.width * 3 / 4, 1);
+		s.vertex(file.x - rad / 2, file.y + rad, z, ((Tag_File) file).textur.width / 4, 1);
+		s.vertex(file.x - rad, file.y + rad / 2, z, 0, ((Tag_File) file).textur.height * 3 / 4);
 
 		s.end(CLOSE);
 
@@ -2035,29 +2196,42 @@ public class TagExplorerProcessing2 extends PApplet {
 		// // // promts.remove(p);
 		// // }
 		// break;
-		case 'a':
-			cam_eye_target.x -= 150;
-			// println("cam_eye.x = " + cam_eye.x);
-			break;
-		case 'd':
-			cam_eye_target.x += 150;
-			// println("cam_eye.x = " + cam_eye.x);
-			break;
+		// case 'a':
+		// cam_eye_target.x -= 150;
+		// // println("cam_eye.x = " + cam_eye.x);
+		// break;
+		// case 'd':
+		// cam_eye_target.x += 150;
+		// // println("cam_eye.x = " + cam_eye.x);
+		// break;
+		// case 'w':
+		// cam_eye_target.y -= 150;
+		// // println("cam_eye.y = " + cam_eye.y);
+		// break;
+		// case 's':
+		// cam_eye_target.y += 150;
+		// // println("cam_eye.y = " + cam_eye.y);
+		// break;
+		// case 'y':
+		// cam_eye_target.z -= 150;
+		// // println("cam_eye.y = " + cam_eye.y);
+		// break;
+		// case 'x':
+		// cam_eye_target.z += 150;
+		// // println("cam_eye.y = " + cam_eye.y);
+		// break;
+
 		case 'w':
-			cam_eye_target.y -= 150;
-			// println("cam_eye.y = " + cam_eye.y);
+			cam_eyetargetpos.z += 20;
 			break;
 		case 's':
-			cam_eye_target.y += 150;
-			// println("cam_eye.y = " + cam_eye.y);
+			cam_eyetargetpos.z -= 20;
 			break;
-		case 'y':
-			cam_eye_target.z -= 150;
-			// println("cam_eye.y = " + cam_eye.y);
+		case '2':
+			cam_eyetargetpos = cam_eye2Dpos;
 			break;
-		case 'x':
-			cam_eye_target.z += 150;
-			// println("cam_eye.y = " + cam_eye.y);
+		case '3':
+			cam_eyetargetpos = cam_eye3Dpos;
 			break;
 		}
 
@@ -2266,38 +2440,38 @@ public class TagExplorerProcessing2 extends PApplet {
 		System.out.println("removed Controller");
 	}
 
-	void calcBillboardRotation() {
-
-		Vec3D cam = cam_eye.sub(cam_target);
-
-		Vec3D cam_yz = new Vec3D(0, cam.y, cam.z).normalize();
-		Vec3D cam_xz = new Vec3D(cam.x, 0, cam.z).normalize();
-		Vec3D cam_xy = new Vec3D(cam.x, cam.y, 0).normalize();
-
-		if (cam.y >= 0) {
-			xBillboardRotation = -cam_yz.angleBetween(new Vec3D(0, 0, 1));
-		} else {
-			xBillboardRotation = cam_yz.angleBetween(new Vec3D(0, 0, 1));
-		}
-		if (cam.x >= 0) {
-			yBillboardRotation = cam_xz.angleBetween(new Vec3D(0, 0, 1));
-		} else {
-			yBillboardRotation = -cam_xz.angleBetween(new Vec3D(0, 0, 1));
-		}
-
-		// zBillboardRotation = cam_xy.angleBetween(new Vec3D(0, -1, 0));
-		// println(zBillboardRotation);
-
-		// zBillboardRotation = 0;
-
-		if (cam.z < 0) {
-			xBillboardRotation += PI;
-			yBillboardRotation *= -1;
-		}
-
-		// println("x:rotation: " + xBillboardRotation);
-		// println("y:rotation: " + yBillboardRotation);
-	}
+	// void calcBillboardRotation() {
+	//
+	// Vec3D cam = cam_eye.sub(cam_target);
+	//
+	// Vec3D cam_yz = new Vec3D(0, cam.y, cam.z).normalize();
+	// Vec3D cam_xz = new Vec3D(cam.x, 0, cam.z).normalize();
+	// Vec3D cam_xy = new Vec3D(cam.x, cam.y, 0).normalize();
+	//
+	// if (cam.y >= 0) {
+	// xBillboardRotation = -cam_yz.angleBetween(new Vec3D(0, 0, 1));
+	// } else {
+	// xBillboardRotation = cam_yz.angleBetween(new Vec3D(0, 0, 1));
+	// }
+	// if (cam.x >= 0) {
+	// yBillboardRotation = cam_xz.angleBetween(new Vec3D(0, 0, 1));
+	// } else {
+	// yBillboardRotation = -cam_xz.angleBetween(new Vec3D(0, 0, 1));
+	// }
+	//
+	// // zBillboardRotation = cam_xy.angleBetween(new Vec3D(0, -1, 0));
+	// // println(zBillboardRotation);
+	//
+	// // zBillboardRotation = 0;
+	//
+	// if (cam.z < 0) {
+	// xBillboardRotation += PI;
+	// yBillboardRotation *= -1;
+	// }
+	//
+	// // println("x:rotation: " + xBillboardRotation);
+	// // println("y:rotation: " + yBillboardRotation);
+	// }
 
 	void loadImages() {
 		closeImg = loadImage("../data/close.png");
@@ -2443,10 +2617,17 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 	}
 
+	public Vec3D interpolateVec(Vec3D aktuell, Vec3D target) {
+		aktuell.x = interpolate(aktuell.x, target.x);
+		aktuell.y = interpolate(aktuell.y, target.y);
+		aktuell.z = interpolate(aktuell.z, target.z);
+		return new Vec3D(aktuell.x, aktuell.y, aktuell.z);
+	}
+
 	public float interpolate(float aktuell, float target) {
 
 		if (abs(aktuell - target) > 0.1f) {
-			aktuell += (target - aktuell) / 60.0f;
+			aktuell += (target - aktuell) / 30.0f;
 			// println("aktuell: " + aktuell);
 		} else {
 			aktuell = target;
