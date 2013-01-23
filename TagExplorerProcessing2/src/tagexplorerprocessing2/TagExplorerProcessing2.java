@@ -17,6 +17,7 @@ import controlP5.Controller;
 import controlP5.Textfield;
 import de.bezier.data.sql.MySQL;
 import processing.core.PApplet;
+import processing.core.PConstants;
 import processing.core.PFont;
 import processing.core.PGraphics;
 import processing.core.PImage;
@@ -59,6 +60,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	ArrayList<Tag> applications = new ArrayList<Tag>();
 	ArrayList<Tag> showApplications = new ArrayList<Tag>();
+	ArrayList<Button_App> appButtons = new ArrayList<Button_App>();
 
 	Tag_File oldest_showFile = null;
 
@@ -147,6 +149,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	Tag_Comparator_Id comp_id;
 	Tag_Comparator_Time comp_time;
+	App_Comparator_Count comp_appcount;
 
 	// PImage
 
@@ -304,6 +307,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		// Comparator
 		comp_id = new Tag_Comparator_Id();
 		comp_time = new Tag_Comparator_Time();
+		comp_appcount = new App_Comparator_Count();
 
 		// Standartuser: Öffentlich
 		// user = (Tag_User) SQL.queryTagList("users").get(0);
@@ -400,7 +404,11 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 
 		// drawApplications
-		drawApplications();
+//		drawApplications();
+		
+		for(Button_App b : appButtons){
+			b.render();
+		}
 
 		// MenuPlane
 		menuPlane.render();
@@ -578,6 +586,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		renderer.endDraw();
 		// renderer end
 
+		imageMode(PConstants.CORNER);
 		image(renderer, 0, 0);
 	}
 
@@ -592,7 +601,8 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		if (filePhysics.particles != null) {
 
-//			println("filePhysics.particles.size(): " + filePhysics.particles.size());
+			// println("filePhysics.particles.size(): " +
+			// filePhysics.particles.size());
 
 			// renderer.shader(plifShader);
 			boolean drawShape = false;
@@ -604,10 +614,10 @@ public class TagExplorerProcessing2 extends PApplet {
 					drawShape = true;
 					s.addChild(file.shape);
 
-					//	debug
-//					if (mousePressed) {
-//						println((Tag_File) filePhysics.particles.get(i));
-//					}
+					// debug
+					// if (mousePressed) {
+					// println((Tag_File) filePhysics.particles.get(i));
+					// }
 
 					// if (draw2DShape) {
 					// renderer.pushMatrix();
@@ -666,16 +676,35 @@ public class TagExplorerProcessing2 extends PApplet {
 	}
 
 	public void drawApplications() { // PGraphics renderer
+		if (showApplications.size() > 0) {
+//			int allAccesses = 0;
+//			for (Tag tag : showApplications) {
+//				Tag_App app = (Tag_App) tag;
+//				allAccesses += app.count;
+//			}
+//			
+//			int xShift = 0;
+//			for (Tag tag : showApplications) {
+//				Tag_App app = (Tag_App) tag;
+//				
+//				int w = (int) map(app.count, 0, allAccesses, 0, width);
+//				fill(220);
+//				stroke(0);
+//				rect(xShift, height - 100, w, 20);
+//				xShift += w;
+//			}
 
-		pushMatrix();
-		translate(width / 2, height - 200, 0);
-		for (int i = 0; i < appPhysics.particles.size(); i++) {
-			Tag_App app = (Tag_App) appPhysics.particles.get(i);
-
-			image(app.img, app.x, app.y, 100, 100);
+			// particle Visualisierung
+			// pushMatrix();
+			// translate(width / 2, height - 200, 0);
+			// for (int i = 0; i < appPhysics.particles.size(); i++) {
+			// Tag_App app = (Tag_App) appPhysics.particles.get(i);
+			//
+			// image(app.img, app.x, app.y, 100, 100);
+			// }
+			//
+			// popMatrix();
 		}
-
-		popMatrix();
 	}
 
 	public PShape generateTypeSprings(ConnectionType type) {
@@ -967,21 +996,47 @@ public class TagExplorerProcessing2 extends PApplet {
 			// alle files
 			showApplications = applications;
 		}
-
-		float dist;
-		if (showApplications.size() > 1) {
-			dist = 120;
-		} else {
-			dist = 0;
+		
+		// sort showApplications nach count
+		Collections.sort(showApplications, comp_appcount);
+		
+		
+		// calc maße und erzeuge Buttons
+		
+		int allAccesses = 0;
+		for (Tag tag : showApplications) {
+			Tag_App app = (Tag_App) tag;
+			allAccesses += app.count;
 		}
-
-		int shiftCount = 0;
-
-		for (int i = 0; i < showApplications.size(); i++) {
-			dropParticle(appPhysics, shiftCount * dist - ((dist * (showApplications.size() - 1)) / 2.0f), 0,
-					showApplications.get(i), true); // links/rechts
-			shiftCount++;
+		
+		int xShift = 0;
+		for (Tag tag : showApplications) {
+			Tag_App app = (Tag_App) tag;
+			
+			int w = (int) map(app.count, 0, allAccesses, 0, width);
+			
+			appButtons.add(new Button_App(this, app.name, app.img, w, 30, xShift, height - 20));
+			xShift += w;
 		}
+		
+
+		// particle visualisierung
+
+		// float dist;
+		// if (showApplications.size() > 1) {
+		// dist = 120;
+		// } else {
+		// dist = 0;
+		// }
+		//
+		// int shiftCount = 0;
+		//
+		// for (int i = 0; i < showApplications.size(); i++) {
+		// dropParticle(appPhysics, shiftCount * dist - ((dist *
+		// (showApplications.size() - 1)) / 2.0f), 0,
+		// showApplications.get(i), true); // links/rechts
+		// shiftCount++;
+		// }
 
 	}
 
@@ -1156,7 +1211,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 	}
 
-	private void setParticlesPosition2D(VerletPhysics physics, ArrayList<Tag> files) {
+	private void setParticlesPosition2D(VerletPhysics physics, ArrayList<Tag> _files) {
 		physics.particles.clear();
 
 		// int count = getSizeWithoutVersion(files);
@@ -1179,12 +1234,12 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		// sortiere nach letztem genutzten Zeitpunkt nur neuesten
 		// FilesVersionen! - es könne älter Versionen neuere Accesses haben!
-		ArrayList<Tag> sortedFiles = getFilesSortedLastAccess(files);
-		println("files.size:" + files.size());
-		println("sortedFiles.size:" + sortedFiles.size());
+		ArrayList<Tag> sortedFiles = getFilesSortedLastAccess(_files);
+		println("setParticlesPosition2D(): files.size:" + _files.size());
+		println("setParticlesPosition2D(): sortedFiles.size:" + sortedFiles.size());
 
 		// fülle von unten rechts beginnend mit wenigst interessantem
-		if (getSizeWithoutVersion(files) < max1Seite) {
+		if (getSizeWithoutVersion(_files) < max1Seite) {
 
 			for (int i = sortedFiles.size() - 1; i >= 0; i--) {
 				// println("sortedFiles name: " + sortedFiles.get(i).name);
@@ -1203,25 +1258,25 @@ public class TagExplorerProcessing2 extends PApplet {
 			// wenn showVersions alle Versionen an neuester Datei ansetzen
 			if (showVersions) {
 
-				for (int i = 0; i < files.size(); i++) {
+				for (int i = 0; i < _files.size(); i++) {
 
 					// wenn file nicht in sortedFiles ist:
-					if (!inSortedFiles(files.get(i).id, sortedFiles)) {
+					if (!inSortedFiles(_files.get(i).id, sortedFiles)) {
 
 						Tag_File position;
 
 						// origin
 
-						if (((Tag_File) files.get(i)).origin_ID == 0) {
+						if (((Tag_File) _files.get(i)).origin_ID == 0) {
 							// suche file mit dessen Id zur positionierung
-							position = (Tag_File) getTagByIDandType(((Tag_File) files.get(i)).id, sortedFiles);
+							position = (Tag_File) getTagByIDandType(((Tag_File) _files.get(i)).id, sortedFiles);
 
 						} // andere Verson
 						else {
-							position = (Tag_File) getTagByIDandType(((Tag_File) files.get(i)).origin_ID, sortedFiles);
+							position = (Tag_File) getTagByIDandType(((Tag_File) _files.get(i)).origin_ID, sortedFiles);
 
 						}
-						dropParticle(physics, position.x, position.y, files.get(i), true);
+						dropParticle(physics, position.x, position.y, _files.get(i), true);
 					}
 				}
 			}
@@ -1250,21 +1305,21 @@ public class TagExplorerProcessing2 extends PApplet {
 			// wenn showVersions alle Versionen an neuester Datei ansetzen
 			if (showVersions) {
 
-				for (int i = 0; i < files.size(); i++) {
-					if (!inSortedFiles(files.get(i).id, sortedFiles)) {
+				for (int i = 0; i < _files.size(); i++) {
+					if (!inSortedFiles(_files.get(i).id, sortedFiles)) {
 						Tag_File position;
 
 						// origin
-						if (((Tag_File) files.get(i)).origin_ID == 0) {
+						if (((Tag_File) _files.get(i)).origin_ID == 0) {
 							// suche file mit dessen Id zur positionierung
-							position = (Tag_File) getTagByIDandType(((Tag_File) files.get(i)).id, sortedFiles);
+							position = (Tag_File) getTagByIDandType(((Tag_File) _files.get(i)).id, sortedFiles);
 
 						} // andere Verson
 						else {
-							position = (Tag_File) getTagByIDandType(((Tag_File) files.get(i)).origin_ID, sortedFiles);
+							position = (Tag_File) getTagByIDandType(((Tag_File) _files.get(i)).origin_ID, sortedFiles);
 
 						}
-						dropParticle(physics, position.x, position.y, files.get(i), true);
+						dropParticle(physics, position.x, position.y, _files.get(i), true);
 					}
 				}
 			}
@@ -1294,27 +1349,65 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 
 		int shiftCount = 0;
+		int yStartUnten = (int) (mainscreen.height / 2 - dist / 2);
 
-		for (int i = 0; i < _files.size(); i++) {
-			// wenn versionen nicht ausgeblendet sind && parent_ID -> set x & y
-			// wert nach parent.
-			if (showVersions && ((Tag_File) _files.get(i)).parent_ID != 0) {
+		ArrayList<Tag> sortedFiles = getFilesSortedLastAccess(_files);
+		println("setParticlesPosition1D(): _files.size:" + _files.size());
+		println("setParticlesPosition1D(): sortedFiles.size:" + sortedFiles.size());
 
-				// get parent
-				Tag_File parent = (Tag_File) getTagByID(_files.get(i).type, ((Tag_File) _files.get(i)).parent_ID);
-				dropParticle(physics, parent.x, parent.y - 120, _files.get(i), true);
-			}
+		// neuest Versionen
+		for (int i = 0; i < sortedFiles.size(); i++) {
+			// jede Datei aus sortedFiles muss positoniert werden
+			dropParticle(physics, shiftCount * dist - ((dist * (count - 1)) / 2.0f), yStartUnten, sortedFiles.get(i),
+					true); // links/rechts
 
-			// ist neueste Version!
-			else {
-				dropParticle(physics, shiftCount * dist - ((dist * (count - 1)) / 2.0f), 0, _files.get(i), true); // links/rechts
+			shiftCount++;
+		}
 
-				// println("i: " + i + " x: " + (shiftCount * dist) +
-				// "verschiebeung um " + -(dist * (count - 1) / 2.0f));
-				// von 0
-				shiftCount++;
+		// wenn showVersions alle Versionen an neuester Datei ansetzen
+		if (showVersions) {
+
+			for (int i = 0; i < _files.size(); i++) {
+				if (!inSortedFiles(_files.get(i).id, sortedFiles)) {
+					Tag_File position;
+
+					// origin
+					if (((Tag_File) _files.get(i)).origin_ID == 0) {
+						// suche file mit dessen Id zur positionierung
+						position = (Tag_File) getTagByIDandType(((Tag_File) _files.get(i)).id, sortedFiles);
+
+					} // andere Verson
+					else {
+						position = (Tag_File) getTagByIDandType(((Tag_File) _files.get(i)).origin_ID, sortedFiles);
+
+					}
+					dropParticle(physics, position.x, position.y, _files.get(i), true);
+				}
 			}
 		}
+
+		// for (int i = 0; i < _files.size(); i++) {
+		// // wenn versionen nicht ausgeblendet sind && parent_ID -> set x & y
+		// // wert nach parent.
+		// if (showVersions && ((Tag_File) _files.get(i)).parent_ID != 0) {
+		//
+		// // get parent
+		// Tag_File parent = (Tag_File) getTagByID(_files.get(i).type,
+		// ((Tag_File) _files.get(i)).parent_ID);
+		// dropParticle(physics, parent.x, parent.y - 120, _files.get(i), true);
+		// }
+		//
+		// // ist neueste Version!
+		// else {
+		// dropParticle(physics, shiftCount * dist - ((dist * (count - 1)) /
+		// 2.0f), 0, _files.get(i), true); // links/rechts
+		//
+		// // println("i: " + i + " x: " + (shiftCount * dist) +
+		// // "verschiebeung um " + -(dist * (count - 1) / 2.0f));
+		// // von 0
+		// shiftCount++;
+		// }
+		// }
 
 		// set z position creation time -> setZTimeAxis()
 		// if(showTimeline){
@@ -1466,15 +1559,15 @@ public class TagExplorerProcessing2 extends PApplet {
 		return tag;
 	}
 
-	public boolean inSortedFiles(int id, ArrayList<Tag> sortedFiles){
-		for(Tag tag : sortedFiles){
-			if(tag.id == id){
+	public boolean inSortedFiles(int id, ArrayList<Tag> sortedFiles) {
+		for (Tag tag : sortedFiles) {
+			if (tag.id == id) {
 				return true;
 			}
 		}
 		return false;
 	}
-	
+
 	public Tag getTagByIDandType(int originId, ArrayList<Tag> sortedFiles) {
 		Tag tag = null;
 

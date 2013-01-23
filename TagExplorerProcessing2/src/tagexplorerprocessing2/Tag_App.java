@@ -7,15 +7,17 @@ import processing.core.PImage;
 public class Tag_App extends Tag {
 	PImage img = null;
 	String imgName = null;
+	int count; // accesses
 	int matches = 0;
 	
 	
 	ArrayList<Tag> attributeBindings = new ArrayList<Tag>();
 	
-	public Tag_App(String tableName, int id, String name, String imgName){
+	public Tag_App(String tableName, int id, String name, String imgName, int count){
 		super(tableName, id, name);
 		
 		this.imgName = imgName;
+		this.count = count;
 		
 //		this.id = id;
 //		this.name = name;

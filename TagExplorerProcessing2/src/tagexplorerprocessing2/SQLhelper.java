@@ -856,7 +856,7 @@ public class SQLhelper {
 			Tag tag = new Tag(tableName, msql.getInt("ID"), msql.getString("name"));
 			t = tag;
 		} else if (tableName.equals("applications")) {
-			Tag tag = new Tag_App(tableName, msql.getInt("ID"), msql.getString("name"), msql.getString("image"));
+			Tag tag = new Tag_App(tableName, msql.getInt("ID"), msql.getString("name"), msql.getString("image"), msql.getInt("count"));
 			t = tag;
 		} else {
 			System.out.println(tableName + " not yet Listed in queryTagList");
