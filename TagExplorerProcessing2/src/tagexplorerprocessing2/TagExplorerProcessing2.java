@@ -161,6 +161,20 @@ public class TagExplorerProcessing2 extends PApplet {
 	PImage minDocument;
 	PImage minProject;
 	
+	// Tag Miniaturen
+	PImage tagMinProject;
+	PImage tagMinUser;
+	PImage tagMinEvent;
+	PImage tagMinKeyword;
+	PImage tagMinLocation;
+	
+	// new Tags
+	PImage newLocation;
+	PImage newUser;
+	PImage newKeyword;
+	PImage newProject;
+	PImage newEvent;
+	
 	//colors
 		int cBorderHover;
 		int cBorder;
@@ -2621,7 +2635,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		appsButton = loadImage(VersionBuilder.versionsVerzeichnis + "applications/apps.png");
 		backgroundApp =  loadImage("../data/backgroundApp.png");
 		
-		// Label miniaturen
+		// Label miniaturen Dropdown Menu & Filter
 		minCall = loadImage("../data/call.png");
 		minEvent = loadImage("../data/event.png");
 		minFilter = loadImage("../data/filter.png");
@@ -2631,6 +2645,20 @@ public class TagExplorerProcessing2 extends PApplet {
 		minUser = loadImage("../data/user.png");
 		minDocument = loadImage("../data/typ_document.png");
 		minProject = loadImage("../data/project.png");
+		
+		// Tag Miniaturen File Tags
+		tagMinProject = loadImage("../data/tagProject.png");
+		tagMinUser = loadImage("../data/tagUser.png");
+		tagMinEvent = loadImage("../data/tagEvent.png");
+		tagMinKeyword = loadImage("../data/tagKeyword.png");
+		tagMinLocation = loadImage("../data/tagLocation.png");
+		
+		// new Tags
+		newLocation = loadImage("../data/newLocation.png");
+		newUser = loadImage("../data/newUser.png");
+		newKeyword = loadImage("../data/newKeyword.png");
+		newProject = loadImage("../data/newProject.png");
+		newEvent = loadImage("../data/newEvent.png");
 	}
 
 	public static void main(String _args[]) {
