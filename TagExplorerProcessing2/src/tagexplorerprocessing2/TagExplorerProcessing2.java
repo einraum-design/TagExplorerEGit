@@ -147,6 +147,29 @@ public class TagExplorerProcessing2 extends PApplet {
 	PImage texture_VIDEO;
 	PImage texture_connection;
 
+	PImage appsButton;
+	PImage backgroundApp;
+	
+	// Label miniaturen
+	PImage minCall;
+	PImage minEvent;
+	PImage minFilter;
+	PImage minKeyword;
+	PImage minLocation;
+	PImage minMessage;
+	PImage minUser;
+	PImage minDocument;
+	PImage minProject;
+	
+	//colors
+		int cBorderHover;
+		int cBorder;
+		int cFont;
+		int cBorderBright;
+		
+		int cButtonBright;
+		int cDropdownHover;
+
 	Tag_Comparator_Id comp_id;
 	Tag_Comparator_Time comp_time;
 	App_Comparator_Count comp_appcount;
@@ -176,6 +199,15 @@ public class TagExplorerProcessing2 extends PApplet {
 		textFont(font, 14);
 
 		loadImages();
+		
+		cBorderHover = color(82, 219, 209);
+		cBorder = color(132, 132, 132);
+		cBorderBright = color(220);
+		
+		cFont = color(132, 132, 132);
+		
+		cButtonBright = color(241);
+		cDropdownHover = color(230);
 
 		// Fill the tables for arcs
 		sinLUT = new float[SINCOS_LENGTH];
@@ -404,9 +436,9 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 
 		// drawApplications
-//		drawApplications();
-		
-		for(Button_App b : appButtons){
+		// drawApplications();
+
+		for (Button_App b : appButtons) {
 			b.render();
 		}
 
@@ -677,22 +709,22 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	public void drawApplications() { // PGraphics renderer
 		if (showApplications.size() > 0) {
-//			int allAccesses = 0;
-//			for (Tag tag : showApplications) {
-//				Tag_App app = (Tag_App) tag;
-//				allAccesses += app.count;
-//			}
-//			
-//			int xShift = 0;
-//			for (Tag tag : showApplications) {
-//				Tag_App app = (Tag_App) tag;
-//				
-//				int w = (int) map(app.count, 0, allAccesses, 0, width);
-//				fill(220);
-//				stroke(0);
-//				rect(xShift, height - 100, w, 20);
-//				xShift += w;
-//			}
+			// int allAccesses = 0;
+			// for (Tag tag : showApplications) {
+			// Tag_App app = (Tag_App) tag;
+			// allAccesses += app.count;
+			// }
+			//
+			// int xShift = 0;
+			// for (Tag tag : showApplications) {
+			// Tag_App app = (Tag_App) tag;
+			//
+			// int w = (int) map(app.count, 0, allAccesses, 0, width);
+			// fill(220);
+			// stroke(0);
+			// rect(xShift, height - 100, w, 20);
+			// xShift += w;
+			// }
 
 			// particle Visualisierung
 			// pushMatrix();
@@ -996,29 +1028,44 @@ public class TagExplorerProcessing2 extends PApplet {
 			// alle files
 			showApplications = applications;
 		}
-		
+
 		// sort showApplications nach count
 		Collections.sort(showApplications, comp_appcount);
-		
-		
+
+		// app Buttons lšschen
+		appButtons.clear();
+
 		// calc ma§e und erzeuge Buttons
-		
+
 		int allAccesses = 0;
 		for (Tag tag : showApplications) {
 			Tag_App app = (Tag_App) tag;
 			allAccesses += app.count;
 		}
-		
+
+		int seitenAbstand = 120;
+		int h = 36;
+
 		int xShift = 0;
+		int wApps = 0;
+
 		for (Tag tag : showApplications) {
 			Tag_App app = (Tag_App) tag;
-			
-			int w = (int) map(app.count, 0, allAccesses, 0, width);
-			
-			appButtons.add(new Button_App(this, app.name, app.img, w, 30, xShift, height - 20));
-			xShift += w;
+
+			int w = (int) map(app.count, 0, allAccesses, 0, width - seitenAbstand * 2 - h);
+//			System.out.println("w: " + app.name + " " + w);
+
+			if (w >= h) {
+				appButtons.add(new Button_App(this, app.name, app.img, w, h, xShift + seitenAbstand, height - h - 10));
+				xShift += w;
+			} else{
+				wApps += w; // Button zu kleine, vergrš§ere Apps Button um Beite auszugleichen
+			}
 		}
-		
+		if (showApplications.size() == 0) {
+			xShift = width - seitenAbstand - h;
+		}
+		appButtons.add(new Button_App(this, "show all", appsButton, h + wApps, h, xShift + seitenAbstand, height - h - 10));
 
 		// particle visualisierung
 
@@ -2571,6 +2618,19 @@ public class TagExplorerProcessing2 extends PApplet {
 		openImg = loadImage("../data/open.png");
 		texture_VIDEO = loadImage("../data/texture_VIDEO.png");
 		texture_connection = loadImage("../data/texture_connection.png");
+		appsButton = loadImage(VersionBuilder.versionsVerzeichnis + "applications/apps.png");
+		backgroundApp =  loadImage("../data/backgroundApp.png");
+		
+		// Label miniaturen
+		minCall = loadImage("../data/call.png");
+		minEvent = loadImage("../data/event.png");
+		minFilter = loadImage("../data/filter.png");
+		minKeyword = loadImage("../data/keyword.png");
+		minLocation = loadImage("../data/location.png");
+		minMessage = loadImage("../data/message.png");
+		minUser = loadImage("../data/user.png");
+		minDocument = loadImage("../data/typ_document.png");
+		minProject = loadImage("../data/project.png");
 	}
 
 	public static void main(String _args[]) {

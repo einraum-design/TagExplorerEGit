@@ -4,25 +4,25 @@ import processing.core.PApplet;
 import toxi.geom.Vec2D;
 
 public class Button extends Vec2D{
-	PApplet p5;
+	TagExplorerProcessing2 p5;
 	protected int w;
 	protected int h;
 	
-	public Button(PApplet p5){
+	public Button(TagExplorerProcessing2 p5){
 		super(0, 0);
 		this.p5 = p5;
 		this.w = 10;	
 		this.h = 10;
 	}
 	
-	public Button(PApplet p5, int w, int h){
+	public Button(TagExplorerProcessing2 p5, int w, int h){
 		super(0, 0);
 		this.p5 = p5;
 		this.w = w;	
 		this.h = h;
 	}
 	
-	public Button(PApplet p5, int w, int h, int x, int y){
+	public Button(TagExplorerProcessing2 p5, int w, int h, int x, int y){
 		super(x, y);
 		this.p5 = p5;
 		this.w = w;

@@ -19,7 +19,10 @@ public class MenuPlane extends Plane {
 
 	public MenuPlane(TagExplorerProcessing2 p5) {
 		super(p5);
-		createTextField(inputFieldName, infoText, 10, 40);
+		
+		int w = 300;
+		int h = 28;
+		createTextField(inputFieldName, infoText, p5.width/2 - w/2, 70, w, h);
 	}
 
 	public void update() {
@@ -36,9 +39,9 @@ public class MenuPlane extends Plane {
 
 	public void render() {
 		// weiße Fläche
-		p5.fill(255, 220);
-		p5.noStroke();
-		p5.rect(0, 0, p5.width, h);
+//		p5.fill(255, 220);
+//		p5.noStroke();
+//		p5.rect(0, 0, p5.width, h);
 
 		int xShift = 0;
 		int yShift = 0;
@@ -53,6 +56,8 @@ public class MenuPlane extends Plane {
 			}
 		}
 		
+		
+		// draw Dropdown unter Textfield
 		dropDownHeight = drawTagList(inputFieldName);
 	}
 	
@@ -63,7 +68,7 @@ public class MenuPlane extends Plane {
 
 			for (int i = 0; i < sortedTags.size(); i++) {
 				Tag tag = sortedTags.get(i);
-				Button_DropDown b = new Button_DropDown(p5, tag.name + " " + tag.bindCount, cp5.get(Textfield.class,
+				Button_DropDown b = new Button_DropDown(p5, tag.name + " " + tag.bindCount, tag.type, cp5.get(Textfield.class,
 						inputFieldName).getWidth(), cp5.get(Textfield.class, inputFieldName).getHeight(), (int) cp5
 						.get(Textfield.class, inputFieldName).getPosition().x, (int) cp5.get(Textfield.class,
 						inputFieldName).getPosition().y);
@@ -96,11 +101,11 @@ public class MenuPlane extends Plane {
 		return 0;
 	}
 
-	public void createTextField(String name, String value, float x, float y) {
+	public void createTextField(String name, String value, float x, float y, int w, int h) {
 		// System.out.println("createTextfield");
 
-		cp5.addTextfield(name).setValue(value).setPosition(x, y).setSize(200, 28).setFont(p5.createFont("arial", 18)).setFocus(false)
-				.setColorCursor(0).setColorBackground(p5.color(255)).setColorActive(p5.color(0, 255, 50)).setColor(p5.color(0)).getCaptionLabel().setVisible(false);
+		cp5.addTextfield(name).setValue(value).setPosition(x, y).setSize(w, h).setFont(p5.createFont("arial", 20)).setFocus(false)
+				.setColorCursor(p5.cFont).setColorBackground(p5.color(255)).setColorActive(p5.cBorderHover).setColor(p5.cFont).getCaptionLabel().setVisible(false);
 		// cp5.get(Textfield.class, inputFieldName).getLabel().
 	}
 
