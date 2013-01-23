@@ -7,9 +7,11 @@ import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.SimpleTimeZone;
 import java.util.TreeSet;
 
 import controlP5.ControlP5;
@@ -66,6 +68,8 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	Timestamp minTime = null;
 	Timestamp maxTime = null;
+
+	SimpleDateFormat sdf;
 
 	boolean showVersions = false;
 	boolean drawAccessShapes = false;
@@ -142,14 +146,15 @@ public class TagExplorerProcessing2 extends PApplet {
 	PImage env_plif;
 
 	// Images
-	PImage closeImg;
-	PImage openImg;
+	PImage close;
+	PImage close_h;
+	PImage open;
 	PImage texture_VIDEO;
 	PImage texture_connection;
 
 	PImage appsButton;
 	PImage backgroundApp;
-	
+
 	// Label miniaturen
 	PImage minCall;
 	PImage minEvent;
@@ -160,29 +165,29 @@ public class TagExplorerProcessing2 extends PApplet {
 	PImage minUser;
 	PImage minDocument;
 	PImage minProject;
-	
+
 	// Tag Miniaturen
 	PImage tagMinProject;
 	PImage tagMinUser;
 	PImage tagMinEvent;
 	PImage tagMinKeyword;
 	PImage tagMinLocation;
-	
+
 	// new Tags
 	PImage newLocation;
 	PImage newUser;
 	PImage newKeyword;
 	PImage newProject;
 	PImage newEvent;
-	
-	//colors
-		int cBorderHover;
-		int cBorder;
-		int cFont;
-		int cBorderBright;
-		
-		int cButtonBright;
-		int cDropdownHover;
+
+	// colors
+	int cBorderHover;
+	int cBorder;
+	int cFont;
+	int cBorderBright;
+
+	int cButtonBright;
+	int cDropdownHover;
 
 	Tag_Comparator_Id comp_id;
 	Tag_Comparator_Time comp_time;
@@ -213,16 +218,23 @@ public class TagExplorerProcessing2 extends PApplet {
 		textFont(font, 14);
 
 		loadImages();
-		
+
 		cBorderHover = color(82, 219, 209);
 		cBorder = color(132, 132, 132);
 		cBorderBright = color(220);
-		
+
 		cFont = color(132, 132, 132);
-		
+
 		cButtonBright = color(241);
 		cDropdownHover = color(230);
 
+		
+		//Date Formatter
+		sdf = new SimpleDateFormat();
+		sdf.setTimeZone(new SimpleTimeZone(1, "GMT"));
+//		sdf.applyPattern("dd MMM yyyy HH:mm:ss");
+		
+		
 		// Fill the tables for arcs
 		sinLUT = new float[SINCOS_LENGTH];
 		cosLUT = new float[SINCOS_LENGTH];
@@ -1067,19 +1079,21 @@ public class TagExplorerProcessing2 extends PApplet {
 			Tag_App app = (Tag_App) tag;
 
 			int w = (int) map(app.count, 0, allAccesses, 0, width - seitenAbstand * 2 - h);
-//			System.out.println("w: " + app.name + " " + w);
+			// System.out.println("w: " + app.name + " " + w);
 
 			if (w >= h) {
 				appButtons.add(new Button_App(this, app.name, app.img, w, h, xShift + seitenAbstand, height - h - 10));
 				xShift += w;
-			} else{
-				wApps += w; // Button zu kleine, vergrš§ere Apps Button um Beite auszugleichen
+			} else {
+				wApps += w; // Button zu kleine, vergrš§ere Apps Button um Beite
+							// auszugleichen
 			}
 		}
 		if (showApplications.size() == 0) {
 			xShift = width - seitenAbstand - h;
 		}
-		appButtons.add(new Button_App(this, "show all", appsButton, h + wApps, h, xShift + seitenAbstand, height - h - 10));
+		appButtons.add(new Button_App(this, "show all", appsButton, h + wApps, h, xShift + seitenAbstand, height - h
+				- 10));
 
 		// particle visualisierung
 
@@ -2628,13 +2642,14 @@ public class TagExplorerProcessing2 extends PApplet {
 	// }
 
 	void loadImages() {
-		closeImg = loadImage("../data/close.png");
-		openImg = loadImage("../data/open.png");
+		close = loadImage("../data/close.png");
+		close_h = loadImage("../data/close_h.png");
+		open = loadImage("../data/open.png");
 		texture_VIDEO = loadImage("../data/texture_VIDEO.png");
 		texture_connection = loadImage("../data/texture_connection.png");
 		appsButton = loadImage(VersionBuilder.versionsVerzeichnis + "applications/apps.png");
-		backgroundApp =  loadImage("../data/backgroundApp.png");
-		
+		backgroundApp = loadImage("../data/backgroundApp.png");
+
 		// Label miniaturen Dropdown Menu & Filter
 		minCall = loadImage("../data/call.png");
 		minEvent = loadImage("../data/event.png");
@@ -2645,14 +2660,14 @@ public class TagExplorerProcessing2 extends PApplet {
 		minUser = loadImage("../data/user.png");
 		minDocument = loadImage("../data/typ_document.png");
 		minProject = loadImage("../data/project.png");
-		
+
 		// Tag Miniaturen File Tags
 		tagMinProject = loadImage("../data/tagProject.png");
 		tagMinUser = loadImage("../data/tagUser.png");
 		tagMinEvent = loadImage("../data/tagEvent.png");
 		tagMinKeyword = loadImage("../data/tagKeyword.png");
 		tagMinLocation = loadImage("../data/tagLocation.png");
-		
+
 		// new Tags
 		newLocation = loadImage("../data/newLocation.png");
 		newUser = loadImage("../data/newUser.png");

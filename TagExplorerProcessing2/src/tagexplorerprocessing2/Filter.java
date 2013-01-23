@@ -32,8 +32,8 @@ public class Filter {
 		}
 		
 
-		Button_Symbol b = new Button_Symbol(p5, p5.closeImg, x + w - p5.closeImg.width - 5, y + h / 2
-				- p5.closeImg.height / 2);
+		Button_Symbol b = new Button_Symbol(p5, "close", x + w - p5.close.width - 5, y + h / 2
+				- p5.close.height / 2);
 		b.render();
 
 		// remove From FilterList

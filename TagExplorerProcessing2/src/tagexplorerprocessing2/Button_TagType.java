@@ -44,13 +44,15 @@ public class Button_TagType extends Button {
 	public void render(){
 		if(mouseOver()){
 			p5.fill(p5.cDropdownHover);
+			p5.stroke(p5.cBorderHover);
 		} else{
 			p5.fill(p5.cButtonBright);
+			p5.stroke(p5.cBorder);
 		}
 		
-		p5.stroke(p5.cBorderBright);
+		
 		p5.rectMode(PConstants.CORNER);
-		p5.rect(x, y, w, h);
+		p5.rect((int)x, (int)y, (int)w, (int)h);
 		p5.imageMode(PConstants.CENTER);
 		p5.image(img, x+w/2, y+h/2);
 //		p5.fill(50);

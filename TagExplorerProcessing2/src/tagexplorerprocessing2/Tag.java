@@ -2,6 +2,8 @@ package tagexplorerprocessing2;
 
 import java.sql.Timestamp;
 
+import processing.core.PConstants;
+
 import toxi.physics.VerletParticle;
 
 public class Tag extends VerletParticle {
@@ -27,20 +29,25 @@ public class Tag extends VerletParticle {
 		
 	}
 	
-	
+	public int getWidth(TagExplorerProcessing2 p5, Tag_File file){
+		p5.textFont(p5.font, 13);
+		int w = (int) p5.textWidth(this.name) + 25;
+		return w;
+	}
 	
 	public int renderTag(TagExplorerProcessing2 p5, Tag_File file, int x, int y) {
 
 		int w = (int) p5.textWidth(this.name) + 25;
 		int h = 22;
-		p5.fill(150);
-		p5.rect(x, y, w, h);
-		p5.fill(0);
-		p5.textAlign(p5.LEFT, p5.CENTER);
+		p5.fill(p5.cButtonBright);
+		p5.stroke(p5.cBorder);
+		p5.rect((int)x, (int)y, (int)w, (int)h);
+		p5.fill(p5.cFont);
+		p5.textAlign(PConstants.LEFT, PConstants.CENTER);
 		p5.text(this.name, x + 5, y + h / 2);
 
-		Button_Symbol b = new Button_Symbol(p5, p5.closeImg, x + w - p5.closeImg.width - 5, y + h / 2
-				- p5.closeImg.height / 2);
+		Button_Symbol b = new Button_Symbol(p5, "close", x + w - p5.close.width - 5, y + h / 2
+				- p5.close.height / 2);
 		b.render();
 
 		if (p5.mouseActive && b.mouseOver() && p5.mousePressed) {
