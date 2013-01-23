@@ -2,48 +2,76 @@ package tagexplorerprocessing2;
 
 import java.util.ArrayList;
 
+import processing.core.PConstants;
+import processing.core.PImage;
+
 public class Filter {
 	Tag tag;
 	boolean inOut;
 	int id;
 	static int counter = 0;
-
+	
 	public Filter(Tag tag, boolean inOut) {
 		this.tag = tag;
 		this.inOut = inOut;
 		this.id = counter;
 		counter++;
 	}
-
+	public int getWidth(TagExplorerProcessing2 p5){
+		p5.textFont(p5.font, 16);
+		int w = (int) p5.textWidth(tag.name) + 2*h;
+		return w;
+	}
+	
+	int h = 28;
 	public int render(TagExplorerProcessing2 p5, int x, int y) {
 
-		int w = (int) p5.textWidth(tag.name) + 25;
-		int h = 22;
-		p5.fill(150);
+		int w = (int) p5.textWidth(tag.name) + 2*h;
+		
+		p5.fill(p5.cButtonBright);
+		p5.stroke(p5.cBorder);
 		p5.rect(x, y, w, h);
-		p5.fill(0);
-		p5.textAlign(p5.LEFT, p5.CENTER);
-		p5.text(tag.name, x + 5, y + h / 2);
+		
+		p5.imageMode(PConstants.CENTER);
+		// img Type icon
+		switch (tag.type) {
+		case "keywords":
+			p5.image(p5.minKeyword, x+h/2, y + h/2);
+			break;
+		case "locations":
+			p5.image(p5.minLocation, x+h/2, y + h/2);
+			break;
+		case "projects":
+			p5.image(p5.minProject, x+h/2, y + h/2);
+			break;
+		case "users":
+			p5.image(p5.minUser, x+h/2, y + h/2);
+			break;
+		case "events":
+			p5.image(p5.minEvent, x+h/2, y + h/2);
+			break;
+		default:
+			p5.image(p5.minKeyword, x+h/2, y + h/2);
+		}
+
+		
+		p5.fill(p5.cFont);
+		p5.textAlign(PConstants.LEFT, PConstants.CENTER);
+		p5.text(tag.name, x + h, y + h / 2);
 		
 		
 		// wieder ausblenden!
-		if(tag.lastStartFilterTime != null){
-			p5.text(tag.lastStartFilterTime.toGMTString(), x + 5, y + h / 2 + 50);
-		}
+//		if(tag.lastStartFilterTime != null){
+//			p5.text(tag.lastStartFilterTime.toGMTString(), x + 5, y + h / 2 + 50);
+//		}
 		
-
-		Button_Symbol b = new Button_Symbol(p5, "close", x + w - p5.close.width - 5, y + h / 2
-				- p5.close.height / 2);
+		Button_Symbol b = new Button_Symbol(p5, "close", x + w - h/2, y + h / 2);
 		b.render();
 
 		// remove From FilterList
 		if (p5.mouseActive && b.mouseOver() && p5.mousePressed) {
 			removeFromFilterList(p5);
 		}
-
-		// update filterList
-		// System.out.println("filterList.size(): " + filterMList.size());
-		
 
 		return w;
 	}

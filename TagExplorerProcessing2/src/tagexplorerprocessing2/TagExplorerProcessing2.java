@@ -2189,7 +2189,26 @@ public class TagExplorerProcessing2 extends PApplet {
 	}
 
 	// ///////// INPUT ///////////////////
+	
+	int lastMouseY;
+	public void mouseDragged(){
+		
+//		if(mouseY > lastMouseY){
+			println("mouseDragged: " + (lastMouseY-mouseY));
+			
+			cam_eyetargetpos.z += (lastMouseY-mouseY)/2;
+//		}
+		
+		lastMouseY = mouseY;
+		
+		
+		
+	}
+	
+	
 	public void mousePressed() {
+		// mouseDragged
+		lastMouseY = mouseY;
 
 		// lastClick = new Timestamp(System.currentTimeMillis());
 
@@ -2847,7 +2866,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	public float interpolate(float aktuell, float target) {
 
 		if (abs(aktuell - target) > 0.1f) {
-			aktuell += (target - aktuell) / 30.0f;
+			aktuell += (target - aktuell) / 20.0f;
 			// println("aktuell: " + aktuell);
 		} else {
 			aktuell = target;

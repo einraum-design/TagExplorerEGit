@@ -46,14 +46,17 @@ public class MenuPlane extends Plane {
 		int xShift = 0;
 		int yShift = 0;
 		for (Filter filter : p5.filterList) {
+			int tagWidth = filter.getWidth(p5);
 			
-			// zeichnet Tag Button mit Button_Symbol
-			xShift += filter.render(p5, 10 + xShift, 10 + yShift) + 3;
-
-			if (xShift > p5.width - 200) {
+			if (xShift + tagWidth > p5.width) { // p5.width - breite UserTag
 				xShift = 0;
 				yShift += 30;
 			}
+			// zeichnet Tag Button mit Button_Symbol
+			xShift += filter.render(p5, 10 + xShift, 10 + yShift);
+			xShift += 3;
+
+			
 		}
 		
 		
@@ -61,6 +64,7 @@ public class MenuPlane extends Plane {
 		dropDownHeight = drawTagList(inputFieldName);
 	}
 	
+	// draw Dropdown unter Textfield
 	public int drawTagList(String inputFieldName){
 		if (cp5.get(Textfield.class, inputFieldName).isFocus()) {
 

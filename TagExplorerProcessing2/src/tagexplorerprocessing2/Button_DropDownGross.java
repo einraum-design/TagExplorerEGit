@@ -67,14 +67,14 @@ public class Button_DropDownGross extends Button_DropDown {
 		p5.rect(x, y, this.w, this.h);
 		p5.fill(p5.cFont);
 		p5.textAlign(p5.LEFT, p5.CENTER);
-		p5.image(typeImg, x + 16, y + this.h / 2);
-		p5.text(label, x + 32, y + this.h / 2);
+		p5.image(typeImg, x + h/2, y + this.h / 2);
+		p5.text(label, x + h, y + this.h / 2);
 
 		// filter Icon
-		p5.image(p5.minFilter, x + w - 16, y + this.h / 2);
+		p5.image(p5.minFilter, x + w - h/2, y + this.h / 2);
 		if(type.equals("users")){
-			p5.image(p5.minMessage, x + w - 16 - 26, y + this.h / 2);
-			p5.image(p5.minCall, x + w - 16 - 50, y + this.h / 2);
+			p5.image(p5.minMessage, x + w - h/2 - 24, y + this.h / 2);
+			p5.image(p5.minCall, x + w - h/2 - 48, y + this.h / 2);
 		}
 	}
 

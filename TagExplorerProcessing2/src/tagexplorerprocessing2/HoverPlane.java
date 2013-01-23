@@ -59,7 +59,7 @@ public class HoverPlane extends Plane {
 			
 			infoBox.addChild(timeline);
 
-			openButton = new Button_Symbol(p5, "open", x + w / 2 - rand / 2 - p5.open.width, y - h + rand / 2);
+			openButton = new Button_Symbol(p5, "open", x + w / 2 - rand / 2, y - h + rand / 2);
 
 			createTextField(inputFieldName, infoText, x - w / 2 + rand, y - 125);
 

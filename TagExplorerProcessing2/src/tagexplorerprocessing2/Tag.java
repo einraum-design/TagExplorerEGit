@@ -31,23 +31,50 @@ public class Tag extends VerletParticle {
 	
 	public int getWidth(TagExplorerProcessing2 p5, Tag_File file){
 		p5.textFont(p5.font, 13);
-		int w = (int) p5.textWidth(this.name) + 25;
+		int w = (int) p5.textWidth(this.name) + 2*h;
 		return w;
 	}
 	
+	int h = 22;
+	
 	public int renderTag(TagExplorerProcessing2 p5, Tag_File file, int x, int y) {
 
-		int w = (int) p5.textWidth(this.name) + 25;
-		int h = 22;
+		int w = (int) p5.textWidth(this.name) + 2*h;
+		
 		p5.fill(p5.cButtonBright);
 		p5.stroke(p5.cBorder);
 		p5.rect((int)x, (int)y, (int)w, (int)h);
+		
+		p5.imageMode(PConstants.CENTER);
+		// img Type icon
+		switch (type) {
+		case "keywords":
+			p5.image(p5.tagMinKeyword, x+h/2, y + h/2);
+			break;
+		case "locations":
+			p5.image(p5.tagMinLocation, x+h/2, y + h/2);
+			break;
+		case "projects":
+			p5.image(p5.tagMinProject, x+h/2, y + h/2);
+			break;
+		case "users":
+			p5.image(p5.tagMinUser, x+h/2, y + h/2);
+			break;
+		case "events":
+			p5.image(p5.tagMinEvent, x+h/2, y + h/2);
+			break;
+		default:
+			p5.image(p5.tagMinKeyword, x+h/2, y + h/2);
+		}
+		
+		
+		
+		
 		p5.fill(p5.cFont);
 		p5.textAlign(PConstants.LEFT, PConstants.CENTER);
-		p5.text(this.name, x + 5, y + h / 2);
+		p5.text(this.name, x + h, y + h / 2);
 
-		Button_Symbol b = new Button_Symbol(p5, "close", x + w - p5.close.width - 5, y + h / 2
-				- p5.close.height / 2);
+		Button_Symbol b = new Button_Symbol(p5, "close", x + w - h/2, y + h / 2);
 		b.render();
 
 		if (p5.mouseActive && b.mouseOver() && p5.mousePressed) {
@@ -58,10 +85,7 @@ public class Tag extends VerletParticle {
 
 		return w;
 	}
-	
-//	public void updateFileBinding(){
-//		
-//	}
+
 
 	@Override
 	public String toString() {

@@ -42,9 +42,9 @@ public class Button_Symbol extends Button {
 	public void render(){
 		p5.imageMode(PConstants.CENTER);
 		if(mouseOver()){
-			p5.image(img_h, x + w/2, y + h/2);
+			p5.image(img_h, x, y);
 		} else{
-			p5.image(img, x + w/2, y + h/2);
+			p5.image(img, x, y);
 		}
 		
 		

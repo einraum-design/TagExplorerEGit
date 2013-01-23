@@ -52,6 +52,7 @@ public class Button_App extends Button {
 		}
 		// Img & Label
 		if(showImgLabel){
+			p5.textFont(p5.font, 18);
 			p5.textAlign(PConstants.CENTER, PConstants.CENTER);
 			p5.fill(p5.cFont);
 			float textX =  x + w/2 + (h-imgRand*2)/2 + imgRand*2;
