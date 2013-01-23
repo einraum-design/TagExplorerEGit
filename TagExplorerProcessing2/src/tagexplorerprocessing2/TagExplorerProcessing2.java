@@ -46,7 +46,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	Timeline timeline;
 
 	// Tag_User user = new Tag_User("users", 0, "noname", "no Password");
-	Tag_User user = null;
+	Tag_User mainUser = null;
 	Tag_Location location = null;
 
 	SQLhelper SQL;
@@ -151,6 +151,8 @@ public class TagExplorerProcessing2 extends PApplet {
 	PImage open;
 	PImage texture_VIDEO;
 	PImage texture_connection;
+	
+	PImage backgroundTransition;
 
 	PImage appsButton;
 	PImage backgroundApp;
@@ -368,7 +370,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		comp_appcount = new App_Comparator_Count();
 
 		// Standartuser: …ffentlich
-		// user = (Tag_User) SQL.queryTagList("users").get(0);
+		// mainUser = (Tag_User) SQL.queryTagList("users").get(0);
 
 		// cp5_Menu.addToggle("Location").setValue(0)
 		// .setPosition(200, 0).setSize(80, 40).getCaptionLabel()
@@ -424,6 +426,17 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 
 		background(255);
+		
+//		lights();
+		
+		imageMode(CORNER);
+		image(backgroundTransition, 0,0);
+//		PShape back = createShape(PConstants.RECT, 0, 0, width, height);
+//		back.texture(backgroundTransition);
+//		shape(back);
+		
+		
+		
 		// set Mouse active nach jeweils 600 millis;
 		if (System.currentTimeMillis() > lastClick.getTime() + 1200) {
 			mouseActive = true;
@@ -460,6 +473,10 @@ public class TagExplorerProcessing2 extends PApplet {
 			// drawMainscreen(mainscreen); // alte mit blur
 			// drawMainscreen(mainscreen); // aktuelle
 		}
+		
+		
+//		image(backgroundTransition, 0, 0);
+
 
 		// drawApplications
 		// drawApplications();
@@ -578,17 +595,19 @@ public class TagExplorerProcessing2 extends PApplet {
 		renderer.beginDraw();
 		renderer.smooth(4);
 
-		// renderer.background(255);
+		renderer.background(255, 0);
 
-		renderer.hint(DISABLE_DEPTH_MASK);
-		renderer.fill(255);
-		renderer.shader(transition);
+		// pulse shader
+//		renderer.hint(DISABLE_DEPTH_MASK);
+//		renderer.fill(255);
+//		renderer.shader(transition);
+//
+//		renderer.rectMode(CENTER);
+//		renderer.rect(renderer.width / 2, renderer.height / 2, renderer.width * 20, renderer.height * 20);
+//		renderer.resetShader();
+//		renderer.hint(ENABLE_DEPTH_MASK);
 
-		renderer.rectMode(CENTER);
-		renderer.rect(renderer.width / 2, renderer.height / 2, renderer.width * 20, renderer.height * 20);
-		renderer.resetShader();
-		renderer.hint(ENABLE_DEPTH_MASK);
-
+		
 		// renderer.directionalLight(0, 255, 0, 0, -1, 0);
 
 		// renderer.rotateY(mainScreenYRotation);
@@ -2649,6 +2668,8 @@ public class TagExplorerProcessing2 extends PApplet {
 		texture_connection = loadImage("../data/texture_connection.png");
 		appsButton = loadImage(VersionBuilder.versionsVerzeichnis + "applications/apps.png");
 		backgroundApp = loadImage("../data/backgroundApp.png");
+		
+		backgroundTransition = loadImage("../data/background.png");
 
 		// Label miniaturen Dropdown Menu & Filter
 		minCall = loadImage("../data/call.png");

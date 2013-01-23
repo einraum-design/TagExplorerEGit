@@ -437,9 +437,9 @@ public class SQLhelper {
 
 			int fileId = msql2.getInt(1);
 			System.out.println("fileId: " + fileId);
-			if (p5.user != null) {
+			if (p5.mainUser != null) {
 				msql2.execute("INSERT INTO accesses (fileID, date, comment, userID) VALUES (" + fileId + ", \""
-						+ new Timestamp(attributeLastAccessTime) + "\", \"" + "comment" + "\", \"" + p5.user.id + "\")");
+						+ new Timestamp(attributeLastAccessTime) + "\", \"" + "comment" + "\", \"" + p5.mainUser.id + "\")");
 			} else {
 				msql2.execute("INSERT INTO accesses (fileID, date, comment) VALUES (" + fileId + ", \""
 						+ new Timestamp(attributeLastAccessTime) + "\", \"" + "comment" + "\")");
@@ -491,9 +491,9 @@ public class SQLhelper {
 			if (now.getTime() - p5.getNewestDate(file).getTime() > 5000) {
 				System.out.println("setAccessTimeNow: open! " + file.name);
 
-				if (p5.user != null) {
+				if (p5.mainUser != null) {
 					msql2.execute("INSERT INTO accesses (fileID, date, comment, userID) VALUES (" + file.id + ", \""
-							+ now + "\", \"" + "comment" + "\", \"" + p5.user.id + "\")");
+							+ now + "\", \"" + "comment" + "\", \"" + p5.mainUser.id + "\")");
 				} else {
 					msql2.execute("INSERT INTO accesses (fileID, date, comment) VALUES (" + file.id + ", \"" + now
 							+ "\", \"" + "per mouseclick" + "\")");

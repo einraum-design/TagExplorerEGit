@@ -369,7 +369,7 @@ public class HoverPlane extends Plane {
 
 		float rad = 6;
 		// startEllipse
-		PShape startEllipse = p5.createShape(PConstants.ELLIPSE, -w/2-rad/2, yTimeline -rad/2, rad, rad);
+		PShape startEllipse = p5.createShape(PConstants.ELLIPSE, -w/2+ rand -rad/2, yTimeline -rad/2, rad, rad);
 		startEllipse.fill(p5.cFont);
 
 		shape.addChild(startEllipse);
