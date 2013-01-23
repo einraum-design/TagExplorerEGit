@@ -133,7 +133,7 @@ public class HoverPlane extends Plane {
 
 			for (int i = 0; i < sortedTags.size(); i++) {
 				Tag tag = sortedTags.get(i);
-				Button_DropDown b = new Button_DropDown(p5, tag.name + " " + tag.bindCount, tag.type, cp5.get(Textfield.class,
+				Button_DropDownTag b = new Button_DropDownTag(p5, tag.name + " " + tag.bindCount, tag.type, cp5.get(Textfield.class,
 						inputFieldName).getWidth(), cp5.get(Textfield.class, inputFieldName).getHeight(), (int) cp5
 						.get(Textfield.class, inputFieldName).getPosition().x, (int) cp5.get(Textfield.class,
 						inputFieldName).getPosition().y);
@@ -167,12 +167,13 @@ public class HoverPlane extends Plane {
 					!cp5.get(Textfield.class, inputFieldName).getText().equals(infoText)){
 				if (p5.mouseActive && b.mouseOver() && p5.mousePressed) {
 					
+					System.out.println(cp5.get(Textfield.class, inputFieldName).getText().trim());
 					// create neuen Tag + update Tags + Springs
 					Tag tag = p5.createNewTag(cp5.get(Textfield.class, inputFieldName).getText().trim(), ((Button_TagType)b).type);
 					
 					// wenn tag schon existiert gebe tag zurŸck (nur absicherung)
 					if(tag == null){
-						System.out.println("Tag exixts already - use existing tag");
+						System.out.println("HoverPlane.drawSaveTypeButtons(): Tag exixts already - use existing tag");
 						tag = p5.getTagByName(cp5.get(Textfield.class, inputFieldName).getText().trim());
 					}
 					
@@ -259,6 +260,60 @@ public class HoverPlane extends Plane {
 				.setColorBackground(p5.color(255)).setColorActive(p5.color(0, 255, 50))
 				.setColor(p5.color(0)).getCaptionLabel().setVisible(false);
 		// cp5.get(Textfield.class, inputFieldName).getLabel().
+	}
+	
+	ArrayList<Button> buttonTypeList = new ArrayList<Button>();
+	public void createTypeButtons(String inputFieldName){
+		//cp5.get(Textfield.class, inputFieldName).setValue(tagName);
+
+		// create Type Buttons
+		int shiftX = (int) cp5.get(Textfield.class, inputFieldName).getPosition().x;
+		int shiftY = (int) cp5.get(Textfield.class, inputFieldName).getPosition().y - 24;
+		
+
+		
+		Button keywordButton = new Button_TagType(p5, p5.newKeyword, "keywords", 
+				20, 20, shiftX, shiftY);
+				//cp5.get(Textfield.class, inputFieldName).getWidth(), 
+//				cp5.get(Textfield.class, inputFieldName).getHeight(), 
+//				shiftX + cp5.get(Textfield.class, inputFieldName).getWidth() + 5, 
+//				shiftY); //+ (int) cp5.get(Textfield.class, inputFieldName).getHeight());
+		
+		buttonTypeList.add(keywordButton);
+		
+		shiftX += keywordButton.w + 5;
+		
+		Button locationButton = new Button_TagType(p5, p5.newLocation, "locations",
+				20, 20, shiftX, shiftY);
+				//cp5.get(Textfield.class, inputFieldName).getWidth(), 
+//				cp5.get(Textfield.class, inputFieldName).getHeight(), 
+//				shiftX + cp5.get(Textfield.class, inputFieldName).getWidth() + 5, 
+//				shiftY); //+ (int) cp5.get(Textfield.class, inputFieldName).getHeight());
+		buttonTypeList.add(locationButton);
+		
+		shiftX += keywordButton.w + 5;
+		
+		Button userButton = new Button_TagType(p5, p5.newUser, "users",
+				20, 20, shiftX, shiftY);
+				//cp5.get(Textfield.class, inputFieldName).getWidth(), 
+//				cp5.get(Textfield.class, inputFieldName).getHeight(), 
+//				shiftX + cp5.get(Textfield.class, inputFieldName).getWidth() + 5, 
+//				shiftY); //+ (int) cp5.get(Textfield.class, inputFieldName).getHeight());
+		buttonTypeList.add(userButton);
+		
+		shiftX += keywordButton.w + 5;
+		
+		Button projectButton = new Button_TagType(p5, p5.newProject, "projects",
+				20, 20, shiftX, shiftY);
+				//cp5.get(Textfield.class, inputFieldName).getWidth(), 
+//				cp5.get(Textfield.class, inputFieldName).getHeight(), 
+//				shiftX + cp5.get(Textfield.class, inputFieldName).getWidth() + 5, 
+//				shiftY); //+ (int) cp5.get(Textfield.class, inputFieldName).getHeight());
+		buttonTypeList.add(projectButton);
+		
+		shiftX += projectButton.w + 5;
+		
+		// weiter Button Typen
 	}
 
 	public boolean mouseOver() {

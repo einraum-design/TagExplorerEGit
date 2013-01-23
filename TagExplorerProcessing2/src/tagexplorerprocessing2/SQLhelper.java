@@ -31,13 +31,12 @@ public class SQLhelper {
 	// "ID, name, size, path, creation_time, expiration_time, origin_ID, score");
 
 	public SQLhelper(TagExplorerProcessing2 p5) {
-		
+
 		user = "root";
 		pass = "root";
 		database = "files2_db";
 		host = "localhost:8889";
-		
-		
+
 		this.p5 = p5;
 		msql = new MySQL(p5, host, database, user, pass);
 		msql.connect();
@@ -252,28 +251,28 @@ public class SQLhelper {
 		ArrayList<Tag> tagList = new ArrayList<Tag>();
 
 		if (checkConnection()) {
-			
+
 			ArrayList<String> types = new ArrayList<String>();
 			ArrayList<Integer> tagIds = new ArrayList<Integer>();
-			
+
 			// File
 			if (tag instanceof Tag_File) {
 				Tag_File file = (Tag_File) tag;
 				msql.query("SELECT type, tag_ID FROM tag_binding WHERE file_ID = " + file.id);
-			} 
+			}
 			// App
-			else if(tag instanceof Tag_App){
+			else if (tag instanceof Tag_App) {
 				Tag_App app = (Tag_App) tag;
 				msql.query("SELECT type, tag_ID FROM app_binding WHERE app_ID = " + app.id);
-			} else{
+			} else {
 				System.out.println("SQL.getBindedTagList() - ERROR Tag ist weder Tag_File noch Tag_App: " + tag.name);
 			}
-			
+
 			while (msql.next()) {
 				types.add(msql.getString("type"));
 				tagIds.add(msql.getInt("tag_ID"));
 			}
-			
+
 			for (int i = 0; i < types.size(); i++) {
 				msql.query("SELECT * FROM " + types.get(i) + " WHERE ID = " + tagIds.get(i));
 				while (msql.next()) {
@@ -356,6 +355,13 @@ public class SQLhelper {
 			System.out.println("Location " + locationName + " registered");
 			return getLastCreatedTag(tableName);
 		}
+		// users
+		else if (tableName.equals("users")) {
+			String userName = s;
+			msql.execute("INSERT INTO " + tableName + " (name) VALUES (\"" + userName + "\")");
+			System.out.println("User " + userName + " registered");
+			return getLastCreatedTag(tableName);
+		}
 		// files
 		else if (tableName.equals("files")) {
 			Path file = FileSystems.getDefault().getPath(s);
@@ -397,7 +403,7 @@ public class SQLhelper {
 				System.out.println("File not saved");
 			}
 		} else {
-			System.out.println(tableName + "wrong or not yet in SQL.createDBTag");
+			System.out.println("SQL.createDBTag(): " + tableName + " wrong tableName or not yet in SQL.createDBTag");
 		}
 		return null;
 	}
@@ -418,22 +424,22 @@ public class SQLhelper {
 		if (msql2.connect()) {
 			msql2.query("SELECT MAX(ID) FROM files");
 			msql2.next();
-			
+
 			// richtige last Access Time
-			//long attributeLastAccessTime = attr.lastAccessTime().toMillis();
-			
+			// long attributeLastAccessTime = attr.lastAccessTime().toMillis();
+
 			// fake last Access Time
-			long attributeLastAccessTime = attr.creationTime().toMillis() + (long)p5.random(24*60*60*1000, 14*24*60*60*1000);
-			if(attributeLastAccessTime > attr.lastAccessTime().toMillis()){
+			long attributeLastAccessTime = attr.creationTime().toMillis()
+					+ (long) p5.random(24 * 60 * 60 * 1000, 14 * 24 * 60 * 60 * 1000);
+			if (attributeLastAccessTime > attr.lastAccessTime().toMillis()) {
 				attributeLastAccessTime = attr.lastAccessTime().toMillis();
 			}
-			
+
 			int fileId = msql2.getInt(1);
 			System.out.println("fileId: " + fileId);
 			if (p5.user != null) {
 				msql2.execute("INSERT INTO accesses (fileID, date, comment, userID) VALUES (" + fileId + ", \""
-						+ new Timestamp(attributeLastAccessTime) + "\", \"" + "comment" + "\", \""
-						+ p5.user.id + "\")");
+						+ new Timestamp(attributeLastAccessTime) + "\", \"" + "comment" + "\", \"" + p5.user.id + "\")");
 			} else {
 				msql2.execute("INSERT INTO accesses (fileID, date, comment) VALUES (" + fileId + ", \""
 						+ new Timestamp(attributeLastAccessTime) + "\", \"" + "comment" + "\")");
@@ -441,33 +447,39 @@ public class SQLhelper {
 		}
 	}
 
-//	public void setLastAccessTime(Tag_File file) {
-//		if (msql2.connect()) {
-//
-//			Path filePath = FileSystems.getDefault().getPath(file.path);
-//			BasicFileAttributes attr;
-//			try {
-//				attr = Files.readAttributes(filePath, BasicFileAttributes.class);
-//
-//				// wenn lastAccessTime der Datei neuer ist als newest Timestamp
-//				// des Tag_Files
-//				if (new Timestamp(attr.lastAccessTime().toMillis()).after(p5.getNewestDate(file))) {
-//
-//					if (p5.user != null) {
-//						msql2.execute("INSERT INTO accesses (fileID, date, comment, userID) VALUES (" + file.id
-//								+ ", \"" + new Timestamp(attr.lastAccessTime().toMillis()) + "\", \"" + "comment"
-//								+ "\", \"" + p5.user.id + "\")");
-//					} else {
-//						msql2.execute("INSERT INTO accesses (fileID, date, comment) VALUES (" + file.id + ", \""
-//								+ new Timestamp(attr.lastAccessTime().toMillis()) + "\", \"" + "comment" + "\")");
-//					}
-//				}
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//				System.out.println("couldn't reach file to update access time");
-//			}
-//		}
-//	}
+	// public void setLastAccessTime(Tag_File file) {
+	// if (msql2.connect()) {
+	//
+	// Path filePath = FileSystems.getDefault().getPath(file.path);
+	// BasicFileAttributes attr;
+	// try {
+	// attr = Files.readAttributes(filePath, BasicFileAttributes.class);
+	//
+	// // wenn lastAccessTime der Datei neuer ist als newest Timestamp
+	// // des Tag_Files
+	// if (new
+	// Timestamp(attr.lastAccessTime().toMillis()).after(p5.getNewestDate(file)))
+	// {
+	//
+	// if (p5.user != null) {
+	// msql2.execute("INSERT INTO accesses (fileID, date, comment, userID) VALUES ("
+	// + file.id
+	// + ", \"" + new Timestamp(attr.lastAccessTime().toMillis()) + "\", \"" +
+	// "comment"
+	// + "\", \"" + p5.user.id + "\")");
+	// } else {
+	// msql2.execute("INSERT INTO accesses (fileID, date, comment) VALUES (" +
+	// file.id + ", \""
+	// + new Timestamp(attr.lastAccessTime().toMillis()) + "\", \"" + "comment"
+	// + "\")");
+	// }
+	// }
+	// } catch (IOException e) {
+	// e.printStackTrace();
+	// System.out.println("couldn't reach file to update access time");
+	// }
+	// }
+	// }
 
 	public void setAccessTimeNow(Tag_File file) {
 		if (msql2.connect()) {
@@ -672,8 +684,9 @@ public class SQLhelper {
 			// System.out.println("number of rows: " + msql.getInt(1));
 
 			if (msql.getInt(1) == 0) {
-				System.out.println("INSERT INTO tag_binding (file_ID, type, tag_ID, time) VALUES (\"" + file.id + "\", \""
-						+ tag.type + "\", \"" + tag.id + "\", \"" + new Timestamp(System.currentTimeMillis()) + "\")");
+				System.out.println("INSERT INTO tag_binding (file_ID, type, tag_ID, time) VALUES (\"" + file.id
+						+ "\", \"" + tag.type + "\", \"" + tag.id + "\", \""
+						+ new Timestamp(System.currentTimeMillis()) + "\")");
 				msql.execute("INSERT INTO tag_binding (file_ID, type, tag_ID, time) VALUES (\"" + file.id + "\", \""
 						+ tag.type + "\", \"" + tag.id + "\", \"" + new Timestamp(System.currentTimeMillis()) + "\")");
 				System.out.println("SQLhelper.bindTag(): Added Tag Binding");
@@ -856,7 +869,8 @@ public class SQLhelper {
 			Tag tag = new Tag(tableName, msql.getInt("ID"), msql.getString("name"));
 			t = tag;
 		} else if (tableName.equals("applications")) {
-			Tag tag = new Tag_App(tableName, msql.getInt("ID"), msql.getString("name"), msql.getString("image"), msql.getInt("count"));
+			Tag tag = new Tag_App(tableName, msql.getInt("ID"), msql.getString("name"), msql.getString("image"),
+					msql.getInt("count"));
 			t = tag;
 		} else {
 			System.out.println(tableName + " not yet Listed in queryTagList");
