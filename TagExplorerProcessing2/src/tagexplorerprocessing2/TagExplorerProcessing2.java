@@ -207,6 +207,8 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	public void setup() {
 		size(1920, 1024, P3D);
+		
+		//size(1024, 768, P3D);
 		// frame.setLocation(1970, 50);
 		smooth(4);
 
@@ -429,11 +431,12 @@ public class TagExplorerProcessing2 extends PApplet {
 		
 //		lights();
 		
-		imageMode(CORNER);
-		image(backgroundTransition, 0,0);
-//		PShape back = createShape(PConstants.RECT, 0, 0, width, height);
-//		back.texture(backgroundTransition);
-//		shape(back);
+//		imageMode(CORNER);
+//		image(backgroundTransition, 0,0);
+		PShape back = createShape(PConstants.RECT, 0, 0, width, height);
+		back.fill(255);
+		back.texture(backgroundTransition);
+		shape(back);
 		
 		
 		

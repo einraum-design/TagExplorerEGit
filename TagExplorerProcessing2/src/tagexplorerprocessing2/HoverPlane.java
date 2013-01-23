@@ -315,12 +315,11 @@ public class HoverPlane extends Plane {
 	// return infoBox;
 	// }
 
+	float yOffset = 28;
+	float xOffset = 28;
 	private PShape createInfoBox(int h) {
 
 		PShape shape = p5.createShape(PConstants.GROUP);
-
-		float yOffset = 28;
-		float xOffset = 28;
 		// float rad = 5.0f;
 		// float kappa = (4.0f * (PApplet.sqrt(2.0f) - 1.0f) / 3.0f);
 		PShape infoBox = p5.createShape();
@@ -450,9 +449,30 @@ public class HoverPlane extends Plane {
 		// weiter Button Typen
 	}
 
+	// unterer Bereich dabei
+//	public boolean mouseOver() {
+//		boolean over = false;
+//		if (p5.mouseX >= x - w / 2 && p5.mouseX < x + w / 2 && p5.mouseY < y + 10 && p5.mouseY > y - h) {
+//			over = true;
+//		} else if (dropDownHeight > 0
+//				&& cp5.get(Textfield.class, inputFieldName).isFocus()
+//				&& p5.mouseX >= cp5.get(Textfield.class, inputFieldName).getPosition().x - 10
+//				&& p5.mouseX < cp5.get(Textfield.class, inputFieldName).getPosition().x
+//						+ cp5.get(Textfield.class, inputFieldName).getWidth() + 10
+//				&& p5.mouseY > cp5.get(Textfield.class, inputFieldName).getPosition().y - 10
+//				&& p5.mouseY < cp5.get(Textfield.class, inputFieldName).getPosition().y + dropDownHeight + 10) {
+//
+//			over = true;
+//		}
+//
+//		return over;
+//	}
+	
+	// ohne unteren Bereich
 	public boolean mouseOver() {
 		boolean over = false;
-		if (p5.mouseX >= x - w / 2 && p5.mouseX < x + w / 2 && p5.mouseY < y + 10 && p5.mouseY > y - h) {
+		if (p5.mouseX >= x - w / 2 && p5.mouseX < x + w / 2 && p5.mouseY < y + 10 - yOffset && p5.mouseY > y - h || 
+				p5.mouseX >= x - xOffset && p5.mouseX <= x + xOffset && p5.mouseY < y + 10 && p5.mouseY > y - yOffset - 10) {
 			over = true;
 		} else if (dropDownHeight > 0
 				&& cp5.get(Textfield.class, inputFieldName).isFocus()
