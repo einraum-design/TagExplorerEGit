@@ -76,6 +76,8 @@ public class TagExplorerProcessing2 extends PApplet {
 	boolean showVersions = false;
 	boolean drawAccessShapes = false;
 
+	boolean drawTags = false;
+
 	boolean draw2DShape = false;
 
 	boolean showTimeline = false;
@@ -293,6 +295,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		testButton.add(new Button_LabelToggle(this, "enableTagBinding", false, 10, 20, width - 120, 300));
 		testButton.add(new Button_LabelToggle(this, "enableFileBinding", false, 10, 20, width - 120, 330));
 		testButton.add(new Button_LabelToggle(this, "setMinTime", false, 10, 20, width - 120, 370));
+		testButton.add(new Button_LabelToggle(this, "drawTags", false, 10, 20, width - 120, 400));
 
 		// FrameRate
 		cp5_Menu.addFrameRate().setInterval(10).setPosition(width - 100, 10).setColor(color(50)); // .setFont(font)
@@ -473,15 +476,13 @@ public class TagExplorerProcessing2 extends PApplet {
 			removeController = !removeController;
 		}
 
-
-
 		// remove UserChooser wenn user gewŠhlt
 		if (userChooser != null && userChooser.ok) {
 			println("remove UserChooser + TextInputFild");
 			cp5_Menu.get(Textfield.class, userChooser.inputFieldName).remove();
 			userChooser = null;
 		}
-		
+
 		// ŸberprŸfe ob mainUser in filterList
 		if (mainUser != null) {
 			boolean userInFilterList = false;
@@ -495,8 +496,6 @@ public class TagExplorerProcessing2 extends PApplet {
 			}
 		}
 
-		
-		
 		// draw mainscene
 
 		if (mainUser != null) {
@@ -603,6 +602,10 @@ public class TagExplorerProcessing2 extends PApplet {
 					b.toggle();
 					setMinTime(b.onOff);
 					break;
+				case "drawTags":
+					b.toggle();
+					drawTags(b.onOff);
+					break;
 				}
 
 				lastClick = new Timestamp(System.currentTimeMillis());
@@ -682,7 +685,13 @@ public class TagExplorerProcessing2 extends PApplet {
 		// renderer.endShape(CLOSE);
 
 		drawFiles(renderer);
-		drawTags(renderer);
+
+		// tags werden immer erzeugt aber neu bei drawTags = true gezeichnet
+		if (drawTags) {
+			drawTags(renderer);
+		}
+
+		// springs werden mit enableTagBinding .... erst erzeugt
 		// drawSprings(renderer);
 		drawSpringsLINES(renderer);
 
@@ -757,7 +766,8 @@ public class TagExplorerProcessing2 extends PApplet {
 				}
 
 				// erstelle Hoverplane
-				if (mouseOver(renderer, file, 30, 30)) {
+				if (!cp5_Menu.get(Textfield.class, menuPlane.inputFieldName).isFocus()
+						&& mouseOver(renderer, file, 30, 30)) {
 					if (hoverPlane == null) {
 						hoverPlane = new HoverPlane(this, file, (int) mainscreen.screenX(file.x, file.y, file.z),
 								(int) mainscreen.screenY(file.x, file.y, file.z));
@@ -783,7 +793,7 @@ public class TagExplorerProcessing2 extends PApplet {
 			}
 			renderer.point(tag.x, tag.y, tag.z);
 
-			if (mouseOver(renderer, tag, 30, 30)) {
+			if (!cp5_Menu.get(Textfield.class, menuPlane.inputFieldName).isFocus() && mouseOver(renderer, tag, 30, 30)) {
 				if (hoverPlane == null) {
 					// tag.lock();
 					hoverPlane = new HoverPlane(this, tag, (int) mainscreen.screenX(tag.x, tag.y, tag.z),
@@ -1303,7 +1313,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		physics.particles.clear();
 
-		int count = attributes.size();
+		int count = this.availableTags.size();
 		float dist;
 		if (count > 1) {
 			dist = ((float) height) / (count - 1);
@@ -1312,9 +1322,27 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 
 		// dropParticles
-		for (int i = 0; i < attributes.size(); i++) {
-			dropParticle(physics, i * dist - (dist * (count - 1) / 2), 0, 20, attributes.get(i), true);
+		for (int i = 0; i < this.availableTags.size(); i++) {
+			dropParticle(physics, i * dist - (dist * (count - 1) / 2), -mainscreen.height / 4, 20,
+					this.availableTags.get(i), true);
 		}
+
+		// draw alle Tags
+		// physics.particles.clear();
+		//
+		// int count = attributes.size();
+		// float dist;
+		// if (count > 1) {
+		// dist = ((float) height) / (count - 1);
+		// } else {
+		// dist = 0;
+		// }
+		//
+		// // dropParticles
+		// for (int i = 0; i < attributes.size(); i++) {
+		// dropParticle(physics, i * dist - (dist * (count - 1) / 2), 0, 20,
+		// attributes.get(i), true);
+		// }
 	}
 
 	public void updateSprings() {
@@ -2236,14 +2264,11 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	public void mouseDragged() {
 
-		// if(mouseY > lastMouseY){
-		println("mouseDragged: " + (lastMouseY - mouseY));
-
-		cam_eyetargetpos.z += (lastMouseY - mouseY) / 2;
-		// }
-
-		lastMouseY = mouseY;
-
+		// nur wenn zeitachse aktiviert ist
+		if (setZTimeAxis) {
+			cam_eyetargetpos.z += (lastMouseY - mouseY) / 2;
+			lastMouseY = mouseY;
+		}
 	}
 
 	public void mousePressed() {
@@ -2729,7 +2754,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		texture_VIDEO = loadImage("../data/texture_VIDEO.png");
 		texture_connection = loadImage("../data/texture_connection.png");
 		mapImg = loadImage("../data/map.png");
-		userImg  = loadImage("../data/userProfil.png");
+		userImg = loadImage("../data/userProfil.png");
 		controlImg = loadImage("../data/control.png");
 
 		appsButton = loadImage(VersionBuilder.versionsVerzeichnis + "applications/apps.png");
@@ -2826,6 +2851,11 @@ public class TagExplorerProcessing2 extends PApplet {
 			println("setZTimeAxis: " + setZTimeAxis + " setZNewestTime()!!!");
 			setZNewestTime();
 		} else {
+
+			// camera auf nullpunkt
+			println("reset Cameraposition");
+			cam_eyetargetpos = cam_eye2Dpos;
+
 			// drawAccessShape nur im ZTime Modus!
 			if (drawAccessShapes) {
 				draw2DShape(true);
@@ -2890,6 +2920,14 @@ public class TagExplorerProcessing2 extends PApplet {
 			minTime = null;
 		}
 		updateShowFiles();
+	}
+
+	public void drawTags(boolean onOff) {
+		drawTags = onOff;
+
+		if (onOff) {
+			updateTags();
+		}
 	}
 
 	public void setButtonState(String buttonName, boolean onOff) {
