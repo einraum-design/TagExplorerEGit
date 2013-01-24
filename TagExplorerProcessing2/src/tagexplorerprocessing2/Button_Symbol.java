@@ -9,9 +9,9 @@ public class Button_Symbol extends Button {
 	PImage img;
 	PImage img_h;
 
-	public Button_Symbol(TagExplorerProcessing2 p5, int w, int h) {
-		super(p5, w, h);	
-	}
+//	public Button_Symbol(TagExplorerProcessing2 p5, int w, int h) {
+//		super(p5, w, h);	
+//	}
 	
 	public Button_Symbol(TagExplorerProcessing2 p5, String imgName, int x, int y) {
 		super(p5,10, 10, x, y);
@@ -29,6 +29,12 @@ public class Button_Symbol extends Button {
 			w = img.width;
 			h = img.height;
 			break;
+		case "user":
+			img = p5.newUser;
+			img_h = p5.newUser;
+			w = img.width;
+			h = img.height;
+			break;
 		default:
 			img = p5.close;
 			img_h = p5.close_h;
@@ -36,7 +42,7 @@ public class Button_Symbol extends Button {
 			h = img.height;
 		}
 		
-		this.img = img;		
+		//this.img = img;		
 	}
 	
 	public void render(){

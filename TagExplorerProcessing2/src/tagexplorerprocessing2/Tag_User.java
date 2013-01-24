@@ -1,7 +1,10 @@
 package tagexplorerprocessing2;
 
+import processing.core.PImage;
+
 public class Tag_User extends Tag {
-String password = "pwd";
+	String password = "pwd";
+	PImage img = null;
 	
 //	public Tag_User(String tableName, int id, String name){
 //		super(tableName, id, name);

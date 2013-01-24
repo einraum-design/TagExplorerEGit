@@ -823,7 +823,7 @@ public class SQLhelper {
 						img = p5.loadImage(VersionBuilder.versionsVerzeichnis + "prev" + String.format("%06d", id)
 								+ blancName + ".png");
 					} catch (Exception e) {
-						img = p5.loadImage("versionsVerzeichnis/prev.png");
+						img = p5.loadImage(VersionBuilder.versionsVerzeichnis + "/prev.png");
 					}
 
 					tag = new Tag_File_Image(tableName, id, name, msql.getFloat("size"), msql.getString("path"),
@@ -864,6 +864,10 @@ public class SQLhelper {
 			t = tag;
 		} else if (tableName.equals("users")) {
 			Tag_User tag = new Tag_User("users", msql.getInt("ID"), msql.getString("name"), msql.getString("password"));
+			String imgUrl = msql.getString("image");		
+			if(msql.getString("image") != null){
+				tag.img = p5.loadImage(VersionBuilder.versionsVerzeichnis + "users/" + imgUrl);
+			}
 			t = tag;
 		} else if (tableName.equals("projects") || tableName.equals("keywords")) {
 			Tag tag = new Tag(tableName, msql.getInt("ID"), msql.getString("name"));

@@ -83,9 +83,9 @@ public class Plane extends Vec2D {
 		}
 
 		// maximal Anzahl
-		while (sortedTags.size() > 6) {
-			sortedTags.remove(sortedTags.size() - 1);
-		}
+//		while (sortedTags.size() > 6) {
+//			sortedTags.remove(sortedTags.size() - 1);
+//		}
 		// System.out.println("sortedTags.size()" + sortedTags.size());
 
 		return sortedTags;

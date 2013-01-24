@@ -76,6 +76,78 @@ public class Filter {
 		return w;
 	}
 	
+	public int renderUser(TagExplorerProcessing2 p5, int x, int y) {
+
+//		int w = (int) p5.textWidth(tag.name) + 2*h;
+		
+//		p5.fill(p5.cButtonBright);
+//		p5.stroke(p5.cBorder);
+//		p5.rect(x, y, w, h);
+
+		p5.imageMode(PConstants.CORNER);
+		
+		PImage profil;
+		
+		if(((Tag_User)tag).img != null){
+			profil = ((Tag_User)tag).img;
+		} else {
+			profil = p5.userImg;
+		}
+		
+		p5.image(profil, x, y);
+		
+		Button_Symbol b = new Button_Symbol(p5, "close", x + profil.width - 9, y + 9);
+		b.render();
+
+		// remove From FilterList
+		if (p5.mouseActive && b.mouseOver() && p5.mousePressed) {
+			removeFromFilterList(p5);
+		}
+
+		return profil.width;
+	}
+	
+	public int renderSmall(TagExplorerProcessing2 p5, int x, int y) {
+
+		int h = 19;
+		int w = (int) p5.textWidth(tag.name) + 2*h;
+		
+		p5.fill(p5.cButtonBright);
+		p5.stroke(p5.cBorder);
+		p5.rect(x, y, w, h);
+		
+		p5.imageMode(PConstants.CENTER);
+		// img Type icon
+		switch (tag.type) {
+		case "keywords":
+			p5.image(p5.tagMinKeyword, x+h/2, y + h/2);
+			break;
+		case "locations":
+			p5.image(p5.tagMinLocation, x+h/2, y + h/2);
+			break;
+		case "projects":
+			p5.image(p5.tagMinProject, x+h/2, y + h/2);
+			break;
+		case "users":
+			p5.image(p5.tagMinUser, x+h/2, y + h/2);
+			break;
+		case "events":
+			p5.image(p5.tagMinEvent, x+h/2, y + h/2);
+			break;
+		default:
+			p5.image(p5.tagMinKeyword, x+h/2, y + h/2);
+		}
+	
+		p5.fill(p5.cFont);
+		p5.textAlign(PConstants.LEFT, PConstants.CENTER);
+		p5.text(tag.name, x + h, y + h / 2);
+		
+		Button_Symbol b = new Button_Symbol(p5, "close", x + w - h/2, y + h / 2);
+		b.render();
+
+		return w;
+	}
+	
 	void removeFromFilterList(TagExplorerProcessing2 p5){
 
 			ArrayList<Filter> myFilters = (ArrayList<Filter>) p5.filterList.clone();

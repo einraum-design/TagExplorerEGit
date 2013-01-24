@@ -47,6 +47,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	// Tag_User user = new Tag_User("users", 0, "noname", "no Password");
 	Tag_User mainUser = null;
+	int aktuellerUserId = 0;
 	Tag_Location location = null;
 
 	SQLhelper SQL;
@@ -59,6 +60,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	ArrayList<Tag> files = null;
 	ArrayList<Tag> showFiles = null;
 	ArrayList<Tag> availableTags = new ArrayList<Tag>();
+	ArrayList<Tag> availableUsers = new ArrayList<Tag>();
 
 	ArrayList<Tag> applications = new ArrayList<Tag>();
 	ArrayList<Tag> showApplications = new ArrayList<Tag>();
@@ -138,6 +140,8 @@ public class TagExplorerProcessing2 extends PApplet {
 	String[] messageExtension = { "msg", "eml" };
 
 	HoverPlane hoverPlane = null;
+	UserChooserPlane userChooser = null;
+
 	MenuPlane menuPlane;
 
 	PShader transition;
@@ -151,7 +155,11 @@ public class TagExplorerProcessing2 extends PApplet {
 	PImage open;
 	PImage texture_VIDEO;
 	PImage texture_connection;
-	
+
+	PImage mapImg;
+	PImage userImg;
+	PImage controlImg;
+
 	PImage backgroundTransition;
 
 	PImage appsButton;
@@ -207,8 +215,8 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	public void setup() {
 		size(1920, 1024, P3D);
-		
-		//size(1024, 768, P3D);
+
+		// size(1024, 768, P3D);
 		// frame.setLocation(1970, 50);
 		smooth(4);
 
@@ -232,13 +240,11 @@ public class TagExplorerProcessing2 extends PApplet {
 		cButtonBright = color(241);
 		cDropdownHover = color(230);
 
-		
-		//Date Formatter
+		// Date Formatter
 		sdf = new SimpleDateFormat();
 		sdf.setTimeZone(new SimpleTimeZone(1, "GMT"));
-//		sdf.applyPattern("dd MMM yyyy HH:mm:ss");
-		
-		
+		// sdf.applyPattern("dd MMM yyyy HH:mm:ss");
+
 		// Fill the tables for arcs
 		sinLUT = new float[SINCOS_LENGTH];
 		cosLUT = new float[SINCOS_LENGTH];
@@ -372,6 +378,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		comp_appcount = new App_Comparator_Count();
 
 		// Standartuser: …ffentlich
+		// aktuellerUserId = 2;
 		// mainUser = (Tag_User) SQL.queryTagList("users").get(0);
 
 		// cp5_Menu.addToggle("Location").setValue(0)
@@ -428,18 +435,16 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 
 		background(255);
-		
-//		lights();
-		
-//		imageMode(CORNER);
-//		image(backgroundTransition, 0,0);
+
+		// lights();
+
+		// imageMode(CORNER);
+		// image(backgroundTransition, 0,0);
 		PShape back = createShape(PConstants.RECT, 0, 0, width, height);
 		back.fill(255);
 		back.texture(backgroundTransition);
 		shape(back);
-		
-		
-		
+
 		// set Mouse active nach jeweils 600 millis;
 		if (System.currentTimeMillis() > lastClick.getTime() + 1200) {
 			mouseActive = true;
@@ -468,22 +473,48 @@ public class TagExplorerProcessing2 extends PApplet {
 			removeController = !removeController;
 		}
 
-		// draw mainscene
 
-		if (minTime == null) {
-			drawMainscreen(mainscreen);
-		} else {
-			// drawMainscreen(mainscreen); // alte mit blur
-			// drawMainscreen(mainscreen); // aktuelle
+
+		// remove UserChooser wenn user gewŠhlt
+		if (userChooser != null && userChooser.ok) {
+			println("remove UserChooser + TextInputFild");
+			cp5_Menu.get(Textfield.class, userChooser.inputFieldName).remove();
+			userChooser = null;
 		}
 		
-		
-//		image(backgroundTransition, 0, 0);
+		// ŸberprŸfe ob mainUser in filterList
+		if (mainUser != null) {
+			boolean userInFilterList = false;
+			for (Filter f : filterList) {
+				if (f.tag instanceof Tag_User && f.tag.id == mainUser.id) {
+					userInFilterList = true;
+				}
+			}
+			if (!userInFilterList) {
+				mainUser = null;
+			}
+		}
 
+		
+		
+		// draw mainscene
+
+		if (mainUser != null) {
+
+			// if (minTime == null) {
+
+			drawMainscreen(mainscreen);
+
+			// } else {
+			// // drawMainscreen(mainscreen); // alte mit blur
+			// // drawMainscreen(mainscreen); // aktuelle
+			// }
+		} else {
+			// erstelle und draw userChooser
+			drawUserChooser();
+		}
 
 		// drawApplications
-		// drawApplications();
-
 		for (Button_App b : appButtons) {
 			b.render();
 		}
@@ -593,6 +624,14 @@ public class TagExplorerProcessing2 extends PApplet {
 		pg.endDraw();
 	}
 
+	public void drawUserChooser() {
+		if (userChooser == null) {
+			filterList.clear();
+			userChooser = new UserChooserPlane(this, width / 2, height / 5);
+		}
+		userChooser.render();
+	}
+
 	private void drawMainscreen(PGraphics renderer) {
 		// renderer begin:
 		renderer.beginDraw();
@@ -601,16 +640,16 @@ public class TagExplorerProcessing2 extends PApplet {
 		renderer.background(255, 0);
 
 		// pulse shader
-//		renderer.hint(DISABLE_DEPTH_MASK);
-//		renderer.fill(255);
-//		renderer.shader(transition);
-//
-//		renderer.rectMode(CENTER);
-//		renderer.rect(renderer.width / 2, renderer.height / 2, renderer.width * 20, renderer.height * 20);
-//		renderer.resetShader();
-//		renderer.hint(ENABLE_DEPTH_MASK);
+		// renderer.hint(DISABLE_DEPTH_MASK);
+		// renderer.fill(255);
+		// renderer.shader(transition);
+		//
+		// renderer.rectMode(CENTER);
+		// renderer.rect(renderer.width / 2, renderer.height / 2, renderer.width
+		// * 20, renderer.height * 20);
+		// renderer.resetShader();
+		// renderer.hint(ENABLE_DEPTH_MASK);
 
-		
 		// renderer.directionalLight(0, 255, 0, 0, -1, 0);
 
 		// renderer.rotateY(mainScreenYRotation);
@@ -996,6 +1035,9 @@ public class TagExplorerProcessing2 extends PApplet {
 		tags.addAll(SQL.queryTagList("locations"));
 		tags.addAll(SQL.queryTagList("projects"));
 		tags.addAll(SQL.queryTagList("users"));
+
+		availableUsers.clear();
+		availableUsers.addAll(SQL.queryTagList("users"));
 
 		// tags.addAll(SQL.queryTagList("files"));
 		// tags nicht Ÿberscheiben, sondern nur abgleichen!
@@ -2189,23 +2231,21 @@ public class TagExplorerProcessing2 extends PApplet {
 	}
 
 	// ///////// INPUT ///////////////////
-	
+
 	int lastMouseY;
-	public void mouseDragged(){
-		
-//		if(mouseY > lastMouseY){
-			println("mouseDragged: " + (lastMouseY-mouseY));
-			
-			cam_eyetargetpos.z += (lastMouseY-mouseY)/2;
-//		}
-		
+
+	public void mouseDragged() {
+
+		// if(mouseY > lastMouseY){
+		println("mouseDragged: " + (lastMouseY - mouseY));
+
+		cam_eyetargetpos.z += (lastMouseY - mouseY) / 2;
+		// }
+
 		lastMouseY = mouseY;
-		
-		
-		
+
 	}
-	
-	
+
 	public void mousePressed() {
 		// mouseDragged
 		lastMouseY = mouseY;
@@ -2688,9 +2728,13 @@ public class TagExplorerProcessing2 extends PApplet {
 		open = loadImage("../data/open.png");
 		texture_VIDEO = loadImage("../data/texture_VIDEO.png");
 		texture_connection = loadImage("../data/texture_connection.png");
+		mapImg = loadImage("../data/map.png");
+		userImg  = loadImage("../data/userProfil.png");
+		controlImg = loadImage("../data/control.png");
+
 		appsButton = loadImage(VersionBuilder.versionsVerzeichnis + "applications/apps.png");
 		backgroundApp = loadImage("../data/backgroundApp.png");
-		
+
 		backgroundTransition = loadImage("../data/background.png");
 
 		// Label miniaturen Dropdown Menu & Filter
