@@ -11,11 +11,11 @@ import processing.core.PShape;
 public class Tag_File extends Tag {
 
 	static public enum FileType {
-		IMAGE, MESSAGE, TEXT, WEB, FONT, VIDEO, AUDIO, LAYOUT, VECTOR, CODE //CODE ist neu
+		DEFAULT, IMAGE, MESSAGE, TEXT, WEB, FONT, VIDEO, AUDIO, LAYOUT, VECTOR, CODE //CODE ist neu
 	}
 
 	// files
-	FileType fileType = null;
+	FileType fileType = FileType.DEFAULT;
 	float size;
 	String path;
 	Timestamp creation_time;

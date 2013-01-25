@@ -142,7 +142,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	UserChooserPlane userChooser = null;
 
 	MenuPlane menuPlane;
-	
+
 	NewsFeed newsFeed;
 
 	PShader transition;
@@ -154,13 +154,24 @@ public class TagExplorerProcessing2 extends PApplet {
 	PImage close;
 	PImage close_h;
 	PImage open;
-	PImage texture_VIDEO;
+
 	PImage texture_connection;
+
+	PImage texture_IMAGE;
+	PImage texture_MESSAGE;
+	PImage texture_TEXT;
+	PImage texture_WEB;
+	PImage texture_FONT;
+	PImage texture_VIDEO;
+	PImage texture_AUDIO;
+	PImage texture_LAYOUT;
+	PImage texture_VECTOR;
+	PImage texture_CODE;
 
 	PImage mapImg;
 	PImage userImg;
 	PImage controlImg;
-	
+
 	PImage newsButton;
 	PImage newsButton_h;
 
@@ -209,20 +220,20 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	// PImage
 
-//	public void init() {
-//		frame.removeNotify();
-//		frame.setUndecorated(true);
-////		frame.setAlwaysOnTop(true);
-//		frame.addNotify();
-//		super.init();
-//	}
+	// public void init() {
+	// frame.removeNotify();
+	// frame.setUndecorated(true);
+	// // frame.setAlwaysOnTop(true);
+	// frame.addNotify();
+	// super.init();
+	// }
 
 	public void setup() {
 		size(1920, 1080, P3D);
 
 		// size(1024, 768, P3D);
-//		 frame.setLocation(1970, 50);
-//		frame.setLocation(0,0);
+		// frame.setLocation(1970, 50);
+		// frame.setLocation(0,0);
 		smooth(4);
 
 		// addMouseWheelListener(new MouseWheelListener() {
@@ -304,8 +315,8 @@ public class TagExplorerProcessing2 extends PApplet {
 		cp5_Menu.addFrameRate().setInterval(10).setPosition(width - 100, 10).setColor(color(50)); // .setFont(font)
 
 		menuPlane = new MenuPlane(this);
-		
-		newsFeed = new NewsFeed(this, 80, height/5);
+
+		newsFeed = new NewsFeed(this, 80, height / 5);
 
 		mainscreen = createGraphics(width, height - 40, P3D);
 		pg = createGraphics(100, 100, P2D);
@@ -350,11 +361,11 @@ public class TagExplorerProcessing2 extends PApplet {
 		plifShader = loadShader("../shader/plifFrag.glsl", "../shader/plifVert.glsl");
 		env_plif = loadImage("../data/env_plif.jpg");
 
-		//fileShape = createShape(SPHERE, 10);
+		// fileShape = createShape(SPHERE, 10);
 		fileShape = createShape(BOX, 20);
 		fileShape.noStroke();
 		fileShape.fill(cBorderHover);
-//		fileShape.emissive(0, 0, 50);
+		// fileShape.emissive(0, 0, 50);
 
 		// ball.shininess(0);
 
@@ -536,10 +547,9 @@ public class TagExplorerProcessing2 extends PApplet {
 		// MenuPlane
 		menuPlane.render();
 		menuPlane.update();
-		
-		
+
 		// NewsFeed
-		if(mainUser != null){
+		if (mainUser != null) {
 			newsFeed.render();
 		}
 
@@ -814,7 +824,8 @@ public class TagExplorerProcessing2 extends PApplet {
 			}
 			renderer.point(tag.x, tag.y, tag.z);
 
-			if (!mousePressed && !cp5_Menu.get(Textfield.class, menuPlane.inputFieldName).isFocus() && mouseOver(renderer, tag, 30, 30)) {
+			if (!mousePressed && !cp5_Menu.get(Textfield.class, menuPlane.inputFieldName).isFocus()
+					&& mouseOver(renderer, tag, 30, 30)) {
 				if (hoverPlane == null) {
 					// tag.lock();
 					hoverPlane = new HoverPlane(this, tag, (int) mainscreen.screenX(tag.x, tag.y, tag.z),
@@ -1922,22 +1933,56 @@ public class TagExplorerProcessing2 extends PApplet {
 	}
 
 	public PGraphics generateTexture(Tag_File file) {
-		int texW = 100;
-		int texH = 100;
+		int texW = 400;
+		int texH = 400;
 		PGraphics textu = createGraphics(texW, texH, P2D);
 		textu.beginDraw();
 
 		// background mach ränder von Textur!
 		textu.background(255, 0);
 		// textu.image(loadImage("../data/texture_VIDEO.png"), 0, 0);
-		textu.image(texture_VIDEO, 0, 0);
-		// textu.fill(255, 0, 0);
-		// textu.ellipse(0, 0, 50, 50);
+		
+		
+		switch (file.fileType) {
+		case IMAGE:
+			textu.image(texture_IMAGE, 0, 0);
+			break;
+		case MESSAGE:
+			textu.image(texture_MESSAGE, 0, 0);
+			break;
+		case TEXT:
+			textu.image(texture_TEXT, 0, 0);
+			break;
+		case WEB:
+			textu.image(texture_WEB, 0, 0);
+			break;
+		case FONT:
+			textu.image(texture_FONT, 0, 0);
+			break;
+		case VIDEO:
+			textu.image(texture_VIDEO, 0, 0);
+			break;
+		case AUDIO:
+			textu.image(texture_AUDIO, 0, 0);
+			break;
+		case LAYOUT:
+			textu.image(texture_LAYOUT, 0, 0);
+			break;
+		case VECTOR:
+			textu.image(texture_VECTOR, 0, 0);
+			break;
+		default:
+			textu.image(texture_TEXT, 0, 0);
+			break;
+		}
+		
+//		textu.image(texture_TEXT, 0, 0);
+//		textu.image(texture_VIDEO, 0, 0);
+
 
 		textu.fill(255, 0, 0);
 		textu.noStroke();
 		// textu.beginShape();
-		//
 		// textu.vertex(0, 0);
 		// textu.vertex(20, 0);
 		// textu.vertex(20, 20);
@@ -1953,29 +1998,7 @@ public class TagExplorerProcessing2 extends PApplet {
 			}
 		}
 
-		// switch(file.fileType){
-		// case IMAGE:
-		// break;
-		// case MESSAGE:
-		// break;
-		// case TEXT:
-		// break;
-		// case WEB:
-		// break;
-		// case FONT:
-		// break;
-		// case VIDEO:
-		// textu.texture(texture_VIDEO);
-		// break;
-		// case AUDIO:
-		// break;
-		// case LAYOUT:
-		// break;
-		// case VECTOR:
-		// break;
-		// default:
-		// break;
-		// }
+		
 		textu.endDraw();
 
 		return textu;
@@ -2784,12 +2807,23 @@ public class TagExplorerProcessing2 extends PApplet {
 		close = loadImage("../data/close.png");
 		close_h = loadImage("../data/close_h.png");
 		open = loadImage("../data/open.png");
-		texture_VIDEO = loadImage("../data/texture_VIDEO.png");
+
+		texture_IMAGE = loadImage("../data/bild.png");
+		texture_MESSAGE = loadImage("../data/nachricht.png");
+		texture_TEXT = loadImage("../data/dokument.png");
+		texture_WEB = loadImage("../data/web.png");
+		texture_FONT = loadImage("../data/font.png");
+		texture_VIDEO = loadImage("../data/video.png");
+		texture_AUDIO = loadImage("../data/musik.png");
+		texture_LAYOUT = loadImage("../data/layout.png");
+		texture_VECTOR = loadImage("../data/vektor.png");
+		texture_CODE = loadImage("../data/code.png");
+
 		texture_connection = loadImage("../data/texture_connection.png");
 		mapImg = loadImage("../data/map.png");
 		userImg = loadImage("../data/userProfil.png");
 		controlImg = loadImage("../data/control.png");
-		
+
 		newsButton = loadImage("../data/newsButton.png");
 		newsButton_h = loadImage("../data/newsButton_h.png");
 
