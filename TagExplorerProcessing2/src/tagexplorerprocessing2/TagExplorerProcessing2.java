@@ -17,7 +17,6 @@ import java.util.TreeSet;
 import controlP5.ControlP5;
 import controlP5.Controller;
 import controlP5.Textfield;
-import de.bezier.data.sql.MySQL;
 import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PFont;
@@ -35,7 +34,6 @@ import toxi.physics.VerletPhysics;
 
 public class TagExplorerProcessing2 extends PApplet {
 
-	// ff
 
 	WatchDir watcher;
 
@@ -516,6 +514,14 @@ public class TagExplorerProcessing2 extends PApplet {
 		// drawApplications
 		for (Button_App b : appButtons) {
 			b.render();
+			if (mouseActive && b.mouseOver() && mousePressed) {
+				if(b.app != null && b.app.url != null){
+					println("open: " + b.app.url);
+					open(b.app.url);
+				}
+				lastClick = new Timestamp(System.currentTimeMillis());
+				mouseActive = false;
+			}
 		}
 
 		// MenuPlane
@@ -1125,8 +1131,10 @@ public class TagExplorerProcessing2 extends PApplet {
 			// alternativ Java Abfrage:
 			showApplications = getUserLocationMatches(applications, appFilterList);
 		} else {
-			// alle files
-			showApplications = applications;
+			// alle apps
+			//showApplications = applications;
+			// keine apps
+			showApplications.clear();
 		}
 
 		// sort showApplications nach count
@@ -1156,7 +1164,7 @@ public class TagExplorerProcessing2 extends PApplet {
 			// System.out.println("w: " + app.name + " " + w);
 
 			if (w >= h) {
-				appButtons.add(new Button_App(this, app.name, app.img, w, h, xShift + seitenAbstand, height - h - 10));
+				appButtons.add(new Button_App(this, app, w, h, xShift + seitenAbstand, height - h - 10));
 				xShift += w;
 			} else {
 				wApps += w; // Button zu kleine, vergrš§ere Apps Button um Beite
@@ -1193,7 +1201,14 @@ public class TagExplorerProcessing2 extends PApplet {
 		ArrayList<Filter> userLocationFilters = new ArrayList<Filter>();
 
 		for (Filter f : filters) {
-			if (f.tag.type.equals("users") || f.tag.type.equals("locations")) {
+			//if (f.tag.type.equals("users") || f.tag.type.equals("locations")) {
+			
+			// nur mainUser als User Filter!
+			if(mainUser != null && f.tag.type.equals("Users") && f.tag.id == mainUser.id){
+				userLocationFilters.add(f);
+			}
+			
+			if (f.tag.type.equals("locations")) {
 				userLocationFilters.add(f);
 			}
 		}

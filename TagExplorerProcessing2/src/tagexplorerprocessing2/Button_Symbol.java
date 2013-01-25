@@ -52,8 +52,16 @@ public class Button_Symbol extends Button {
 		} else{
 			p5.image(img, x, y);
 		}
+	}
+	
+	public boolean mouseOver(){
+		boolean over = false;
 		
-		
-		
+		int zusatz = 3;
+		// referenz links oben
+		if(p5.mouseX >= x-w/2-zusatz && p5.mouseX < x+w/2+zusatz && p5.mouseY > y-h/2 -zusatz && p5.mouseY < y+h/2 +zusatz) {
+			over = true;
+		}	
+		return over;
 	}
 }

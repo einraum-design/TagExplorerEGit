@@ -135,7 +135,7 @@ public class UserChooserPlane extends Plane {
 		// System.out.println("createTextfield");
 
 		cp5.addTextfield(name).setValue(value).setPosition(x, y).setSize(w, h).setFont(p5.createFont("arial", 20))
-				.setFocus(false).setColorCursor(p5.cFont).setColorBackground(p5.color(255)).setColor(p5.cFont).setColor(p5.color(255,0,0))
+				.setFocus(false).setColorCursor(p5.cFont).setColorBackground(p5.color(255)).setColor(p5.cFont)
 				.setColorActive(p5.cBorderHover).getCaptionLabel().setVisible(false);
 		// cp5.get(Textfield.class, inputFieldName).getLabel().
 	}

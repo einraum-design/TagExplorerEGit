@@ -9,6 +9,7 @@ public class Tag_App extends Tag {
 	String imgName = null;
 	int count; // accesses
 	int matches = 0;
+	String url = null;
 	
 	
 	ArrayList<Tag> attributeBindings = new ArrayList<Tag>();
@@ -28,6 +29,10 @@ public class Tag_App extends Tag {
 	
 	public void setImage(PImage img){
 		this.img = img;
+	}
+	
+	public void setUrl(String url){
+		this.url = url;
 	}
 	
 	public void setAttributeBindings(ArrayList<Tag> attributes) {

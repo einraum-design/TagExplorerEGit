@@ -7,11 +7,30 @@ public class Button_App extends Button {
 
 	String label;
 	PImage img;
+	Tag_App app = null;
 	
 	boolean showImgLabel = false;
 	boolean showImg = false;
 	
 	int imgRand = 4;
+	
+	public Button_App(TagExplorerProcessing2 p5, Tag_App app, int w, int h, int x, int y) {
+		super(p5, w, h, x, y);
+		
+		this.app = app;
+		
+		this.label = app.name;
+		this.img = app.img;
+		
+		p5.textFont(p5.font, 18);
+		
+		if (this.w > (int) p5.textWidth(label) + h + imgRand * 2) {
+			showImgLabel = true;
+		}
+		else if (this.w >= h) {
+			showImg = true;
+		}
+	}
 	
 	public Button_App(TagExplorerProcessing2 p5, String label, PImage img, int w, int h, int x, int y) {
 		super(p5, w, h, x, y);
@@ -27,8 +46,6 @@ public class Button_App extends Button {
 		else if (this.w >= h) {
 			showImg = true;
 		}
-
-		
 	}
 	
 	public void render(){
