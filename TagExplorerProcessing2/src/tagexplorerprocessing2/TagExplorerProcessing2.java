@@ -157,6 +157,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	PImage texture_connection;
 
+	PImage texture_RECT;
 	PImage texture_IMAGE;
 	PImage texture_MESSAGE;
 	PImage texture_TEXT;
@@ -1942,7 +1943,10 @@ public class TagExplorerProcessing2 extends PApplet {
 		textu.background(255, 0);
 		// textu.image(loadImage("../data/texture_VIDEO.png"), 0, 0);
 		
+		// background
+		textu.image(texture_RECT, 0, 0);
 		
+		// Icon
 		switch (file.fileType) {
 		case IMAGE:
 			textu.image(texture_IMAGE, 0, 0);
@@ -2808,6 +2812,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		close_h = loadImage("../data/close_h.png");
 		open = loadImage("../data/open.png");
 
+		texture_RECT = loadImage("../data/fileRect.png");
 		texture_IMAGE = loadImage("../data/bild.png");
 		texture_MESSAGE = loadImage("../data/nachricht.png");
 		texture_TEXT = loadImage("../data/dokument.png");
