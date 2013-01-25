@@ -29,6 +29,9 @@ import tagexplorerprocessing2.Connection.ConnectionType;
 import toxi.geom.Vec3D;
 import toxi.physics.VerletParticle;
 import toxi.physics.VerletPhysics;
+import treemap.MapLayout;
+import treemap.SquarifiedLayout;
+import treemap.Treemap;
 
 // Anleitung jogl installation: http://www.3dcoding.de/2009/05/installation-von-eclipse-mit-jogl-unterstutzung/
 
@@ -37,6 +40,11 @@ public class TagExplorerProcessing2 extends PApplet {
 	WatchDir watcher;
 
 	PGraphics mainscreen;
+
+	Treemap map = null;
+	FileMap mapData = null;
+	MapLayout layoutAlgorithm = new SquarifiedLayout();
+
 	// PGraphics textu;
 	PGraphics pg;
 
@@ -76,6 +84,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	boolean drawTags = false;
 
 	boolean draw2DShape = false;
+	boolean drawTreemap = false;
 
 	boolean showTimeline = false;
 
@@ -302,10 +311,11 @@ public class TagExplorerProcessing2 extends PApplet {
 		testButton.add(new Button_LabelToggle(this, "showVersions", false, 10, 20, width - 120, 20));
 		testButton.add(new Button_LabelToggle(this, "drawAccessShapes", false, 10, 20, width - 120, 50));
 		testButton.add(new Button_LabelToggle(this, "draw2DShape", false, 10, 20, width - 120, 80));
-		testButton.add(new Button_LabelToggle(this, "setZTimeAxis", false, 10, 20, width - 120, 120));
-		testButton.add(new Button_LabelToggle(this, "position1D", false, 10, 20, width - 120, 160));
-		testButton.add(new Button_LabelToggle(this, "position2D", false, 10, 20, width - 120, 190));
-		testButton.add(new Button_LabelToggle(this, "last", false, 10, 20, width - 120, 230));
+		testButton.add(new Button_LabelToggle(this, "drawTreemap", false, 10, 20, width - 120, 110));
+		testButton.add(new Button_LabelToggle(this, "setZTimeAxis", false, 10, 20, width - 120, 150));
+		testButton.add(new Button_LabelToggle(this, "position1D", false, 10, 20, width - 120, 190));
+		testButton.add(new Button_LabelToggle(this, "position2D", false, 10, 20, width - 120, 210));
+		testButton.add(new Button_LabelToggle(this, "last", false, 10, 20, width - 20, 230));
 		testButton.add(new Button_LabelToggle(this, "enableVersionBinding", false, 10, 20, width - 120, 270));
 		testButton.add(new Button_LabelToggle(this, "enableTagBinding", false, 10, 20, width - 120, 300));
 		testButton.add(new Button_LabelToggle(this, "enableFileBinding", false, 10, 20, width - 120, 330));
@@ -545,6 +555,11 @@ public class TagExplorerProcessing2 extends PApplet {
 			}
 		}
 
+		// draw Map rects
+//		if (map != null) {
+//			map.draw();
+//		}
+
 		// MenuPlane
 		menuPlane.render();
 		menuPlane.update();
@@ -601,6 +616,10 @@ public class TagExplorerProcessing2 extends PApplet {
 				case "draw2DShape":
 					b.toggle();
 					draw2DShape(b.onOff);
+					break;
+				case "drawTreemap":
+					b.toggle();
+					drawTreemap(b.onOff);
 					break;
 				// case "showTimeline":
 				// b.toggle();
@@ -1121,7 +1140,13 @@ public class TagExplorerProcessing2 extends PApplet {
 			println("timeline.oldest = null!");
 		}
 		println("before setParticelPositions : setZTimeAxis = " + setZTimeAxis);
-		if (position1D) {
+		
+		
+		// hard treemap!
+		if(drawTreemap){
+			setParticlesPositionTreeMap(filePhysics, showFiles);
+			System.out.println("setParticlesPositionTreeMap() TreeMap");
+		} else if (position1D) {
 			setParticlesPosition1D(filePhysics, showFiles);
 			System.out.println("setParticlesPosition() 1D");
 
@@ -1537,6 +1562,23 @@ public class TagExplorerProcessing2 extends PApplet {
 			}
 		}
 	}
+	
+	private void setParticlesPositionTreeMap(VerletPhysics physics, ArrayList<Tag> _files){
+		physics.particles.clear();
+		
+		for(Tag tag : _files){
+			Tag_File file = (Tag_File) tag;
+			
+			MapItem mItem = getMapItemById(file.id);
+			if (mItem != null) {
+				println(mItem.x + mItem.w/2 + " " + (mItem.y + mItem.h/2));
+				dropParticle(physics, mItem.x + mItem.w/2, mItem.y + mItem.h/2, file, true);
+			}
+			
+		}
+		
+		
+	}
 
 	private void setParticlesPosition1D(VerletPhysics physics, ArrayList<Tag> _files) {
 		// drop Particles
@@ -1643,6 +1685,13 @@ public class TagExplorerProcessing2 extends PApplet {
 				file.setShape(generate2DShape(file));
 			}
 			System.out.println("file.setShape(generateShape(file)) : Created Tag Planes");
+		} else if (drawTreemap) {// || shape.getFamily() == PConstants.GROUP){
+
+			for (Tag t : files) {
+				Tag_File file = (Tag_File) t;
+				file.setShape(generateTreemapShape(file));
+			}
+			System.out.println("file.setShape(generateTreemapShape(file)) : Created Tag Planes");
 		} else {
 			for (Tag t : files) {
 				Tag_File file = (Tag_File) t;
@@ -1659,6 +1708,9 @@ public class TagExplorerProcessing2 extends PApplet {
 		} else if (draw2DShape) {// || shape.getFamily() == PConstants.GROUP){
 			file.setShape(generate2DShape(file));
 			System.out.println("file.setShape(generateShape(file)) : Created Tag Plane");
+		} else if (drawTreemap) {
+			file.setShape(generateTreemapShape(file));
+			System.out.println("file.setShape(generateTreemapShape(file)) : Created Tag Plane");
 		} else {
 			file.shape = null;
 		}
@@ -1717,6 +1769,25 @@ public class TagExplorerProcessing2 extends PApplet {
 			Connection.ConnectionType type) {
 		Connection sp = new Connection(fileParticle, attributeParticle, LEN, STR, type);
 		physics.addSpring(sp);
+	}
+
+	public void createTreeMap(ArrayList<Tag> mapFiles) {
+
+		// Treemap
+		mapData = new FileMap(this);
+
+		for (Tag tag : mapFiles) {
+			Tag_File file = (Tag_File) tag;
+			int count = file.attributeBindings.size() + file.versionBindings.size() + file.fileBindings.size()
+					+ file.getAccesses().size();
+			mapData.addItem(file.id, (int) sq(count));
+		}
+
+		// ------ treemap data is ready ------
+		mapData.finishAdd();
+
+		map = new Treemap(mapData, 120, height / 5, width - 240, height - 2 * height / 5);
+		//map  = new Treemap(mapData,  120 - mainscreen.width/2, height / 5 - mainscreen.height/2, width - 240 - mainscreen.width/2, height - 2 * height / 5 - mainscreen.height/2);
 	}
 
 	void setZNewestTime() {
@@ -1942,10 +2013,10 @@ public class TagExplorerProcessing2 extends PApplet {
 		// background mach rŠnder von Textur!
 		textu.background(255, 0);
 		// textu.image(loadImage("../data/texture_VIDEO.png"), 0, 0);
-		
+
 		// background
 		textu.image(texture_RECT, 0, 0);
-		
+
 		// Icon
 		switch (file.fileType) {
 		case IMAGE:
@@ -1979,10 +2050,9 @@ public class TagExplorerProcessing2 extends PApplet {
 			textu.image(texture_TEXT, 0, 0);
 			break;
 		}
-		
-//		textu.image(texture_TEXT, 0, 0);
-//		textu.image(texture_VIDEO, 0, 0);
 
+		// textu.image(texture_TEXT, 0, 0);
+		// textu.image(texture_VIDEO, 0, 0);
 
 		textu.fill(255, 0, 0);
 		textu.noStroke();
@@ -2002,7 +2072,6 @@ public class TagExplorerProcessing2 extends PApplet {
 			}
 		}
 
-		
 		textu.endDraw();
 
 		return textu;
@@ -2068,6 +2137,58 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		s.end(CLOSE);
 		return s;
+	}
+
+	public PShape generateTreemapShape(Tag_File file) {
+		PShape s = createShape();
+		// s.noStroke();
+		// if (file.textur == null) {
+		// // wenn shape aus anderem Thread WatchDir erzeugt wird -> Java
+		// // Exeption!
+		// return null;
+		// }
+		// // PGraphics tex = generateTexture((Tag_File) file);
+		// s.texture(file.textur);
+
+		// get Coordinates form Treemap
+		// if(map!= null)
+
+		s.fill(cBorder);
+		
+		MapItem mItem = getMapItemById(file.id);
+		if (mItem != null) {
+			s.vertex(mItem.x, mItem.y, 0);
+			s.vertex(mItem.x + mItem.w, mItem.y, 0);
+			s.vertex(mItem.x + mItem.w, mItem.y + mItem.h, 0);
+			s.vertex(mItem.x, mItem.y + mItem.h, 0);
+			
+//			s.vertex(-mItem.w/2, -mItem.h/2, 0);
+//			s.vertex(mItem.w/2,  -mItem.h/2, 0);
+//			s.vertex(mItem.w/2, + mItem.h/2, 0);
+//			s.vertex(-mItem.w/2,+ mItem.h/2, 0);
+			
+//			file.x = mItem.x;
+//			file.y = mItem.y;
+			
+//			s.vertex(+50, -50, 0, file.textur.width, 0);
+//			s.vertex(+50, +50, 0, file.textur.width, file.textur.height);
+//			s.vertex(-50, +50, 0, 0, file.textur.height);
+		}
+
+		s.end(CLOSE);
+		return s;
+	}
+
+	public MapItem getMapItemById(int id) {
+
+		for (MapItem i : mapData.mapItems) {
+			if (i.id == id) {
+				println("getMapItemById(): " + id);
+				return i;
+			}
+		}
+
+		return null;
 	}
 
 	// Access shape
@@ -2567,6 +2688,9 @@ public class TagExplorerProcessing2 extends PApplet {
 		case '3':
 			cam_eyetargetpos = cam_eye3Dpos;
 			break;
+		case '0':
+			createTreeMap(showFiles);
+			break;
 		}
 
 	}
@@ -2888,7 +3012,9 @@ public class TagExplorerProcessing2 extends PApplet {
 		if (drawAccessShapes) {
 
 			draw2DShape = false;
+			drawTreemap = false;
 			setButtonState("draw2DShape", false);
+			setButtonState("drawTreemap", false);
 
 			setShape();
 
@@ -2907,12 +3033,37 @@ public class TagExplorerProcessing2 extends PApplet {
 		if (draw2DShape) {
 			// cp5_Test.get(Toggle.class, "drawAccessShapes").setState(false);
 			drawAccessShapes = false;
+			drawTreemap = false;
 
 			// vor setZTimeAxis!
 			setShape();
 
 			setButtonState("drawAccessShapes", false);
+			setButtonState("drawTreemap", false);
 			setZTimeAxis(setZTimeAxis);
+		}
+	}
+
+	public void drawTreemap(boolean onOff) {
+		drawTreemap = onOff;
+		if (drawTreemap) {
+			// cp5_Test.get(Toggle.class, "drawAccessShapes").setState(false);
+			createTreeMap(showFiles);
+			
+			drawAccessShapes = false;
+			draw2DShape = false;
+
+			// vor setZTimeAxis!
+			
+			// setze Partikelpositon neu als Treemap
+			updateShowFiles();
+			
+			// passiert in updateShowFiles
+			//setShape();
+
+			setButtonState("drawAccessShapes", false);
+			setButtonState("draw2DShape", false);
+			setZTimeAxis(false);
 		}
 	}
 
