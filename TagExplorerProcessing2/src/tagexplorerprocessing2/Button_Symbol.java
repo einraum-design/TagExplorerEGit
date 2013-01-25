@@ -30,8 +30,8 @@ public class Button_Symbol extends Button {
 			h = img.height;
 			break;
 		case "user":
-			img = p5.newUser;
-			img_h = p5.newUser;
+			img = p5.minUser;
+			img_h = p5.minUser;
 			w = img.width;
 			h = img.height;
 			break;

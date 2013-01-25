@@ -34,7 +34,6 @@ import toxi.physics.VerletPhysics;
 
 public class TagExplorerProcessing2 extends PApplet {
 
-
 	WatchDir watcher;
 
 	PGraphics mainscreen;
@@ -127,7 +126,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	VerletPhysics filePhysics;
 	VerletPhysics appPhysics;
 
-	PShape ball;
+	PShape fileShape;
 
 	String[] imageExtension = { "jpg", "jpeg", "png", "gif", "psd", "tif", "tiff", "bmp", "tga" };
 	String[] vectorExtension = { "ai", "drw", "eps", "ps", "svg" };
@@ -143,6 +142,8 @@ public class TagExplorerProcessing2 extends PApplet {
 	UserChooserPlane userChooser = null;
 
 	MenuPlane menuPlane;
+	
+	NewsFeed newsFeed;
 
 	PShader transition;
 	PShader transition2;
@@ -159,6 +160,9 @@ public class TagExplorerProcessing2 extends PApplet {
 	PImage mapImg;
 	PImage userImg;
 	PImage controlImg;
+	
+	PImage newsButton;
+	PImage newsButton_h;
 
 	PImage backgroundTransition;
 
@@ -205,19 +209,20 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	// PImage
 
-	// public void init() {
-	// frame.removeNotify();
-	// frame.setUndecorated(true);
-	// // frame.setAlwaysOnTop(true);
-	// frame.addNotify();
-	// super.init();
-	// }
+//	public void init() {
+//		frame.removeNotify();
+//		frame.setUndecorated(true);
+////		frame.setAlwaysOnTop(true);
+//		frame.addNotify();
+//		super.init();
+//	}
 
 	public void setup() {
-		size(1920, 1024, P3D);
+		size(1920, 1080, P3D);
 
 		// size(1024, 768, P3D);
-		// frame.setLocation(1970, 50);
+//		 frame.setLocation(1970, 50);
+//		frame.setLocation(0,0);
 		smooth(4);
 
 		// addMouseWheelListener(new MouseWheelListener() {
@@ -299,6 +304,8 @@ public class TagExplorerProcessing2 extends PApplet {
 		cp5_Menu.addFrameRate().setInterval(10).setPosition(width - 100, 10).setColor(color(50)); // .setFont(font)
 
 		menuPlane = new MenuPlane(this);
+		
+		newsFeed = new NewsFeed(this, 80, height/5);
 
 		mainscreen = createGraphics(width, height - 40, P3D);
 		pg = createGraphics(100, 100, P2D);
@@ -343,10 +350,11 @@ public class TagExplorerProcessing2 extends PApplet {
 		plifShader = loadShader("../shader/plifFrag.glsl", "../shader/plifVert.glsl");
 		env_plif = loadImage("../data/env_plif.jpg");
 
-		ball = createShape(SPHERE, 10);
-		ball.noStroke();
-		ball.fill(155);
-		ball.emissive(0, 0, 0);
+		//fileShape = createShape(SPHERE, 10);
+		fileShape = createShape(BOX, 20);
+		fileShape.noStroke();
+		fileShape.fill(cBorderHover);
+//		fileShape.emissive(0, 0, 50);
 
 		// ball.shininess(0);
 
@@ -491,6 +499,7 @@ public class TagExplorerProcessing2 extends PApplet {
 			}
 			if (!userInFilterList) {
 				mainUser = null;
+				// updateApplications();
 			}
 		}
 
@@ -515,7 +524,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		for (Button_App b : appButtons) {
 			b.render();
 			if (mouseActive && b.mouseOver() && mousePressed) {
-				if(b.app != null && b.app.url != null){
+				if (b.app != null && b.app.url != null) {
 					println("open: " + b.app.url);
 					open(b.app.url);
 				}
@@ -527,6 +536,12 @@ public class TagExplorerProcessing2 extends PApplet {
 		// MenuPlane
 		menuPlane.render();
 		menuPlane.update();
+		
+		
+		// NewsFeed
+		if(mainUser != null){
+			newsFeed.render();
+		}
 
 		// Hover Plane Dateiinfos
 		if (hoverPlane != null) {
@@ -764,7 +779,7 @@ public class TagExplorerProcessing2 extends PApplet {
 				else {
 					renderer.pushMatrix();
 					renderer.translate(file.x, file.y, file.z);
-					renderer.shape(ball);
+					renderer.shape(fileShape);
 					// Plane mit Text
 					file.renderFileName(this, renderer);
 					renderer.popMatrix();
@@ -772,7 +787,7 @@ public class TagExplorerProcessing2 extends PApplet {
 				}
 
 				// erstelle Hoverplane
-				if (!cp5_Menu.get(Textfield.class, menuPlane.inputFieldName).isFocus()
+				if (!mousePressed && !cp5_Menu.get(Textfield.class, menuPlane.inputFieldName).isFocus()
 						&& mouseOver(renderer, file, 30, 30)) {
 					if (hoverPlane == null) {
 						hoverPlane = new HoverPlane(this, file, (int) mainscreen.screenX(file.x, file.y, file.z),
@@ -799,7 +814,7 @@ public class TagExplorerProcessing2 extends PApplet {
 			}
 			renderer.point(tag.x, tag.y, tag.z);
 
-			if (!cp5_Menu.get(Textfield.class, menuPlane.inputFieldName).isFocus() && mouseOver(renderer, tag, 30, 30)) {
+			if (!mousePressed && !cp5_Menu.get(Textfield.class, menuPlane.inputFieldName).isFocus() && mouseOver(renderer, tag, 30, 30)) {
 				if (hoverPlane == null) {
 					// tag.lock();
 					hoverPlane = new HoverPlane(this, tag, (int) mainscreen.screenX(tag.x, tag.y, tag.z),
@@ -1132,7 +1147,7 @@ public class TagExplorerProcessing2 extends PApplet {
 			showApplications = getUserLocationMatches(applications, appFilterList);
 		} else {
 			// alle apps
-			//showApplications = applications;
+			// showApplications = applications;
 			// keine apps
 			showApplications.clear();
 		}
@@ -1201,17 +1216,20 @@ public class TagExplorerProcessing2 extends PApplet {
 		ArrayList<Filter> userLocationFilters = new ArrayList<Filter>();
 
 		for (Filter f : filters) {
-			//if (f.tag.type.equals("users") || f.tag.type.equals("locations")) {
-			
+			// if (f.tag.type.equals("users") || f.tag.type.equals("locations"))
+			// {
+
 			// nur mainUser als User Filter!
-			if(mainUser != null && f.tag.type.equals("Users") && f.tag.id == mainUser.id){
+			if (mainUser != null && f.tag.type.equals("users") && f.tag.id == mainUser.id) {
 				userLocationFilters.add(f);
 			}
-			
+
 			if (f.tag.type.equals("locations")) {
 				userLocationFilters.add(f);
 			}
 		}
+
+		println("getUserLocationFilters.size(): " + userLocationFilters.size());
 		return userLocationFilters;
 	}
 
@@ -2771,6 +2789,9 @@ public class TagExplorerProcessing2 extends PApplet {
 		mapImg = loadImage("../data/map.png");
 		userImg = loadImage("../data/userProfil.png");
 		controlImg = loadImage("../data/control.png");
+		
+		newsButton = loadImage("../data/newsButton.png");
+		newsButton_h = loadImage("../data/newsButton_h.png");
 
 		appsButton = loadImage(VersionBuilder.versionsVerzeichnis + "applications/apps.png");
 		backgroundApp = loadImage("../data/backgroundApp.png");

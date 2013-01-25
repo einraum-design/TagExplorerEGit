@@ -128,9 +128,13 @@ public class HoverPlane extends Plane {
 			openButton.render();
 			if (p5.mouseActive && p5.mousePressed && openButton.mouseOver() && ((Tag_File) tag).delete_time == null) {
 				p5.SQL.setAccessTimeNow((Tag_File) tag);
+				
+				PApplet.open(((Tag_File)tag).path);
+				System.out.println("open: " + tag.name);
 
 				p5.setShape((Tag_File) tag);
 
+				// mouseClick new Zeit
 				p5.lastClick = new Timestamp(System.currentTimeMillis());
 				p5.mouseActive = false;
 				System.out.println("ResetLastClick in HoverPlane.render()");

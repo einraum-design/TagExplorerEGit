@@ -101,6 +101,8 @@ public class MenuPlane extends Plane {
 					p5.updateTags();
 					p5.updateApplications();
 					p5.updateSprings();
+					
+					// mouseClick new Zeit
 					p5.lastClick = new Timestamp(System.currentTimeMillis());
 					p5.mouseActive = false;
 				}
