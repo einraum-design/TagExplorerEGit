@@ -832,12 +832,47 @@ public class SQLhelper {
 
 					tag.setFileType(FileType.IMAGE);
 				}
+				
 				// Default FileType
 				else {
 					tag = new Tag_File(tableName, id, msql.getString("name"), msql.getFloat("size"),
 							msql.getString("path"), msql.getTimestamp("creation_time"),
 							msql.getTimestamp("expiration_time"), msql.getInt("parent_ID"), msql.getInt("origin_ID"),
 							msql.getInt("score"));
+					
+					// setFileType
+					switch(fileTypeString){
+					case "MESSAGE":
+						tag.setFileType(FileType.MESSAGE);
+						break;
+					case "TEXT":
+						tag.setFileType(FileType.TEXT);
+						break;
+					case "WEB":
+						tag.setFileType(FileType.WEB);
+						break;
+					case "FONT":
+						tag.setFileType(FileType.FONT);
+						break;
+					case "VIDEO":
+						tag.setFileType(FileType.VIDEO);
+						break;
+					case "AUDIO":
+						tag.setFileType(FileType.AUDIO);
+						break;
+					case "LAYOUT":
+						tag.setFileType(FileType.LAYOUT);
+						break;
+					case "VECTOR":
+						tag.setFileType(FileType.VECTOR);
+						break;
+					case "CODE": 
+						tag.setFileType(FileType.CODE);
+						break;
+					default:
+						tag.setFileType(FileType.DEFAULT);
+						break;
+					}
 				}
 			}
 			// sonstige File

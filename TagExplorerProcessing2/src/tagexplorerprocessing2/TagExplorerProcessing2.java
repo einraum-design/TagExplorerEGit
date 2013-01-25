@@ -1128,7 +1128,21 @@ public class TagExplorerProcessing2 extends PApplet {
 		// nur neueste werden showFiles
 		if (!showVersions) {
 			showFiles = getNewestTagFileVersions(showFiles);
+			
+			// create Map Position fŸr Treemap
+			if(drawTreemap){
+				println("updateShowFiles(): createTreeMap");
+				createTreeMap(showFiles);
+			}
+		} 
+		// wenn alle Versions treemap nur fŸr neuest erzeugen!
+		else{
+			if(drawTreemap){
+				println("updateShowFiles(): createTreeMap");
+				createTreeMap(getNewestTagFileVersions(showFiles));
+			}
 		}
+		
 
 		oldest_showFile = (Tag_File) getOldestTagFile(showFiles);
 
@@ -1570,9 +1584,10 @@ public class TagExplorerProcessing2 extends PApplet {
 			Tag_File file = (Tag_File) tag;
 			
 			MapItem mItem = getMapItemById(file.id);
+			// versionen werden aussortiert!
 			if (mItem != null) {
-				println(mItem.x + mItem.w/2 + " " + (mItem.y + mItem.h/2));
-				dropParticle(physics, mItem.x + mItem.w/2, mItem.y + mItem.h/2, file, true);
+				//println(mItem.x + mItem.w/2 + " " + (mItem.y + mItem.h/2));
+				dropParticle(physics, mItem.x + mItem.w/2 - mainscreen.width/2, mItem.y + mItem.h/2 - mainscreen.height/2, file, true);
 			}
 			
 		}
@@ -1786,7 +1801,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		// ------ treemap data is ready ------
 		mapData.finishAdd();
 
-		map = new Treemap(mapData, 120, height / 5, width - 240, height - 2 * height / 5);
+		map = new Treemap(mapData, 120, height / 5, width - 240, height - 1 * height / 5  - 60);
 		//map  = new Treemap(mapData,  120 - mainscreen.width/2, height / 5 - mainscreen.height/2, width - 240 - mainscreen.width/2, height - 2 * height / 5 - mainscreen.height/2);
 	}
 
@@ -2141,27 +2156,23 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	public PShape generateTreemapShape(Tag_File file) {
 		PShape s = createShape();
-		// s.noStroke();
-		// if (file.textur == null) {
-		// // wenn shape aus anderem Thread WatchDir erzeugt wird -> Java
-		// // Exeption!
-		// return null;
-		// }
-		// // PGraphics tex = generateTexture((Tag_File) file);
-		// s.texture(file.textur);
+		 s.noStroke();
+		 if (file.textur == null) {
+		 // wenn shape aus anderem Thread WatchDir erzeugt wird -> Java
+		 // Exeption!
+		 return null;
+		 }
+		 // PGraphics tex = generateTexture((Tag_File) file);
+		 s.texture(file.textur);
 
-		// get Coordinates form Treemap
-		// if(map!= null)
-
-		s.fill(cBorder);
 		
 		MapItem mItem = getMapItemById(file.id);
 		if (mItem != null) {
-			s.vertex(mItem.x, mItem.y, 0);
-			s.vertex(mItem.x + mItem.w, mItem.y, 0);
-			s.vertex(mItem.x + mItem.w, mItem.y + mItem.h, 0);
-			s.vertex(mItem.x, mItem.y + mItem.h, 0);
-			
+			s.vertex(mItem.x - mainscreen.width/2, 			mItem.y - mainscreen.height/2, 0, 0, 0);
+			s.vertex(mItem.x + mItem.w - mainscreen.width/2,mItem.y - mainscreen.height/2, 0, file.textur.width, 0);
+			s.vertex(mItem.x + mItem.w - mainscreen.width/2,mItem.y + mItem.h - mainscreen.height/2, 0, file.textur.width, file.textur.height);
+			s.vertex(mItem.x - mainscreen.width/2,			mItem.y + mItem.h - mainscreen.height/2, 0,  0, file.textur.height);
+//			
 //			s.vertex(-mItem.w/2, -mItem.h/2, 0);
 //			s.vertex(mItem.w/2,  -mItem.h/2, 0);
 //			s.vertex(mItem.w/2, + mItem.h/2, 0);
@@ -2170,9 +2181,7 @@ public class TagExplorerProcessing2 extends PApplet {
 //			file.x = mItem.x;
 //			file.y = mItem.y;
 			
-//			s.vertex(+50, -50, 0, file.textur.width, 0);
-//			s.vertex(+50, +50, 0, file.textur.width, file.textur.height);
-//			s.vertex(-50, +50, 0, 0, file.textur.height);
+			
 		}
 
 		s.end(CLOSE);
@@ -2183,7 +2192,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		for (MapItem i : mapData.mapItems) {
 			if (i.id == id) {
-				println("getMapItemById(): " + id);
+				//println("getMapItemById(): " + id);
 				return i;
 			}
 		}
@@ -2688,9 +2697,9 @@ public class TagExplorerProcessing2 extends PApplet {
 		case '3':
 			cam_eyetargetpos = cam_eye3Dpos;
 			break;
-		case '0':
-			createTreeMap(showFiles);
-			break;
+//		case '0':
+//			createTreeMap(showFiles);
+//			break;
 		}
 
 	}
@@ -3048,12 +3057,14 @@ public class TagExplorerProcessing2 extends PApplet {
 		drawTreemap = onOff;
 		if (drawTreemap) {
 			// cp5_Test.get(Toggle.class, "drawAccessShapes").setState(false);
-			createTreeMap(showFiles);
 			
 			drawAccessShapes = false;
 			draw2DShape = false;
 
 			// vor setZTimeAxis!
+			
+			setButtonState("position2D", false);
+			setButtonState("position1D", false);
 			
 			// setze Partikelpositon neu als Treemap
 			updateShowFiles();
