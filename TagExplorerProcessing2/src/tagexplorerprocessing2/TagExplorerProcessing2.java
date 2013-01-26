@@ -1138,8 +1138,9 @@ public class TagExplorerProcessing2 extends PApplet {
 		// wenn alle Versions treemap nur für neuest erzeugen!
 		else{
 			if(drawTreemap){
+				ArrayList<Tag> newest = (ArrayList<Tag>) showFiles.clone();
 				println("updateShowFiles(): createTreeMap");
-				createTreeMap(getNewestTagFileVersions(showFiles));
+				createTreeMap(getNewestTagFileVersions(newest));
 			}
 		}
 		
@@ -2166,12 +2167,14 @@ public class TagExplorerProcessing2 extends PApplet {
 		 s.texture(file.textur);
 
 		
+		 int abstand = 3;
+		 
 		MapItem mItem = getMapItemById(file.id);
 		if (mItem != null) {
-			s.vertex(mItem.x - mainscreen.width/2, 			mItem.y - mainscreen.height/2, 0, 0, 0);
-			s.vertex(mItem.x + mItem.w - mainscreen.width/2,mItem.y - mainscreen.height/2, 0, file.textur.width, 0);
-			s.vertex(mItem.x + mItem.w - mainscreen.width/2,mItem.y + mItem.h - mainscreen.height/2, 0, file.textur.width, file.textur.height);
-			s.vertex(mItem.x - mainscreen.width/2,			mItem.y + mItem.h - mainscreen.height/2, 0,  0, file.textur.height);
+			s.vertex(mItem.x - mainscreen.width/2 +abstand, 				mItem.y - mainscreen.height/2 + abstand, 0, 0, 0);
+			s.vertex(mItem.x + mItem.w - mainscreen.width/2 - abstand,		mItem.y - mainscreen.height/2 + abstand, 0, file.textur.width, 0);
+			s.vertex(mItem.x + mItem.w - mainscreen.width/2 - abstand,		mItem.y + mItem.h - mainscreen.height/2 - abstand, 0, file.textur.width, file.textur.height);
+			s.vertex(mItem.x - mainscreen.width/2 + abstand,				mItem.y + mItem.h - mainscreen.height/2 - abstand, 0,  0, file.textur.height);
 //			
 //			s.vertex(-mItem.w/2, -mItem.h/2, 0);
 //			s.vertex(mItem.w/2,  -mItem.h/2, 0);
