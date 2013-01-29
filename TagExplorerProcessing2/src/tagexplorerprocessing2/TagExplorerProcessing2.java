@@ -239,7 +239,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	// }
 
 	public void setup() {
-		size(1920, 1080, P3D);
+		size(1400, 1050, P3D);
 
 		// size(1024, 768, P3D);
 		// frame.setLocation(1970, 50);
@@ -431,6 +431,11 @@ public class TagExplorerProcessing2 extends PApplet {
 		updateSprings();
 
 		initApplications();
+		
+		// sets Default main user
+		mainUser = (Tag_User) getTagByID("users", 2);
+		filterList.add(new Filter(mainUser, true));
+		println("Default main User in setup: " + mainUser.name);
 
 		lastClick = new Timestamp(System.currentTimeMillis());
 	}
@@ -1115,6 +1120,14 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		// filter files
 		if (filterList.size() > 0) {
+			
+			
+			// debug
+			for(Filter f : filterList){
+				println("aktuelle Filter: " + f.tag.name);
+			}
+			
+			
 			// DB Abfrage
 			// showFiles = SQL.queryTagListFiltered("files", filterList);
 
@@ -1291,6 +1304,7 @@ public class TagExplorerProcessing2 extends PApplet {
 			Tag_File file = (Tag_File) t;
 			if (file.matches == filterList.size()) {
 				fullMatches.add(file);
+//				println("getFullMatches add: " + file.name);
 			}
 		}
 		return fullMatches;
@@ -1324,12 +1338,21 @@ public class TagExplorerProcessing2 extends PApplet {
 				// }
 
 				if (f.inOut) {
-					if (file.attributeBindings.contains(f.tag)) {
-						file.matches++;
+					for(Tag tt : file.attributeBindings){
+						if(tt.type.equals(f.tag.type) && tt.id == f.tag.id){
+							file.matches++;
+						}				
 					}
+					// contains funktioniert nicht
+//					if (file.attributeBindings.contains(f.tag)) {
+//						file.matches++;
+//						println("updateMatches(): " + file.name + " id " + file.id + " contains Tag: " + f.tag.name);
+//					}
 				} else {
-					if (file.attributeBindings.contains(f.tag)) {
-						file.matches--;
+					for(Tag tt : file.attributeBindings){
+						if(tt.type.equals(f.tag.type) && tt.id == f.tag.id){
+							file.matches--;
+						}
 					}
 				}
 			}
@@ -1850,11 +1873,18 @@ public class TagExplorerProcessing2 extends PApplet {
 		// attributes
 		else if (tableName != "files" && attributes != null) {
 			for (Tag _tag : attributes) {
+//				println(tableName + " " + _tag.id + " " + _tag.type);
 				if (_tag.id == id && _tag.type.equals(tableName)) {
 					tag = _tag;
 				}
 			}
 		}
+		// debug
+//		if(tag == null){
+//			println("getTagByID() attributes.size(): " + attributes.size());
+//			println("getTagByID() tag ist null!");
+//		}
+		
 		return tag;
 	}
 
@@ -2087,6 +2117,12 @@ public class TagExplorerProcessing2 extends PApplet {
 								+ i * (360.0f / parts), 30, 5);
 			}
 		}
+		
+		textu.fill(cFont);
+		textu.rectMode(PConstants.CENTER);
+		textu.textAlign(PConstants.CENTER, PConstants.CENTER);
+		textu.textFont(font, 60);
+		textu.text(file.name, textu.width/2, textu.height - 70, textu.width-80, 120);
 
 		textu.endDraw();
 
