@@ -54,9 +54,9 @@ public class HoverPlane extends Plane {
 			} else {
 				infoBox = createInfoBox(h);
 			}
-			
+
 			timeline = createTimeline();
-			
+
 			infoBox.addChild(timeline);
 
 			openButton = new Button_Symbol(p5, "open", x + w / 2 - rand / 2, y - h + rand / 2);
@@ -128,8 +128,8 @@ public class HoverPlane extends Plane {
 			openButton.render();
 			if (p5.mouseActive && p5.mousePressed && openButton.mouseOver() && ((Tag_File) tag).delete_time == null) {
 				p5.SQL.setAccessTimeNow((Tag_File) tag);
-				
-				PApplet.open(((Tag_File)tag).path);
+
+				PApplet.open(((Tag_File) tag).path);
 				System.out.println("open: " + tag.name);
 
 				p5.setShape((Tag_File) tag);
@@ -178,7 +178,16 @@ public class HoverPlane extends Plane {
 			if (bindetTags.size() != ((Tag_File) this.tag).attributeBindings.size()) {
 				((Tag_File) this.tag).attributeBindings = bindetTags;
 				// wenn attribut geŠndert wurden:
-				((Tag_File) this.tag).setTextur(p5.generateTexture((Tag_File) this.tag));
+
+				// standartFormat (100, 100);
+				if (!p5.drawTreemap) {
+					((Tag_File) this.tag).setTextur(p5.generateTexture((Tag_File) this.tag));
+				}
+				// bei Treemap:
+				else {
+					// funktioniert
+					((Tag_File) this.tag).setTextur(p5.generateTexture((Tag_File) this.tag, ((Tag_File) this.tag).treemapW, ((Tag_File) this.tag).treemapH));
+				}
 				p5.setShape((Tag_File) this.tag);
 				p5.updateSprings();
 			}
@@ -321,6 +330,7 @@ public class HoverPlane extends Plane {
 
 	float yOffset = 28;
 	float xOffset = 28;
+
 	private PShape createInfoBox(int h) {
 
 		PShape shape = p5.createShape(PConstants.GROUP);
@@ -356,37 +366,35 @@ public class HoverPlane extends Plane {
 
 		shape.addChild(line);
 
-		
-
 		// Accesses Shape
 
 		return shape;
 	}
-	
+
 	int yTimeline = -75;
-	
-	public PShape createTimeline(){
+
+	public PShape createTimeline() {
 		PShape shape = p5.createShape(PConstants.GROUP);
 		long startTime = ((Tag_File) this.tag).creation_time.getTime();
 		long endTime = (p5.getNewestDate((Tag_File) tag).getTime());
 
 		float rad = 6;
 		// startEllipse
-		PShape startEllipse = p5.createShape(PConstants.ELLIPSE, -w/2+ rand -rad/2, yTimeline -rad/2, rad, rad);
+		PShape startEllipse = p5
+				.createShape(PConstants.ELLIPSE, -w / 2 + rand - rad / 2, yTimeline - rad / 2, rad, rad);
 		startEllipse.fill(p5.cFont);
 
 		shape.addChild(startEllipse);
 
 		for (Access access : ((Tag_File) this.tag).getAccesses()) {
-			
-			float xPos = PApplet.map(access.date.getTime(), startTime, endTime, -w/2 + rand, w/2 -rand);
-			
-			PShape ellips = p5.createShape(PConstants.ELLIPSE, xPos - rad/2, yTimeline-rad/2, rad, rad);
+
+			float xPos = PApplet.map(access.date.getTime(), startTime, endTime, -w / 2 + rand, w / 2 - rand);
+
+			PShape ellips = p5.createShape(PConstants.ELLIPSE, xPos - rad / 2, yTimeline - rad / 2, rad, rad);
 			ellips.fill(p5.cFont);
 			shape.addChild(ellips);
 		}
-		
-		
+
 		return shape;
 	}
 
@@ -454,29 +462,34 @@ public class HoverPlane extends Plane {
 	}
 
 	// unterer Bereich dabei
-//	public boolean mouseOver() {
-//		boolean over = false;
-//		if (p5.mouseX >= x - w / 2 && p5.mouseX < x + w / 2 && p5.mouseY < y + 10 && p5.mouseY > y - h) {
-//			over = true;
-//		} else if (dropDownHeight > 0
-//				&& cp5.get(Textfield.class, inputFieldName).isFocus()
-//				&& p5.mouseX >= cp5.get(Textfield.class, inputFieldName).getPosition().x - 10
-//				&& p5.mouseX < cp5.get(Textfield.class, inputFieldName).getPosition().x
-//						+ cp5.get(Textfield.class, inputFieldName).getWidth() + 10
-//				&& p5.mouseY > cp5.get(Textfield.class, inputFieldName).getPosition().y - 10
-//				&& p5.mouseY < cp5.get(Textfield.class, inputFieldName).getPosition().y + dropDownHeight + 10) {
-//
-//			over = true;
-//		}
-//
-//		return over;
-//	}
-	
+	// public boolean mouseOver() {
+	// boolean over = false;
+	// if (p5.mouseX >= x - w / 2 && p5.mouseX < x + w / 2 && p5.mouseY < y + 10
+	// && p5.mouseY > y - h) {
+	// over = true;
+	// } else if (dropDownHeight > 0
+	// && cp5.get(Textfield.class, inputFieldName).isFocus()
+	// && p5.mouseX >= cp5.get(Textfield.class, inputFieldName).getPosition().x
+	// - 10
+	// && p5.mouseX < cp5.get(Textfield.class, inputFieldName).getPosition().x
+	// + cp5.get(Textfield.class, inputFieldName).getWidth() + 10
+	// && p5.mouseY > cp5.get(Textfield.class, inputFieldName).getPosition().y -
+	// 10
+	// && p5.mouseY < cp5.get(Textfield.class, inputFieldName).getPosition().y +
+	// dropDownHeight + 10) {
+	//
+	// over = true;
+	// }
+	//
+	// return over;
+	// }
+
 	// ohne unteren Bereich
 	public boolean mouseOver() {
 		boolean over = false;
-		if (p5.mouseX >= x - w / 2 && p5.mouseX < x + w / 2 && p5.mouseY < y + 10 - yOffset && p5.mouseY > y - h || 
-				p5.mouseX >= x - xOffset && p5.mouseX <= x + xOffset && p5.mouseY < y + 10 && p5.mouseY > y - yOffset - 10) {
+		if (p5.mouseX >= x - w / 2 && p5.mouseX < x + w / 2 && p5.mouseY < y + 10 - yOffset && p5.mouseY > y - h
+				|| p5.mouseX >= x - xOffset && p5.mouseX <= x + xOffset && p5.mouseY < y + 10
+				&& p5.mouseY > y - yOffset - 10) {
 			over = true;
 		} else if (dropDownHeight > 0
 				&& cp5.get(Textfield.class, inputFieldName).isFocus()

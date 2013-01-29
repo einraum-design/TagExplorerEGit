@@ -25,6 +25,9 @@ public class Tag_File extends Tag {
 	int origin_ID = 0;
 	int score;
 	
+	int treemapW;
+	int treemapH;
+	
 	int matches = 0;
 	boolean newest = false;
 	

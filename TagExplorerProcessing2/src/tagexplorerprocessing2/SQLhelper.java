@@ -505,7 +505,7 @@ public class SQLhelper {
 
 				}
 				if (p5.showTimeline) {
-					file.z = -p5.timeline.mapExp(p5.getNewestDate(file));
+					file.z = (float) -p5.timeline.mapExp(p5.getNewestDate(file));
 				}
 			}
 

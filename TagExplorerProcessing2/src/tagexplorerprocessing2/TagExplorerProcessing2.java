@@ -26,6 +26,7 @@ import processing.core.PShape;
 import processing.opengl.PShader;
 
 import tagexplorerprocessing2.Connection.ConnectionType;
+import tagexplorerprocessing2.Tag_File.FileType;
 import toxi.geom.Vec3D;
 import toxi.physics.VerletParticle;
 import toxi.physics.VerletPhysics;
@@ -77,6 +78,8 @@ public class TagExplorerProcessing2 extends PApplet {
 	Timestamp maxTime = null;
 
 	SimpleDateFormat sdf;
+
+	boolean showButtons = true;
 
 	boolean showVersions = false;
 	boolean drawAccessShapes = false;
@@ -431,7 +434,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		updateSprings();
 
 		initApplications();
-		
+
 		// sets Default main user
 		mainUser = (Tag_User) getTagByID("users", 2);
 		filterList.add(new Filter(mainUser, true));
@@ -446,7 +449,22 @@ public class TagExplorerProcessing2 extends PApplet {
 	// }
 
 	// /////////// draw ////////////////////
+	// /////////// draw ////////////////////
+	// /////////// draw ////////////////////
+	// /////////// draw ////////////////////
+	// /////////// draw ////////////////////
+	// /////////// draw ////////////////////
+	// /////////// draw ////////////////////
+	// /////////// draw ////////////////////
+	// /////////// draw ////////////////////
+	// /////////// draw ////////////////////
+	// /////////// draw ////////////////////
+	// /////////// draw ////////////////////
+	// /////////// draw ////////////////////
+	// /////////// draw ////////////////////
 	boolean first = true;
+
+	// boolean updateTextures = false;
 
 	public void draw() {
 
@@ -457,6 +475,22 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		}
 
+		// if (updateTextures) {
+		//
+		// // erzeuge TreemapTexturen
+		// if (drawTreemap) {
+		// initTextures(showFiles);
+		// println("tremapTextures");
+		// }
+		// // erzeuge StandartTexturen;
+		// else{
+		// initTextures();
+		// println("normal textures");
+		// }
+		// updateTextures = false;
+		//
+		// }
+
 		// update interpolate cam position
 		cam_eyeaktuellpos = interpolateVec(cam_eyeaktuellpos, cam_eyetargetpos);
 		cam_target.z = cam_eyeaktuellpos.z - (height / 2.0f) / tan(PI * 30.0f / 180.0f);
@@ -465,7 +499,13 @@ public class TagExplorerProcessing2 extends PApplet {
 		for (Tag t : showFiles) {
 			Tag_File file = (Tag_File) t;
 			if (file.textur == null) {
+
+				// position setzten
+
+				// textur erzeugen
 				file.setTextur(generateTexture(file));
+
+				// shape erzeugen
 				setShape(file);
 			}
 		}
@@ -476,7 +516,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		// imageMode(CORNER);
 		// image(backgroundTransition, 0,0);
-		PShape back = createShape(PConstants.RECT, 0, 0, width, height);
+		PShape back = createShape(PConstants.RECT, -100, 0, width + 200, height);
 		back.fill(255);
 		back.texture(backgroundTransition);
 		shape(back);
@@ -561,9 +601,9 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 
 		// draw Map rects
-//		if (map != null) {
-//			map.draw();
-//		}
+		// if (map != null) {
+		// map.draw();
+		// }
 
 		// MenuPlane
 		menuPlane.render();
@@ -604,68 +644,70 @@ public class TagExplorerProcessing2 extends PApplet {
 		interaction = false;
 		hoverPoint = null;
 
-		for (Button_LabelToggle b : testButton) {
-			b.render();
+		if (showButtons) {
+			for (Button_LabelToggle b : testButton) {
+				b.render();
 
-			if (mouseActive && b.mouseOver() && mousePressed) {
+				if (mouseActive && b.mouseOver() && mousePressed) {
 
-				switch (b.label) {
-				case "showVersions":
-					b.toggle();
-					showVersions(b.onOff);
-					break;
-				case "drawAccessShapes":
-					b.toggle();
-					drawAccessShapes(b.onOff);
-					break;
-				case "draw2DShape":
-					b.toggle();
-					draw2DShape(b.onOff);
-					break;
-				case "drawTreemap":
-					b.toggle();
-					drawTreemap(b.onOff);
-					break;
-				// case "showTimeline":
-				// b.toggle();
-				// showTimeline(b.onOff);
-				// break;
-				case "setZTimeAxis":
-					b.toggle();
-					setZTimeAxis(b.onOff);
-					break;
-				case "position1D":
-					b.toggle();
-					position1D(b.onOff);
-					break;
-				case "position2D":
-					b.toggle();
-					position2D(b.onOff);
-					break;
-				case "enableVersionBinding":
-					b.toggle();
-					enableVersionBinding(b.onOff);
-					break;
-				case "enableTagBinding":
-					b.toggle();
-					enableTagBinding(b.onOff);
-					break;
-				case "enableFileBinding":
-					b.toggle();
-					enableFileBinding(b.onOff);
-					break;
-				case "setMinTime":
-					b.toggle();
-					setMinTime(b.onOff);
-					break;
-				case "drawTags":
-					b.toggle();
-					drawTags(b.onOff);
-					break;
+					switch (b.label) {
+					case "showVersions":
+						b.toggle();
+						showVersions(b.onOff);
+						break;
+					case "drawAccessShapes":
+						b.toggle();
+						drawAccessShapes(b.onOff);
+						break;
+					case "draw2DShape":
+						b.toggle();
+						draw2DShape(b.onOff);
+						break;
+					case "drawTreemap":
+						b.toggle();
+						drawTreemap(b.onOff);
+						break;
+					// case "showTimeline":
+					// b.toggle();
+					// showTimeline(b.onOff);
+					// break;
+					case "setZTimeAxis":
+						b.toggle();
+						setZTimeAxis(b.onOff);
+						break;
+					case "position1D":
+						b.toggle();
+						position1D(b.onOff);
+						break;
+					case "position2D":
+						b.toggle();
+						position2D(b.onOff);
+						break;
+					case "enableVersionBinding":
+						b.toggle();
+						enableVersionBinding(b.onOff);
+						break;
+					case "enableTagBinding":
+						b.toggle();
+						enableTagBinding(b.onOff);
+						break;
+					case "enableFileBinding":
+						b.toggle();
+						enableFileBinding(b.onOff);
+						break;
+					case "setMinTime":
+						b.toggle();
+						setMinTime(b.onOff);
+						break;
+					case "drawTags":
+						b.toggle();
+						drawTags(b.onOff);
+						break;
+					}
+
+					lastClick = new Timestamp(System.currentTimeMillis());
+					mouseActive = false;
 				}
-
-				lastClick = new Timestamp(System.currentTimeMillis());
-				mouseActive = false;
 			}
 		}
 
@@ -740,6 +782,10 @@ public class TagExplorerProcessing2 extends PApplet {
 		// renderer.vertex(delta, 0, -delta);
 		// renderer.endShape(CLOSE);
 
+		if (showTimeline) {
+			timeline.render(renderer);
+		}
+
 		drawFiles(renderer);
 
 		// tags werden immer erzeugt aber neu bei drawTags = true gezeichnet
@@ -751,7 +797,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		// drawSprings(renderer);
 		drawSpringsLINES(renderer);
 
-		// draw interaction
+		// draw interaction -renderer.height/2
 		stroke(255, 0, 0);
 		if (startTag != null) {
 			renderer.strokeWeight(15);
@@ -760,10 +806,6 @@ public class TagExplorerProcessing2 extends PApplet {
 				renderer.strokeWeight(3);
 				renderer.line(startTag.x, startTag.y, startTag.z, hoverPoint.x, hoverPoint.y, hoverPoint.z);
 			}
-		}
-
-		if (showTimeline) {
-			timeline.render(renderer);
 		}
 
 		renderer.popMatrix();
@@ -1076,7 +1118,18 @@ public class TagExplorerProcessing2 extends PApplet {
 	public void initTextures() {
 		for (Tag t : files) {
 			Tag_File file = (Tag_File) t;
-			file.setTextur(generateTexture((Tag_File) file));
+
+			// file.setTextur(generateTexture((Tag_File) file);
+			file.setTextur(generateTexture((Tag_File) file, 100, 100));
+		}
+	}
+
+	public void initTextures(ArrayList<Tag> showFiles) {
+		for (Tag t : showFiles) {
+			Tag_File file = (Tag_File) t;
+
+			// file.setTextur(generateTexture((Tag_File) file);
+			file.setTextur(generateTexture((Tag_File) file, file.treemapW, file.treemapH));
 		}
 	}
 
@@ -1118,16 +1171,13 @@ public class TagExplorerProcessing2 extends PApplet {
 		// count matches mit FilterList
 		updateMatches(files);
 
-		// filter files
+		// Filter files
 		if (filterList.size() > 0) {
-			
-			
 			// debug
-			for(Filter f : filterList){
-				println("aktuelle Filter: " + f.tag.name);
-			}
-			
-			
+			// for (Filter f : filterList) {
+			// println("aktuelle Filter: " + f.tag.name);
+			// }
+
 			// DB Abfrage
 			// showFiles = SQL.queryTagListFiltered("files", filterList);
 
@@ -1138,25 +1188,61 @@ public class TagExplorerProcessing2 extends PApplet {
 			showFiles = files;
 		}
 
+		// ArrayList<Tag> showFilesCopy = (ArrayList<Tag>) showFiles.clone();
+		ArrayList<Tag> newest = getNewestTagFileVersions(showFiles);
+
 		// nur neueste werden showFiles
 		if (!showVersions) {
-			showFiles = getNewestTagFileVersions(showFiles);
-			
-			// create Map Position für Treemap
-			if(drawTreemap){
+			// showFiles = getNewestTagFileVersions(showFiles);
+			showFiles = newest;
+		}
+
+		// Filter nach minTime
+		if (minTime != null) {
+			println("updateShowFiles(): showFiles.size():" + showFiles.size());
+			// Filter nach verwendungszeit später als:
+			ArrayList<Tag> results = new ArrayList<Tag>();
+
+			// ohne Versions
+
+			for (Tag tag : newest) {
+				Tag_File file = (Tag_File) tag;
+				if (getNewestDate(file).after(minTime)) {
+					results.add(file);
+					// println(file.name + " " +
+					// getNewestDate(file).toGMTString());
+				}
+			}
+			if (!showVersions) {
+				showFiles = results;
+				println("updateShowFiles(): showFiles.size():" + showFiles.size());
+			} else {
+
+				// mit Versionen
+				ArrayList<Tag> resultsAndVersions = new ArrayList<Tag>();
+				for (Tag tag : results) {
+					Tag_File file = (Tag_File) tag;
+					if (file.origin_ID != 0) {
+						resultsAndVersions.addAll(getAllVersions(file.origin_ID));
+					} else {
+						resultsAndVersions.add(file);
+					}
+				}
+				showFiles = resultsAndVersions;
+				println("updateShowFiles(): showFiles.size():" + showFiles.size());
+			}
+
+		}
+
+		// create Map Position für Treemap
+		if (drawTreemap) {
+			if (!showVersions) {
 				println("updateShowFiles(): createTreeMap");
 				createTreeMap(showFiles);
-			}
-		} 
-		// wenn alle Versions treemap nur für neuest erzeugen!
-		else{
-			if(drawTreemap){
-				ArrayList<Tag> newest = (ArrayList<Tag>) showFiles.clone();
-				println("updateShowFiles(): createTreeMap");
-				createTreeMap(getNewestTagFileVersions(newest));
+			} else {
+				createTreeMap(getNewestTagFileVersions(showFiles));
 			}
 		}
-		
 
 		oldest_showFile = (Tag_File) getOldestTagFile(showFiles);
 
@@ -1167,34 +1253,36 @@ public class TagExplorerProcessing2 extends PApplet {
 			timeline.oldest = null;
 			println("timeline.oldest = null!");
 		}
-		println("before setParticelPositions : setZTimeAxis = " + setZTimeAxis);
-		
-		
-		// hard treemap!
-		if(drawTreemap){
-			setParticlesPositionTreeMap(filePhysics, showFiles);
-			System.out.println("setParticlesPositionTreeMap() TreeMap");
-		} else if (position1D) {
-			setParticlesPosition1D(filePhysics, showFiles);
-			System.out.println("setParticlesPosition() 1D");
 
-		} else if (position2D) {
-			System.out.println("setParticlesPosition2D() 2D");
-			setParticlesPosition2D(filePhysics, showFiles);
+		// println("before setParticelPositions : setZTimeAxis = " +
+		// setZTimeAxis);
 
-		} // setParticlesPosition(filePhysics, showFiles);
-		else {
-			System.out.println("DEFAULT: setParticlesPosition2D() 2D");
-			setParticlesPosition2D(filePhysics, showFiles);
-
-		}
+		// set Partikel Position
+		setParticlePositions(showFiles);
 
 		// setzt shape oder null
 		setShape();
 
-		println("setZTimeAxis = " + setZTimeAxis);
+		// println("setZTimeAxis = " + setZTimeAxis);
 		setZTimeAxis(setZTimeAxis); // macht auch updateSprings
 
+	}
+
+	public void setParticlePositions(ArrayList<Tag> showFiles) {
+		// hard treemap!
+		if (drawTreemap) {
+			System.out.println("setParticlesPositionTreeMap() TreeMap");
+			setParticlesPositionTreeMap(filePhysics, showFiles);
+		} else if (position1D) {
+			System.out.println("setParticlesPosition() 1D");
+			setParticlesPosition1D(filePhysics, showFiles);
+		} else if (position2D) {
+			System.out.println("setParticlesPosition2D() 2D");
+			setParticlesPosition2D(filePhysics, showFiles);
+		} else {
+			System.out.println("DEFAULT: setParticlesPosition2D() 2D");
+			setParticlesPosition2D(filePhysics, showFiles);
+		}
 	}
 
 	void updateApplications() {
@@ -1304,7 +1392,7 @@ public class TagExplorerProcessing2 extends PApplet {
 			Tag_File file = (Tag_File) t;
 			if (file.matches == filterList.size()) {
 				fullMatches.add(file);
-//				println("getFullMatches add: " + file.name);
+				// println("getFullMatches add: " + file.name);
 			}
 		}
 		return fullMatches;
@@ -1338,19 +1426,20 @@ public class TagExplorerProcessing2 extends PApplet {
 				// }
 
 				if (f.inOut) {
-					for(Tag tt : file.attributeBindings){
-						if(tt.type.equals(f.tag.type) && tt.id == f.tag.id){
+					for (Tag tt : file.attributeBindings) {
+						if (tt.type.equals(f.tag.type) && tt.id == f.tag.id) {
 							file.matches++;
-						}				
+						}
 					}
 					// contains funktioniert nicht
-//					if (file.attributeBindings.contains(f.tag)) {
-//						file.matches++;
-//						println("updateMatches(): " + file.name + " id " + file.id + " contains Tag: " + f.tag.name);
-//					}
+					// if (file.attributeBindings.contains(f.tag)) {
+					// file.matches++;
+					// println("updateMatches(): " + file.name + " id " +
+					// file.id + " contains Tag: " + f.tag.name);
+					// }
 				} else {
-					for(Tag tt : file.attributeBindings){
-						if(tt.type.equals(f.tag.type) && tt.id == f.tag.id){
+					for (Tag tt : file.attributeBindings) {
+						if (tt.type.equals(f.tag.type) && tt.id == f.tag.id) {
 							file.matches--;
 						}
 					}
@@ -1600,23 +1689,25 @@ public class TagExplorerProcessing2 extends PApplet {
 			}
 		}
 	}
-	
-	private void setParticlesPositionTreeMap(VerletPhysics physics, ArrayList<Tag> _files){
+
+	private void setParticlesPositionTreeMap(VerletPhysics physics, ArrayList<Tag> _files) {
 		physics.particles.clear();
-		
-		for(Tag tag : _files){
+
+		for (Tag tag : _files) {
 			Tag_File file = (Tag_File) tag;
-			
+
 			MapItem mItem = getMapItemById(file.id);
 			// versionen werden aussortiert!
 			if (mItem != null) {
-				//println(mItem.x + mItem.w/2 + " " + (mItem.y + mItem.h/2));
-				dropParticle(physics, mItem.x + mItem.w/2 - mainscreen.width/2, mItem.y + mItem.h/2 - mainscreen.height/2, file, true);
+				// println(mItem.x + mItem.w/2 + " " + (mItem.y + mItem.h/2));
+				file.treemapH = (int) mItem.h;
+				file.treemapW = (int) mItem.w;
+				dropParticle(physics, mItem.x + mItem.w / 2 - mainscreen.width / 2, mItem.y + mItem.h / 2
+						- mainscreen.height / 2, file, true);
 			}
-			
+
 		}
-		
-		
+
 	}
 
 	private void setParticlesPosition1D(VerletPhysics physics, ArrayList<Tag> _files) {
@@ -1742,14 +1833,17 @@ public class TagExplorerProcessing2 extends PApplet {
 	public void setShape(Tag_File file) {
 		// nachdem positionen festgelegt sind
 		if (drawAccessShapes) {
-			file.setShape(generateAccessShape(file));
 			System.out.println("file.setShape(generateShape(file)) -> VersionShapee");
+			file.setShape(generateAccessShape(file));
+
 		} else if (draw2DShape) {// || shape.getFamily() == PConstants.GROUP){
-			file.setShape(generate2DShape(file));
 			System.out.println("file.setShape(generateShape(file)) : Created Tag Plane");
+			file.setShape(generate2DShape(file));
+
 		} else if (drawTreemap) {
-			file.setShape(generateTreemapShape(file));
 			System.out.println("file.setShape(generateTreemapShape(file)) : Created Tag Plane");
+			file.setShape(generateTreemapShape(file));
+
 		} else {
 			file.shape = null;
 		}
@@ -1825,8 +1919,11 @@ public class TagExplorerProcessing2 extends PApplet {
 		// ------ treemap data is ready ------
 		mapData.finishAdd();
 
-		map = new Treemap(mapData, 120, height / 5, width - 240, height - 1 * height / 5  - 60);
-		//map  = new Treemap(mapData,  120 - mainscreen.width/2, height / 5 - mainscreen.height/2, width - 240 - mainscreen.width/2, height - 2 * height / 5 - mainscreen.height/2);
+		map = new Treemap(mapData, 120, height / 5, width - 240, height - 1 * height / 5 - 60);
+
+		// map = new Treemap(mapData, 120 - mainscreen.width/2, height / 5 -
+		// mainscreen.height/2, width - 240 - mainscreen.width/2, height - 2 *
+		// height / 5 - mainscreen.height/2);
 	}
 
 	void setZNewestTime() {
@@ -1834,7 +1931,7 @@ public class TagExplorerProcessing2 extends PApplet {
 			Tag_File file = (Tag_File) t;
 
 			// println("aktuelle anzeige file:" + file.name);
-			file.z = -timeline.mapExp(getNewestDate(file));
+			file.z = (float) -timeline.mapExp(getNewestDate(file));
 
 			// shape2D
 			if (draw2DShape) {
@@ -1842,6 +1939,13 @@ public class TagExplorerProcessing2 extends PApplet {
 				if (file.shape != null) {
 					file.shape.resetMatrix();
 					file.shape.translate(file.x, file.y, file.z);
+				}
+			}
+
+			if (drawTreemap) {
+				if (file.shape != null) {
+					// file.shape.resetMatrix();
+					file.shape.translate(0, 0, file.z);
 				}
 			}
 		}
@@ -1873,18 +1977,18 @@ public class TagExplorerProcessing2 extends PApplet {
 		// attributes
 		else if (tableName != "files" && attributes != null) {
 			for (Tag _tag : attributes) {
-//				println(tableName + " " + _tag.id + " " + _tag.type);
+				// println(tableName + " " + _tag.id + " " + _tag.type);
 				if (_tag.id == id && _tag.type.equals(tableName)) {
 					tag = _tag;
 				}
 			}
 		}
 		// debug
-//		if(tag == null){
-//			println("getTagByID() attributes.size(): " + attributes.size());
-//			println("getTagByID() tag ist null!");
-//		}
-		
+		// if(tag == null){
+		// println("getTagByID() attributes.size(): " + attributes.size());
+		// println("getTagByID() tag ist null!");
+		// }
+
 		return tag;
 	}
 
@@ -1938,16 +2042,17 @@ public class TagExplorerProcessing2 extends PApplet {
 	}
 
 	private ArrayList<Tag> getAllVersions(int originId) {
-		ArrayList<Tag> files = new ArrayList<Tag>();
+		ArrayList<Tag> results = new ArrayList<Tag>();
 
 		for (Tag t : files) {
 			Tag_File file = (Tag_File) t;
-			if (file.id == originId || file.origin_ID == originId) {
-				files.add(file);
+			if (file.id == originId || file.origin_ID == originId || file.parent_ID == originId) {
+				results.add(file);
+				println(file.name + " " + file.id);
 			}
 		}
 
-		return files;
+		return results;
 	}
 
 	private int getSizeWithoutVersion(ArrayList<Tag> files) {
@@ -2050,83 +2155,139 @@ public class TagExplorerProcessing2 extends PApplet {
 		app.setAttributeBindings(SQL.getBindedTagList(app));
 	}
 
-	public PGraphics generateTexture(Tag_File file) {
-		int texW = 400;
-		int texH = 400;
-		PGraphics textu = createGraphics(texW, texH, P2D);
+	public PGraphics generateTexture(Tag_File file, int texturW, int texturH) {
+
+		// int texW = w*4; // 4fache Auflösung
+		// int texH = h*4; // 4fache Auflösung
+
+		PGraphics textu = createGraphics(texturW * 4, texturH * 4, P2D);
 		textu.beginDraw();
 
-		// background mach ränder von Textur!
-		textu.background(255, 0);
-		// textu.image(loadImage("../data/texture_VIDEO.png"), 0, 0);
+		int cTint = color(255, 255, 255);
 
-		// background
-		textu.image(texture_RECT, 0, 0);
+		// background macht Ränder von Textur!
+		textu.background(cTint, 0);
+
+		textu.imageMode(PConstants.CENTER);
+
+		// Hintergrund Textur
+		textu.image(texture_RECT, textu.width / 2, textu.height / 2, textu.width, textu.height);
 
 		// Icon
-		switch (file.fileType) {
-		case IMAGE:
-			textu.image(texture_IMAGE, 0, 0);
-			break;
-		case MESSAGE:
-			textu.image(texture_MESSAGE, 0, 0);
-			break;
-		case TEXT:
-			textu.image(texture_TEXT, 0, 0);
-			break;
-		case WEB:
-			textu.image(texture_WEB, 0, 0);
-			break;
-		case FONT:
-			textu.image(texture_FONT, 0, 0);
-			break;
-		case VIDEO:
-			textu.image(texture_VIDEO, 0, 0);
-			break;
-		case AUDIO:
-			textu.image(texture_AUDIO, 0, 0);
-			break;
-		case LAYOUT:
-			textu.image(texture_LAYOUT, 0, 0);
-			break;
-		case VECTOR:
-			textu.image(texture_VECTOR, 0, 0);
-			break;
-		default:
-			textu.image(texture_TEXT, 0, 0);
-			break;
+
+		if (textu.width <= textu.height) {
+			int smaller = (int) (textu.width * 0.15f);
+			textu.image(getFileTypeImage(file.fileType), textu.width / 2, textu.height / 2 - smaller * 2 / 3,
+					textu.width - smaller * 2, textu.width - smaller * 2);
+		} else {
+			int smaller = (int) (textu.height * 0.15f);
+			textu.image(getFileTypeImage(file.fileType), textu.width / 2, textu.height / 2 - smaller * 2 / 3,
+					textu.height - smaller * 2, textu.height - smaller * 2);
 		}
 
-		// textu.image(texture_TEXT, 0, 0);
-		// textu.image(texture_VIDEO, 0, 0);
+		// mindestgröße, damit text gezeigt wird
+		if (textu.width >= 400 && textu.height >= 400) {
+			textu.fill(cFont);
+			textu.rectMode(PConstants.CENTER);
+			textu.textAlign(PConstants.CENTER, PConstants.CENTER);
 
-		textu.fill(255, 0, 0);
-		textu.noStroke();
-		// textu.beginShape();
-		// textu.vertex(0, 0);
-		// textu.vertex(20, 0);
-		// textu.vertex(20, 20);
-		// textu.endShape();
-		if (file.attributeBindings.size() > 0) {
-			int parts = file.attributeBindings.size();
+			if (textu.width <= textu.height) {
+				textu.textFont(font, (int) (textu.width * 0.15f));
+				// text länger als einzeilig
+				if (textWidth(file.name) * 4 > textu.width - textu.width * 0.2f) {
+					// verkleinere text
+					textu.textFont(font, (int) (textu.width * 0.12f));
+					textu.text(file.name, textu.width / 2, textu.height - (int) (textu.width * 0.2f), textu.width
+							- (textu.width * 0.2f), (textu.height * 0.4f));
+				}
+				// einzeilig
+				else {
+					textu.text(file.name, textu.width / 2, textu.height - (int) (textu.height * 0.2f));
+				}
+			}
+			// breiter als hoch
+			else {
 
-			// println("arc drawn?");
-			for (int i = 0; i < file.attributeBindings.size(); i++) {
-				arc(textu, textu.width / 2, textu.height / 2,
-						(360 - (1.0f / (parts * 4)) * 360) + i * (360.0f / parts), (360 + (1.0f / (parts * 4)) * 360)
-								+ i * (360.0f / parts), 30, 5);
+				textu.textFont(font, (int) (textu.height * 0.15f));
+
+				// text länger als einzeilig
+				if (textWidth(file.name) > textu.width - textu.width * 0.2f) {
+					// verkleinere text
+					textu.textFont(font, (int) (textu.width * 0.12f));
+					textu.text(file.name, textu.width / 2, textu.height - (int) (textu.width * 0.2f), textu.width
+							- (textu.width * 0.2f), (textu.height * 0.4f));
+				}
+				// einzeilig
+				else {
+					textu.text(file.name, textu.width / 2, textu.height - (int) (textu.height * 0.1f));
+				}
 			}
 		}
-		
-		textu.fill(cFont);
-		textu.rectMode(PConstants.CENTER);
-		textu.textAlign(PConstants.CENTER, PConstants.CENTER);
-		textu.textFont(font, 60);
-		textu.text(file.name, textu.width/2, textu.height - 70, textu.width-80, 120);
+
+		// draw Arcs
+		// textu.fill(255, 0, 0);
+		// textu.noStroke();
+		//
+		// if (file.attributeBindings.size() > 0) {
+		// int parts = file.attributeBindings.size();
+		//
+		// // println("arc drawn?");
+		// for (int i = 0; i < file.attributeBindings.size(); i++) {
+		// arc(textu, textu.width / 2, textu.height / 2,
+		// (360 - (1.0f / (parts * 4)) * 360) + i * (360.0f / parts), (360 +
+		// (1.0f / (parts * 4)) * 360)
+		// + i * (360.0f / parts), 30, 5);
+		// }
+		// }
 
 		textu.endDraw();
 
 		return textu;
+
+	}
+
+	public PGraphics generateTexture(Tag_File file) {
+
+		return generateTexture(file, 100, 100);
+	}
+
+	public PImage getFileTypeImage(FileType fileType) {
+		// Icon
+		PImage icon;
+		switch (fileType) {
+		case IMAGE:
+			// textu.image(texture_IMAGE, 0, 0);
+			icon = texture_IMAGE;
+			break;
+		case MESSAGE:
+			icon = texture_MESSAGE;
+			break;
+		case TEXT:
+			icon = texture_TEXT;
+			break;
+		case WEB:
+			icon = texture_WEB;
+			break;
+		case FONT:
+			icon = texture_FONT;
+			break;
+		case VIDEO:
+			icon = texture_VIDEO;
+			break;
+		case AUDIO:
+			icon = texture_AUDIO;
+			break;
+		case LAYOUT:
+			icon = texture_LAYOUT;
+			break;
+		case VECTOR:
+			icon = texture_VECTOR;
+			break;
+		default:
+			icon = texture_TEXT;
+			break;
+		}
+		return icon;
 	}
 
 	// Draw solid arc
@@ -2192,36 +2353,56 @@ public class TagExplorerProcessing2 extends PApplet {
 	}
 
 	public PShape generateTreemapShape(Tag_File file) {
-		PShape s = createShape();
-		 s.noStroke();
-		 if (file.textur == null) {
-		 // wenn shape aus anderem Thread WatchDir erzeugt wird -> Java
-		 // Exeption!
-		 return null;
-		 }
-		 // PGraphics tex = generateTexture((Tag_File) file);
-		 s.texture(file.textur);
 
-		
-		 int abstand = 3;
-		 
-		MapItem mItem = getMapItemById(file.id);
-		if (mItem != null) {
-			s.vertex(mItem.x - mainscreen.width/2 +abstand, 				mItem.y - mainscreen.height/2 + abstand, 0, 0, 0);
-			s.vertex(mItem.x + mItem.w - mainscreen.width/2 - abstand,		mItem.y - mainscreen.height/2 + abstand, 0, file.textur.width, 0);
-			s.vertex(mItem.x + mItem.w - mainscreen.width/2 - abstand,		mItem.y + mItem.h - mainscreen.height/2 - abstand, 0, file.textur.width, file.textur.height);
-			s.vertex(mItem.x - mainscreen.width/2 + abstand,				mItem.y + mItem.h - mainscreen.height/2 - abstand, 0,  0, file.textur.height);
-//			
-//			s.vertex(-mItem.w/2, -mItem.h/2, 0);
-//			s.vertex(mItem.w/2,  -mItem.h/2, 0);
-//			s.vertex(mItem.w/2, + mItem.h/2, 0);
-//			s.vertex(-mItem.w/2,+ mItem.h/2, 0);
-			
-//			file.x = mItem.x;
-//			file.y = mItem.y;
-			
-			
+		// im nächsten draw() werden Treemap textures erstellt
+
+		if (file.textur == null) {
+			// wenn shape aus anderem Thread WatchDir erzeugt wird -> Java
+			// Exeption!
+			return null;
 		}
+		// PGraphics tex = generateTexture((Tag_File) file);
+		// file.textur = null;
+		// file.setTextur(generateTexture(file, file.treemapW, file.treemapH));
+
+		// erzeuge Textur in Form des Treemmap Items
+
+		PShape s = createShape();
+		s.noStroke();
+
+		s.texture(file.textur);
+
+		int abstand = 3;
+
+		// get information von File
+		// MapItem mItem = getMapItemById(file.id);
+		if (file.treemapH != 0) {
+			s.vertex(file.x - file.treemapW / 2 + abstand, file.y - file.treemapH / 2 + abstand, 0, 0, 0);
+			s.vertex(file.x + file.treemapW / 2 - abstand, file.y - file.treemapH / 2 + abstand, 0, file.textur.width,
+					0);
+			s.vertex(file.x + file.treemapW / 2 - abstand, file.y + file.treemapH / 2 - abstand, 0, file.textur.width,
+					file.textur.height);
+			s.vertex(file.x - file.treemapW / 2 + abstand, file.y + file.treemapH / 2 - abstand, 0, 0,
+					file.textur.height);
+
+		}
+
+		// get positon and information by treemapItem
+		// MapItem mItem = getMapItemById(file.id);
+		// if (mItem != null) {
+		// s.vertex(mItem.x - mainscreen.width / 2 + abstand, mItem.y -
+		// mainscreen.height / 2 + abstand, 0, 0, 0);
+		// s.vertex(mItem.x + mItem.w - mainscreen.width / 2 - abstand, mItem.y
+		// - mainscreen.height / 2 + abstand, 0,
+		// file.textur.width, 0);
+		// s.vertex(mItem.x + mItem.w - mainscreen.width / 2 - abstand, mItem.y
+		// + mItem.h - mainscreen.height / 2
+		// - abstand, 0, file.textur.width, file.textur.height);
+		// s.vertex(mItem.x - mainscreen.width / 2 + abstand, mItem.y + mItem.h
+		// - mainscreen.height / 2 - abstand, 0,
+		// 0, file.textur.height);
+		//
+		// }
 
 		s.end(CLOSE);
 		return s;
@@ -2231,7 +2412,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		for (MapItem i : mapData.mapItems) {
 			if (i.id == id) {
-				//println("getMapItemById(): " + id);
+				// println("getMapItemById(): " + id);
 				return i;
 			}
 		}
@@ -2275,7 +2456,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	}
 
 	public PShape makeRect(Tag file, Timestamp ts) {
-		float z = -timeline.mapExp(System.currentTimeMillis() - ts.getTime());
+		float z = (float) -timeline.mapExpMillis(System.currentTimeMillis() - ts.getTime());
 
 		PShape s = createShape();
 		s.noStroke();
@@ -2303,7 +2484,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	}
 
 	public PShape makeOcto(Tag file, Timestamp ts) {
-		float z = -timeline.mapExp(System.currentTimeMillis() - ts.getTime());
+		float z = (float) -timeline.mapExpMillis(System.currentTimeMillis() - ts.getTime());
 
 		PShape s = createShape();
 		s.noStroke();
@@ -2723,7 +2904,15 @@ public class TagExplorerProcessing2 extends PApplet {
 		// cam_eye_target.z += 150;
 		// // println("cam_eye.y = " + cam_eye.y);
 		// break;
-
+		case 'T':
+			println("Set minTime als Filter");
+			Timestamp ts = new Timestamp(System.currentTimeMillis() - 14L * 24 * 60 * 60 * 1000);
+			minTime = ts;
+			// Tag_LastTime lt = new Tag_LastTime(this, ts);
+			// Filter minTime = new Filter(lt, true);
+			// filterList.add(minTime);
+			updateShowFiles();
+			break;
 		case 'w':
 			cam_eyetargetpos.z += 20;
 			break;
@@ -2736,9 +2925,13 @@ public class TagExplorerProcessing2 extends PApplet {
 		case '3':
 			cam_eyetargetpos = cam_eye3Dpos;
 			break;
-//		case '0':
-//			createTreeMap(showFiles);
-//			break;
+
+		case '9':
+			showButtons = !showButtons;
+			break;
+		// case '0':
+		// createTreeMap(showFiles);
+		// break;
 		}
 
 	}
@@ -3007,7 +3200,8 @@ public class TagExplorerProcessing2 extends PApplet {
 		appsButton = loadImage(VersionBuilder.versionsVerzeichnis + "applications/apps.png");
 		backgroundApp = loadImage("../data/backgroundApp.png");
 
-		backgroundTransition = loadImage("../data/background.png");
+		backgroundTransition = loadImage("../data/hintergrund_1600x1200.png");
+		// backgroundTransition = loadImage("../data/background.png");
 
 		// Label miniaturen Dropdown Menu & Filter
 		minCall = loadImage("../data/call.png");
@@ -3084,7 +3278,8 @@ public class TagExplorerProcessing2 extends PApplet {
 			drawTreemap = false;
 
 			// vor setZTimeAxis!
-			setShape();
+			updateShowFiles();
+			// setShape();
 
 			setButtonState("drawAccessShapes", false);
 			setButtonState("drawTreemap", false);
@@ -3094,26 +3289,32 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	public void drawTreemap(boolean onOff) {
 		drawTreemap = onOff;
+
+		// erzeuge Treemap Texturen oder setze auf standartTexturen zurück
+		// updateTextures = true;
 		if (drawTreemap) {
 			// cp5_Test.get(Toggle.class, "drawAccessShapes").setState(false);
-			
+
 			drawAccessShapes = false;
 			draw2DShape = false;
 
 			// vor setZTimeAxis!
-			
+
 			setButtonState("position2D", false);
 			setButtonState("position1D", false);
-			
+
 			// setze Partikelpositon neu als Treemap
 			updateShowFiles();
-			
+
 			// passiert in updateShowFiles
-			//setShape();
+			// setShape();
 
 			setButtonState("drawAccessShapes", false);
 			setButtonState("draw2DShape", false);
-			setZTimeAxis(false);
+			// setButtonState("setZTimeAxis", false);
+
+			// passiert in updateShowFiles()
+			// setZTimeAxis(false);
 		}
 	}
 
