@@ -189,6 +189,8 @@ public class TagExplorerProcessing2 extends PApplet {
 	PImage newsButton_h;
 
 	PImage backgroundTransition;
+	
+	PImage schatten;
 
 	PImage appsButton;
 	PImage backgroundApp;
@@ -832,6 +834,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 			// renderer.shader(plifShader);
 			boolean drawShape = false;
+			renderer.fill(0);
 			for (int i = 0; i < filePhysics.particles.size(); i++) {
 				Tag_File file = (Tag_File) filePhysics.particles.get(i);
 
@@ -839,12 +842,26 @@ public class TagExplorerProcessing2 extends PApplet {
 				if (file.shape != null) {
 					drawShape = true;
 					s.addChild(file.shape);
+					
+					if(draw2DShape && (position1D || file.y > renderer.height/2 - 70)){
+						PShape shadow = createShape();
+						shadow.fill(0);
+						shadow.texture(schatten);
+						
+						shadow.vertex(file.x - 70, file.y +59, file.z+12, 0, 0);
+						shadow.vertex(file.x - 70, file.y +59, file.z-12, 0, schatten.height);
+						shadow.vertex(file.x + 70, file.y +59, file.z-12, schatten.width, schatten.height);
+						shadow.vertex(file.x + 70, file.y +59, file.z+12, schatten.width, 0);
+						
+						shadow.end();
+						s.addChild(shadow);
+					}
 
 					// debug
 					// if (mousePressed) {
 					// println((Tag_File) filePhysics.particles.get(i));
 					// }
-
+					
 					// if (draw2DShape) {
 					// renderer.pushMatrix();
 					// renderer.translate(file.x, file.y, file.z);
@@ -1960,6 +1977,9 @@ public class TagExplorerProcessing2 extends PApplet {
 					((Tag_File) t).shape.translate(t.x, t.y, 0);
 				}
 			}
+			if(drawTreemap){
+				((Tag_File) t).shape.translate(0, 0, -t.z);
+			}
 			t.z = 0;
 		}
 	}
@@ -2048,7 +2068,7 @@ public class TagExplorerProcessing2 extends PApplet {
 			Tag_File file = (Tag_File) t;
 			if (file.id == originId || file.origin_ID == originId || file.parent_ID == originId) {
 				results.add(file);
-				println(file.name + " " + file.id);
+				//println(file.name + " " + file.id);
 			}
 		}
 
@@ -3196,6 +3216,8 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		newsButton = loadImage("../data/newsButton.png");
 		newsButton_h = loadImage("../data/newsButton_h.png");
+		
+		schatten = loadImage("../data/schatten.png");
 
 		appsButton = loadImage(VersionBuilder.versionsVerzeichnis + "applications/apps.png");
 		backgroundApp = loadImage("../data/backgroundApp.png");

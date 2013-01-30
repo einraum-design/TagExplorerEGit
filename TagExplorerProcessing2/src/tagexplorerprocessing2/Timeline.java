@@ -3,10 +3,13 @@ package tagexplorerprocessing2;
 import java.sql.Timestamp;
 
 import processing.core.PApplet;
+import processing.core.PConstants;
 import processing.core.PGraphics;
+import processing.core.PImage;
 
 public class Timeline {
-
+	PImage zeitbereich_hover;
+	PImage zeitbereich_wand;
 	TagExplorerProcessing2 p5;
 	PGraphics pg;
 	Timestamp oldest = null;
@@ -17,6 +20,8 @@ public class Timeline {
 		this.p5 = p5;
 
 		pg = p5.createGraphics(200, p5.height);
+		zeitbereich_hover = p5.loadImage("../data/zeitbereich_hover3.png");
+		zeitbereich_wand = p5.loadImage("../data/zeitbereich_wand.png");
 
 		// timelineLength = pg.height - 80;
 
@@ -27,11 +32,11 @@ public class Timeline {
 		if (oldest != null) {
 			renderer.noStroke();
 			renderer.fill(255, 150);
-			
+
 			renderer.pushMatrix();
-			
-			renderer.translate(renderer.width/2 - 120, renderer.height/2 - 60);
-			
+
+			renderer.translate(renderer.width / 2 - 120, renderer.height / 2);
+
 			renderer.beginShape();
 			renderer.vertex(10, 0, 0);
 			renderer.vertex(10, 0, -timelineLength);
@@ -39,17 +44,16 @@ public class Timeline {
 			renderer.vertex(-10, 0, 0);
 			renderer.endShape(p5.CLOSE);
 
-//			renderer.pushMatrix();
-			
-			
-			
+			// renderer.pushMatrix();
 
 			renderer.textAlign(p5.CENTER);
+			renderer.textFont(p5.font, 18);
+			
 
 			renderTime(renderer, 60L * 60 * 1000, "1 hour");
 			renderTime(renderer, 24L * 60 * 60 * 1000, "1 day");
 			renderTime(renderer, 7L * 24 * 60 * 60 * 1000, "1 week");
-			renderTime(renderer, 14L * 24 * 60 * 60 * 1000, "2 weeks");
+			//renderTime(renderer, 14L * 24 * 60 * 60 * 1000, "2 weeks");
 			renderTime(renderer, 21L * 24 * 60 * 60 * 1000, "3 weeks");
 			// renderTime(renderer, 28L * 24 * 60 * 60 * 1000, "4 weeks ");
 			renderTime(renderer, 30L * 24 * 60 * 60 * 1000, "1 month");
@@ -58,34 +62,85 @@ public class Timeline {
 
 			renderTime(renderer, System.currentTimeMillis() - oldest.getTime(), oldest.toGMTString());
 
-//			renderer.popMatrix();
+			// renderer.popMatrix();
 			renderer.popMatrix();
-			
-			renderZeitbereich(renderer, 0, 24L * 60 * 60 * 1000); // jetzt bis 1 Tag
-			renderZeitbereich(renderer,  7L * 24 * 60 * 60 * 1000, 14L * 24 * 60 * 60 * 1000); // letzte woche
-			renderZeitbereich(renderer,  21L * 24 * 60 * 60 * 1000, 30L * 24 * 60 * 60 * 1000); // 3. woche bis monatsende
-			renderZeitbereich(renderer,  180L * 24 * 60 * 60 * 1000, 365L * 24 * 60 * 60 * 1000); // Halbjahr bis Jahresende
-			renderZeitbereich(renderer,  730L * 24 * 60 * 60 * 1000, 1095L * 24 * 60 * 60 * 1000); // Halbjahr bis Jahresende
-//			renderZeitbereich(renderer,  180L * 24 * 60 * 60 * 1000, 365L * 24 * 60 * 60 * 1000); // Halbjahr bis Jahresende
+
+			// renderZeitbereich(renderer, 0, 24L * 60 * 60 * 1000); // jetzt
+			// bis 1 Tag
+			// renderZeitbereich(renderer, 7L * 24 * 60 * 60 * 1000, 14L * 24 *
+			// 60 * 60 * 1000); // letzte woche
+			// renderZeitbereich(renderer, 21L * 24 * 60 * 60 * 1000, 30L * 24 *
+			// 60 * 60 * 1000); // 3. woche bis monatsende
+			// renderZeitbereich(renderer, 180L * 24 * 60 * 60 * 1000, 365L * 24
+			// * 60 * 60 * 1000); // Halbjahr bis Jahresende
+			// renderZeitbereich(renderer, 730L * 24 * 60 * 60 * 1000, 1095L *
+			// 24 * 60 * 60 * 1000); // Halbjahr bis Jahresende
+			// renderZeitbereich(renderer, 180L * 24 * 60 * 60 * 1000, 365L * 24
+			// * 60 * 60 * 1000); // Halbjahr bis Jahresende
+
+			if (p5.minTime != null) {
+				// minTime bis jetzt
+				renderZeitbereich(renderer, 0, System.currentTimeMillis() - p5.minTime.getTime()); 
+				// wand at minTime
+//				if(p5.mousePressed){
+				renderWall(renderer, System.currentTimeMillis() - p5.minTime.getTime());
+//				}
+				
+				
+				//renderTime(renderer, System.currentTimeMillis() - p5.minTime.getTime(), "letzter Besuch");
+				
+				renderer.pushMatrix();
+				renderer.translate(renderer.width/2, renderer.height/2, -mapExpMillis(System.currentTimeMillis() - p5.minTime.getTime()));
+//				renderer.rotateX(p5.xBillboardRotation);
+//				renderer.rotateY(p5.yBillboardRotation);
+				renderer.fill(0, 200, 200);
+				renderer.textAlign(PConstants.RIGHT, PConstants.BOTTOM);
+				renderer.textFont(p5.font, 24);
+				renderer.text("letzter Besuch", 0, 0);
+//				renderer.rotateY(-p5.yBillboardRotation);
+//				renderer.rotateX(-p5.xBillboardRotation);
+				renderer.popMatrix();
+			}
+
 		}
 	}
 	
-	public void renderZeitbereich(PGraphics renderer, long startTime, long endTime){
-		renderer.fill(0, 180);
+	public void renderWall(PGraphics renderer, long time) {
+		// renderer.fill(0, 180);
 		renderer.beginShape();
-		
-//		System.out.println("starttime" + -mapExpMillis(startTime));
-//		System.out.println("endtime: " + -mapExpMillis(endTime));
-		
-//		renderer.translate(0, 0, -mapExpMillis(startTime));
-		
-		renderer.vertex(-renderer.width/2, renderer.height/2 - 60, -mapExpMillis(startTime));
-		renderer.vertex(renderer.width/2,  renderer.height/2 - 60, -mapExpMillis(startTime));
-		renderer.vertex(renderer.width/2,  renderer.height/2 - 60, -mapExpMillis(endTime));
-		renderer.vertex(-renderer.width/2, renderer.height/2 - 60, -mapExpMillis(endTime));
+
+		// System.out.println("starttime" + -mapExpMillis(startTime));
+		// System.out.println("endtime: " + -mapExpMillis(endTime));
+
+		renderer.texture(zeitbereich_wand);
+		renderer.vertex(-renderer.width / 2, -renderer.height / 2, -mapExpMillis(time), 0, 0);
+		renderer.vertex(renderer.width / 2, -renderer.height / 2, -mapExpMillis(time), zeitbereich_hover.width, 0);
+		renderer.vertex(renderer.width / 2, renderer.height / 2, -mapExpMillis(time), zeitbereich_hover.width,
+				zeitbereich_hover.height);
+		renderer.vertex(-renderer.width / 2, renderer.height / 2, -mapExpMillis(time), 0, zeitbereich_hover.height);
 		renderer.endShape(p5.CLOSE);
 		
-//		renderer.translate(0, 0, mapExpMillis(startTime));
+		
+
+		// renderer.translate(0, 0, mapExpMillis(startTime));
+	}
+
+	public void renderZeitbereich(PGraphics renderer, long startTime, long endTime) {
+		// renderer.fill(0, 180);
+		renderer.beginShape();
+
+		// System.out.println("starttime" + -mapExpMillis(startTime));
+		// System.out.println("endtime: " + -mapExpMillis(endTime));
+
+		renderer.texture(zeitbereich_hover);
+		renderer.vertex(-renderer.width / 2, renderer.height / 2, -mapExpMillis(startTime), 0, 0);
+		renderer.vertex(renderer.width / 2, renderer.height / 2, -mapExpMillis(startTime), zeitbereich_hover.width, 0);
+		renderer.vertex(renderer.width / 2, renderer.height / 2, -mapExpMillis(endTime), zeitbereich_hover.width,
+				zeitbereich_hover.height);
+		renderer.vertex(-renderer.width / 2, renderer.height / 2, -mapExpMillis(endTime), 0, zeitbereich_hover.height);
+		renderer.endShape(p5.CLOSE);
+
+		// renderer.translate(0, 0, mapExpMillis(startTime));
 	}
 
 	public void renderTime(PGraphics renderer, long time, String name) {
@@ -111,17 +166,19 @@ public class Timeline {
 		if (oldest == null) {
 			return 0;
 		}
-		float val = p5.map(p5.sqrt(time/1000), 0, p5.sqrt(System.currentTimeMillis()/1000 - oldest.getTime()/1000), 0, timelineLength);
+		float val = p5.map(p5.sqrt(time / 1000), 0,
+				p5.sqrt(System.currentTimeMillis() / 1000 - oldest.getTime() / 1000), 0, timelineLength);
 		// System.out.println("val: " + p5.sqrt(time));
 		return val;
 	}
-	
+
 	public float mapExpSeconds(long time) {
 
 		if (oldest == null) {
 			return 0;
 		}
-		float val = p5.map(p5.sqrt(time), 0, p5.sqrt(System.currentTimeMillis()/1000 - oldest.getTime()/1000), 0, timelineLength);
+		float val = p5.map(p5.sqrt(time), 0, p5.sqrt(System.currentTimeMillis() / 1000 - oldest.getTime() / 1000), 0,
+				timelineLength);
 		// System.out.println("val: " + p5.sqrt(time));
 		return val;
 	}
