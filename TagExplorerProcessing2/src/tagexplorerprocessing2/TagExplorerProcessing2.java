@@ -112,6 +112,9 @@ public class TagExplorerProcessing2 extends PApplet {
 	// Interaction
 	Tag startTag = null;
 	boolean mouseActive = true;
+	
+	boolean clickNextFrame = false;
+	
 	Timestamp lastClick;
 
 	// Camera
@@ -716,6 +719,8 @@ public class TagExplorerProcessing2 extends PApplet {
 		physics.update();
 		filePhysics.update();
 		appPhysics.update();
+		
+		clickNextFrame = false;
 	}
 
 	public void drawPGTexture() {
