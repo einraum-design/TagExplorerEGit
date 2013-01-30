@@ -93,7 +93,10 @@ public class MenuPlane extends Plane {
 					// get lastTime Tag used as Filter: Timestamp
 					tag.lastStartFilterTime = p5.SQL.getFilterTime(tag, "start_time");
 					tag.lastEndFilterTime = p5.SQL.getFilterTime(tag, "end_time");
-
+					
+					// Set minTime
+					p5.minTime = tag.lastStartFilterTime;
+					
 					// Save Timestamp and TagID and TagType -> SQL filter_time
 					p5.SQL.setFilterTime(tag, true); // startFilter
 

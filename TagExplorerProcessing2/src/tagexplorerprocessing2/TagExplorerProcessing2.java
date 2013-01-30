@@ -729,6 +729,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	public void drawUserChooser() {
 		if (userChooser == null) {
+			minTime = null;
 			filterList.clear();
 			userChooser = new UserChooserPlane(this, width / 2, height / 5);
 		}
