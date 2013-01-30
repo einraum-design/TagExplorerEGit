@@ -1,5 +1,6 @@
 package tagexplorerprocessing2;
 
+import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PShape;
 import toxi.geom.Vec2D;
@@ -12,9 +13,12 @@ public class CamMover extends Vec2D {
 
 	float h;
 	float w;
+	
+	float minY;
+	float maxY;
 
 
-	public CamMover(TagExplorerProcessing2 p5, int x, int y) {
+	public CamMover(TagExplorerProcessing2 p5, int x, int y, int chooserH) {
 		super(x, y);
 
 		this.p5 = p5;
@@ -26,7 +30,10 @@ public class CamMover extends Vec2D {
 		w = h * 2;
 		
 		this.x = x;
-		this.y = y - h; // startY    	// + p5.timeline.mapExpCam(p5.cam_eyetargetpos.z - (p5.height / 2.0f) / p5.tan(PConstants.PI * 30.0f / 180.0f), h) - hFeld;
+		this.y = y-h; // startY    	// + p5.timeline.mapExpCam(p5.cam_eyetargetpos.z - (p5.height / 2.0f) / p5.tan(PConstants.PI * 30.0f / 180.0f), h) - hFeld;
+		
+		minY = this.y - chooserH;
+		maxY = this.y;
 
 		// MinTime Feld
 		mover = p5.createShape();
@@ -48,6 +55,11 @@ public class CamMover extends Vec2D {
 		p5.pushMatrix();
 		p5.translate(x, y);
 		
+		if(mouseOver() && p5.setZTimeAxis){
+			mover.fill(p5.cBorderHover);
+		} else{
+			mover.fill(p5.cTagDark);
+		}
 		p5.shape(mover);
 		
 		// Icon
@@ -58,18 +70,26 @@ public class CamMover extends Vec2D {
 	}
 	
 	public void setY(float setY){
-		y  = setY - h/2;
+		y  = PApplet.constrain(setY - h/2, minY, maxY);
 		
 		
 		// mapping eventuell noch logarithmisch? - müsste stimmen
 		
 		// calc cameraTarget
-		p5.cam_eyetargetpos.z = p5.map(y+h, 
+		p5.cam_eyetargetpos.z = PApplet.map(y+h, 
 				p5.timeChooser.y + p5.timeChooser.h, p5.timeChooser.y, 
-				(p5.height / 2.0f) / p5.tan(PConstants.PI * 30.0f / 180.0f), 
-				- p5.timeline.timelineLength + (p5.height / 2.0f) / p5.tan(PConstants.PI * 30.0f / 180.0f));
+				(p5.height / 2.0f) / PApplet.tan(PConstants.PI * 30.0f / 180.0f), 
+				- p5.timeline.timelineLength + (p5.height / 2.0f) / PApplet.tan(PConstants.PI * 30.0f / 180.0f));
 		
 		//System.out.println("set Y: " + p5.cam_eyetargetpos.z + " " + (p5.timeChooser.y + p5.timeChooser.h) + " " + (p5.timeChooser.y) + " " + ((p5.height / 2.0f) / p5.tan(PConstants.PI * 30.0f / 180.0f)) + " " + (p5.timeline.timelineLength + (p5.height / 2.0f) / p5.tan(PConstants.PI * 30.0f / 180.0f)));
+	}
+
+	public void reset(){
+		
+		this.y  = (p5.timeChooser.y + p5.timeChooser.h - h);
+		
+		// reset Cam Position
+		p5.cam_eyetargetpos = p5.cam_eye2Dpos.copy();
 	}
 
 	public boolean mouseOver(float x, float y, float w, float h) {

@@ -846,6 +846,9 @@ public class SQLhelper {
 					case "MESSAGE":
 						tag.setFileType(FileType.MESSAGE);
 						break;
+					case "IMAGE":
+						tag.setFileType(FileType.IMAGE);
+						break;
 					case "TEXT":
 						tag.setFileType(FileType.TEXT);
 						break;

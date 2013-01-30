@@ -74,6 +74,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	ArrayList<Button_App> appButtons = new ArrayList<Button_App>();
 
 	Tag_File oldest_showFile = null;
+	Tag_File oldest_File = null;
 
 	Timestamp minTime = null;
 	Timestamp maxTime = null;
@@ -87,7 +88,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	boolean drawTags = false;
 
-	boolean draw2DShape = false;
+	boolean draw2DShape = true;
 	boolean drawTreemap = false;
 
 	boolean showTimeline = false;
@@ -95,6 +96,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	boolean setZTimeAxis = false;
 	boolean position1D = false;
 	boolean position2D = true;
+	// boolean position2Ddown = false;
 
 	boolean enableVersionBinding = false;
 	boolean enableTagBinding = false;
@@ -113,10 +115,10 @@ public class TagExplorerProcessing2 extends PApplet {
 	// Interaction
 	Tag startTag = null;
 	boolean mouseActive = true;
-	
+
 	boolean startClickNextFrame = false;
 	boolean clickNextFrame = false;
-	
+
 	Timestamp lastClick;
 
 	// Camera
@@ -146,7 +148,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	PShape fileShape;
 
 	String[] imageExtension = { "jpg", "jpeg", "png", "gif", "psd", "tif", "tiff", "bmp", "tga" };
-	String[] vectorExtension = { "ai", "drw", "eps", "ps", "svg" };
+	String[] vectorExtension = { "ai", "drw", "eps", "ps", "svg", "c4d" };
 	String[] layoutExtension = { "indd", "pdf", "pxd", "pxp" };
 	String[] audioExtension = { "aif", "m4a", "mid", "mp3", "mpa", "wav", "wma" };
 	String[] videoExtension = { "avi", "flv", "mov", "mp4", "mpg", "swf", "wmv", "vob" };
@@ -171,7 +173,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	PImage close;
 	PImage close_h;
 	PImage open;
-	
+
 	PImage cameraImg;
 
 	PImage texture_connection;
@@ -196,7 +198,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	PImage newsButton_h;
 
 	PImage backgroundTransition;
-	
+
 	PImage schatten;
 
 	PImage appsButton;
@@ -235,7 +237,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	int cButtonBright;
 	int cDropdownHover;
-	
+
 	int cPopUp;
 	int cTagDark;
 
@@ -280,9 +282,9 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		cButtonBright = color(241);
 		cDropdownHover = color(230);
-		
+
 		cPopUp = color(111, 126, 132);
-		cTagDark = color(72,86,92);
+		cTagDark = color(72, 86, 92);
 
 		// Date Formatter
 		sdf = new SimpleDateFormat();
@@ -333,6 +335,9 @@ public class TagExplorerProcessing2 extends PApplet {
 		testButton.add(new Button_LabelToggle(this, "setZTimeAxis", false, 10, 20, width - 120, 150));
 		testButton.add(new Button_LabelToggle(this, "position1D", false, 10, 20, width - 120, 190));
 		testButton.add(new Button_LabelToggle(this, "position2D", false, 10, 20, width - 120, 210));
+		// testButton.add(new Button_LabelToggle(this, "position2Ddown", false,
+		// 10, 20, width - 40, 210));
+
 		testButton.add(new Button_LabelToggle(this, "last", false, 10, 20, width - 20, 230));
 		testButton.add(new Button_LabelToggle(this, "enableVersionBinding", false, 10, 20, width - 120, 270));
 		testButton.add(new Button_LabelToggle(this, "enableTagBinding", false, 10, 20, width - 120, 300));
@@ -370,7 +375,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		cam_eye2Dpos = new Vec3D(width / 2.0f, height / 2.0f, (height / 2.0f) / tan(PI * 30.0f / 180.0f));
 		cam_eye3Dpos = new Vec3D(width / 2.0f, height * 2, (height / 2.0f) / tan(PI * 30.0f / 180.0f));
 
-		cam_eyeaktuellpos = cam_eye2Dpos;
+		cam_eyeaktuellpos = cam_eye2Dpos.copy();
 		cam_eyetargetpos = cam_eyeaktuellpos;
 
 		cam_target = new Vec3D(width / 2.0f, height / 2.0f, cam_eyeaktuellpos.z - (height / 2.0f)
@@ -379,18 +384,18 @@ public class TagExplorerProcessing2 extends PApplet {
 		mainscreen.camera(cam_eyeaktuellpos.x, cam_eyeaktuellpos.y, cam_eyeaktuellpos.z, cam_target.x, cam_target.y,
 				cam_target.z, 0, 1, 0);
 
-		
-		
-//		transition = loadShader("../shader/transition.glsl");
-//		transition.set("res", (float) (mainscreen.width), (float) (mainscreen.height));
-//		transition.set("color", (1.0f), (1.0f), (1.0f));
-//
-//		transition2 = loadShader("../shader/transition.glsl");
-//		transition2.set("res", 100.0f, 100.0f);
-//		transition2.set("color", (1.0f), (0.1f), (0.1f));
-//
-//		plifShader = loadShader("../shader/plifFrag.glsl", "../shader/plifVert.glsl");
-//		env_plif = loadImage("../data/env_plif.jpg");
+		// transition = loadShader("../shader/transition.glsl");
+		// transition.set("res", (float) (mainscreen.width), (float)
+		// (mainscreen.height));
+		// transition.set("color", (1.0f), (1.0f), (1.0f));
+		//
+		// transition2 = loadShader("../shader/transition.glsl");
+		// transition2.set("res", 100.0f, 100.0f);
+		// transition2.set("color", (1.0f), (0.1f), (0.1f));
+		//
+		// plifShader = loadShader("../shader/plifFrag.glsl",
+		// "../shader/plifVert.glsl");
+		// env_plif = loadImage("../data/env_plif.jpg");
 
 		// fileShape = createShape(SPHERE, 10);
 		fileShape = createShape(BOX, 20);
@@ -422,9 +427,9 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		// TIMELINE
 		timeline = new Timeline(this);
-		
+
 		// TimeChooser
-		timeChooser = new TimeChooser(this, width - 80, height/5);
+		timeChooser = new TimeChooser(this, width - 80, height / 5);
 
 		// Comparator
 		comp_id = new Tag_Comparator_Id();
@@ -449,6 +454,9 @@ public class TagExplorerProcessing2 extends PApplet {
 		// erst Tags, dann Files!
 		attributes = initTagsFromDB();
 		initFilesFromDB();
+		
+		oldest_File = (Tag_File) getOldestTagFile(files);
+		
 		updateShowFiles();
 		updateTags();
 		updateSprings();
@@ -494,12 +502,11 @@ public class TagExplorerProcessing2 extends PApplet {
 			first = false;
 
 		}
-		
-		if(startClickNextFrame){
+
+		if (startClickNextFrame) {
 			clickNextFrame = true;
 			startClickNextFrame = false;
 		}
-		
 
 		// if (updateTextures) {
 		//
@@ -519,7 +526,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		// update interpolate cam position
 		cam_eyeaktuellpos = interpolateVec(cam_eyeaktuellpos, cam_eyetargetpos);
-		
+
 		// target.z wird mitverschoben
 		cam_target.z = cam_eyeaktuellpos.z - (height / 2.0f) / tan(PI * 30.0f / 180.0f);
 
@@ -544,25 +551,24 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		// imageMode(CORNER);
 		// image(backgroundTransition, 0,0);
-		
-		
-		//PShape back = createShape(PConstants.RECT, -100, 0, width + 200, height);
+
+		// PShape back = createShape(PConstants.RECT, -100, 0, width + 200,
+		// height);
 		PShape back = createShape();
-		
+
 		back.texture(backgroundTransition);
-		
+
 		back.vertex(-100, 0, 0, 0);
 		back.vertex(width + 200, 0, backgroundTransition.width, 0);
 		back.vertex(width + 200, height, backgroundTransition.width, backgroundTransition.height);
 		back.vertex(-100, height, 0, backgroundTransition.height);
-		//back.fill(255);
+		// back.fill(255);
 		back.end();
-		
-		back.translate(0, (cam_eyeaktuellpos.y - height/2.0f)*2);
-		back.scale(1, map(cam_eyeaktuellpos.y, height/2, 0, 1, 2));
+
+		back.translate(0, (cam_eyeaktuellpos.y - height / 2.0f) * 2);
+		back.scale(1, map(cam_eyeaktuellpos.y, height / 2, 0, 1, 2));
 		shape(back);
 
-		
 		// set Mouse active nach jeweils 600 millis;
 		if (System.currentTimeMillis() > lastClick.getTime() + 1200) {
 			mouseActive = true;
@@ -573,8 +579,8 @@ public class TagExplorerProcessing2 extends PApplet {
 		// println("mouseActive: " + mouseActive);
 
 		// calcBillboardRotation();
-//		transition.set("shaderTime", (millis() / 1000.0f));
-//		transition2.set("shaderTime", (millis() / 1000.0f));
+		// transition.set("shaderTime", (millis() / 1000.0f));
+		// transition2.set("shaderTime", (millis() / 1000.0f));
 
 		// plifShader.set("shininess", 5.1f);
 		// plifShader.set("EnvMap", 0);
@@ -582,7 +588,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		// plifShader.set("SpecularVal", 0.2f);
 
 		// modelTextur
-//		drawPGTexture();
+		// drawPGTexture();
 
 		// control p5 Promt
 		// removeController by Button cancel
@@ -632,8 +638,8 @@ public class TagExplorerProcessing2 extends PApplet {
 		// drawApplications
 		for (Button_App b : appButtons) {
 			b.render();
-			//if (mouseActive && b.mouseOver() && mousePressed) {
-			if(clickNextFrame && b.mouseOver()){
+			// if (mouseActive && b.mouseOver() && mousePressed) {
+			if (clickNextFrame && b.mouseOver()) {
 				if (b.app != null && b.app.url != null) {
 					println("open: " + b.app.url);
 					open(b.app.url);
@@ -652,16 +658,9 @@ public class TagExplorerProcessing2 extends PApplet {
 		// MenuPlane
 		menuPlane.render();
 		menuPlane.update();
-		
-		
-		
+
 		// TimeChoose
 		timeChooser.render();
-		
-		
-		
-		
-		
 
 		// NewsFeed
 		if (mainUser != null) {
@@ -702,8 +701,8 @@ public class TagExplorerProcessing2 extends PApplet {
 			for (Button_LabelToggle b : testButton) {
 				b.render();
 
-				//if (mouseActive && b.mouseOver() && mousePressed) {
-				if(clickNextFrame && b.mouseOver()){
+				// if (mouseActive && b.mouseOver() && mousePressed) {
+				if (clickNextFrame && b.mouseOver()) {
 
 					switch (b.label) {
 					case "showVersions":
@@ -738,6 +737,10 @@ public class TagExplorerProcessing2 extends PApplet {
 						b.toggle();
 						position2D(b.onOff);
 						break;
+					// case "position2Ddown":
+					// b.toggle();
+					// position2Ddown(true);
+					// break;
 					case "enableVersionBinding":
 						b.toggle();
 						enableVersionBinding(b.onOff);
@@ -770,10 +773,10 @@ public class TagExplorerProcessing2 extends PApplet {
 		physics.update();
 		filePhysics.update();
 		appPhysics.update();
-		
-//		if(startClickNextFrame){
-//			startClickNextFrame = false;
-//		}
+
+		// if(startClickNextFrame){
+		// startClickNextFrame = false;
+		// }
 		clickNextFrame = false;
 	}
 
@@ -902,18 +905,18 @@ public class TagExplorerProcessing2 extends PApplet {
 				if (file.shape != null) {
 					drawShape = true;
 					s.addChild(file.shape);
-					
-					if(draw2DShape && (position1D || file.y > renderer.height/2 - 70)){
+
+					if (draw2DShape && (position1D || file.y > renderer.height / 2 - 70)) {
 						PShape shadow = createShape();
 						shadow.fill(0);
 						shadow.noStroke();
 						shadow.texture(schatten);
-						
-						shadow.vertex(file.x - 70, file.y +59, file.z+12, 0, 0);
-						shadow.vertex(file.x - 70, file.y +59, file.z-12, 0, schatten.height);
-						shadow.vertex(file.x + 70, file.y +59, file.z-12, schatten.width, schatten.height);
-						shadow.vertex(file.x + 70, file.y +59, file.z+12, schatten.width, 0);
-						
+
+						shadow.vertex(file.x - 70, file.y + 59, file.z + 12, 0, 0);
+						shadow.vertex(file.x - 70, file.y + 59, file.z - 12, 0, schatten.height);
+						shadow.vertex(file.x + 70, file.y + 59, file.z - 12, schatten.width, schatten.height);
+						shadow.vertex(file.x + 70, file.y + 59, file.z + 12, schatten.width, 0);
+
 						shadow.end();
 						s.addChild(shadow);
 					}
@@ -922,7 +925,7 @@ public class TagExplorerProcessing2 extends PApplet {
 					// if (mousePressed) {
 					// println((Tag_File) filePhysics.particles.get(i));
 					// }
-					
+
 					// if (draw2DShape) {
 					// renderer.pushMatrix();
 					// renderer.translate(file.x, file.y, file.z);
@@ -1313,7 +1316,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 
 		// create Map Position fŸr Treemap
-		if (drawTreemap) {
+		if (drawTreemap && showFiles.size() > 0) {
 			if (!showVersions) {
 				println("updateShowFiles(): createTreeMap");
 				createTreeMap(showFiles);
@@ -1323,6 +1326,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 
 		oldest_showFile = (Tag_File) getOldestTagFile(showFiles);
+		System.out.println("oldest_showFile: " + oldest_showFile.creation_time.toGMTString());
 
 		// set Timeline Wertebereich
 		if (oldest_showFile != null) {
@@ -2038,7 +2042,7 @@ public class TagExplorerProcessing2 extends PApplet {
 					((Tag_File) t).shape.translate(t.x, t.y, 0);
 				}
 			}
-			if(drawTreemap){
+			if (drawTreemap) {
 				((Tag_File) t).shape.translate(0, 0, -t.z);
 			}
 			t.z = 0;
@@ -2129,7 +2133,7 @@ public class TagExplorerProcessing2 extends PApplet {
 			Tag_File file = (Tag_File) t;
 			if (file.id == originId || file.origin_ID == originId || file.parent_ID == originId) {
 				results.add(file);
-				//println(file.name + " " + file.id);
+				// println(file.name + " " + file.id);
 			}
 		}
 
@@ -2757,15 +2761,14 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		float mouseDraggedY = (lastMouseY - mouseY);
 		lastMouseY = mouseY;
-		
-		
+
 		// nur wenn zeitachse aktiviert ist
-//		if (setZTimeAxis) {
-//			cam_eyetargetpos.z += mouseDraggedY/2;
-//		}
-		
+		// if (setZTimeAxis) {
+		// cam_eyetargetpos.z += mouseDraggedY/2;
+		// }
+
 		// CamMover
-		if(timeChooser.camMover.mouseOver()){
+		if (setZTimeAxis && timeChooser.camMover.mouseOver()) {
 			timeChooser.camMover.setY(mouseY);
 		}
 	}
@@ -2790,7 +2793,22 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 	}
 
+	Timestamp lastMinTime = null;
+
 	public void mouseReleased() {
+//		if (minTime != null) {
+//			if (lastMinTime == null) {
+//				lastMinTime = (Timestamp) minTime.clone();
+//			}
+//			
+//			// neuer timestamp:
+//			if (lastMinTime != minTime) {
+//				updateShowFiles();
+//			}
+//		}
+
+		
+
 		lastClick = new Timestamp(System.currentTimeMillis());
 		startClickNextFrame = true;
 
@@ -3011,16 +3029,16 @@ public class TagExplorerProcessing2 extends PApplet {
 			cam_eyetargetpos.z -= 20;
 			break;
 		case '2':
-			
+
 			cam_eyetargetpos.y -= 100;
-			//cam_eyetargetpos = cam_eye2Dpos;
+			// cam_eyetargetpos = cam_eye2Dpos;
 			break;
 		case '3':
 			cam_eyetargetpos.y += 100;
-			if(cam_eyetargetpos.y > height/2){
-				cam_eyetargetpos.y = height/2;
+			if (cam_eyetargetpos.y > height / 2) {
+				cam_eyetargetpos.y = height / 2;
 			}
-			//cam_eyetargetpos = cam_eye3Dpos;
+			// cam_eyetargetpos = cam_eye3Dpos;
 			break;
 
 		case '9':
@@ -3290,12 +3308,12 @@ public class TagExplorerProcessing2 extends PApplet {
 		mapImg = loadImage("../data/map.png");
 		userImg = loadImage("../data/userProfil.png");
 		controlImg = loadImage("../data/control.png");
-		
+
 		cameraImg = loadImage("../data/camera.png");
 
 		newsButton = loadImage("../data/newsButton.png");
 		newsButton_h = loadImage("../data/newsButton_h.png");
-		
+
 		schatten = loadImage("../data/schatten.png");
 
 		appsButton = loadImage(VersionBuilder.versionsVerzeichnis + "applications/apps.png");
@@ -3432,7 +3450,9 @@ public class TagExplorerProcessing2 extends PApplet {
 
 			// camera auf nullpunkt
 			println("reset Cameraposition");
-			cam_eyetargetpos = cam_eye2Dpos;
+
+			timeChooser.camMover.reset();
+			// cam_eyetargetpos = cam_eye2Dpos;
 
 			// drawAccessShape nur im ZTime Modus!
 			if (drawAccessShapes) {
@@ -3468,6 +3488,23 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 		updateShowFiles();
 	}
+
+	// public void position2Ddown(boolean onOff) {
+	// position2Ddown = onOff;
+	// if (position2Ddown) {
+	// // cp5_Test.get(Toggle.class, "position1D").setState(false);
+	//
+	// if (position1D || drawTreemap) {
+	// position1D = false;
+	// setButtonState("position1D", false);
+	// drawTreemap = false;
+	// setButtonState("drawTreemap", false);
+	//
+	// setButtonState("position2D", true);
+	// }
+	// }
+	// updateShowFiles();
+	// }
 
 	public void enableVersionBinding(boolean onOff) {
 		enableVersionBinding = onOff;

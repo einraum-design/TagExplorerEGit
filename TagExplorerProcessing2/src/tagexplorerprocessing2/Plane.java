@@ -38,11 +38,19 @@ public class Plane extends Vec2D {
 	
 	
 	
-	
+	String lastInput = null;
 	
 	public void updateTextfieldValue(String inputFieldName, String infoText) {
-		// nicht gleich infotext:
+		
 		String inputText = cp5.get(Textfield.class, inputFieldName).getText().trim();
+		
+		if(!inputText.equals(infoText) && !inputText.equals("")){
+			lastInput = cp5.get(Textfield.class, inputFieldName).getText().trim();
+		}
+		
+		// nicht gleich infotext:
+		// lšsche Infotext aus feld
+		
 		if (cp5.get(Textfield.class, inputFieldName).isFocus() && inputText.equals(infoText)) {
 			cp5.get(Textfield.class, inputFieldName).setValue("");
 		}

@@ -31,6 +31,8 @@ public class HoverPlane extends Plane {
 
 	String infoText = "add Tag";
 	String inputFieldName = "tagInputHoverPlane";
+	
+	
 
 	public HoverPlane(TagExplorerProcessing2 p5, Tag tag, int x, int y) {
 		super(p5, x, y);
@@ -234,24 +236,30 @@ public class HoverPlane extends Plane {
 	}
 
 	public void drawSaveTypeButtons() {
+		if(lastInput != null){
+				System.out.println("lastInput");
+		}
 		for (Button b : buttonTypeList) {
 			b.render();
 			// text nicht gleich "" oder infotext
-			if (!cp5.get(Textfield.class, inputFieldName).getText().trim().toLowerCase().equals("")
-					&& !cp5.get(Textfield.class, inputFieldName).getText().equals(infoText)) {
+			if (lastInput != null){ 
+//					|| (!cp5.get(Textfield.class, inputFieldName).getText().trim().toLowerCase().equals("")
+//					&& !cp5.get(Textfield.class, inputFieldName).getText().equals(infoText))) {
 				//if (p5.mouseActive && b.mouseOver() && p5.mousePressed) {
 				if(p5.clickNextFrame && b.mouseOver()){
 
-					System.out.println(cp5.get(Textfield.class, inputFieldName).getText().trim());
+					//System.out.println(cp5.get(Textfield.class, inputFieldName).getText().trim());
 					// create neuen Tag + update Tags + Springs
-					Tag tag = p5.createNewTag(cp5.get(Textfield.class, inputFieldName).getText().trim(),
-							((Button_TagType) b).type);
+					
+//					Tag tag = p5.createNewTag(cp5.get(Textfield.class, inputFieldName).getText().trim(), ((Button_TagType) b).type);
+					Tag tag = p5.createNewTag(lastInput, ((Button_TagType) b).type);
 
 					// wenn tag schon existiert gebe tag zurück (nur
 					// absicherung)
 					if (tag == null) {
 						System.out.println("HoverPlane.drawSaveTypeButtons(): Tag exixts already - use existing tag");
-						tag = p5.getTagByName(cp5.get(Textfield.class, inputFieldName).getText().trim());
+						//tag = p5.getTagByName(cp5.get(Textfield.class, inputFieldName).getText().trim());
+						tag = p5.getTagByName(lastInput);
 					}
 
 					// add File-Tag binding
