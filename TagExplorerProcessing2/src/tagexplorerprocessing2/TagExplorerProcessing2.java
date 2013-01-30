@@ -519,6 +519,8 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		// update interpolate cam position
 		cam_eyeaktuellpos = interpolateVec(cam_eyeaktuellpos, cam_eyetargetpos);
+		
+		// target.z wird mitverschoben
 		cam_target.z = cam_eyeaktuellpos.z - (height / 2.0f) / tan(PI * 30.0f / 180.0f);
 
 		// bei neu hinzugefŸgten Files textur generieren
@@ -542,17 +544,31 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		// imageMode(CORNER);
 		// image(backgroundTransition, 0,0);
-		PShape back = createShape(PConstants.RECT, -100, 0, width + 200, height);
-		back.fill(255);
+		
+		
+		//PShape back = createShape(PConstants.RECT, -100, 0, width + 200, height);
+		PShape back = createShape();
+		
 		back.texture(backgroundTransition);
+		
+		back.vertex(-100, 0, 0, 0);
+		back.vertex(width + 200, 0, backgroundTransition.width, 0);
+		back.vertex(width + 200, height, backgroundTransition.width, backgroundTransition.height);
+		back.vertex(-100, height, 0, backgroundTransition.height);
+		//back.fill(255);
+		back.end();
+		
+		back.translate(0, (cam_eyeaktuellpos.y - height/2.0f)*2);
+		back.scale(1, map(cam_eyeaktuellpos.y, height/2, 0, 1, 2));
 		shape(back);
 
+		
 		// set Mouse active nach jeweils 600 millis;
-//		if (System.currentTimeMillis() > lastClick.getTime() + 1200) {
-//			mouseActive = true;
-//		} else {
-//			mouseActive = false;
-//		}
+		if (System.currentTimeMillis() > lastClick.getTime() + 1200) {
+			mouseActive = true;
+		} else {
+			mouseActive = false;
+		}
 
 		// println("mouseActive: " + mouseActive);
 
@@ -2987,10 +3003,16 @@ public class TagExplorerProcessing2 extends PApplet {
 			cam_eyetargetpos.z -= 20;
 			break;
 		case '2':
-			cam_eyetargetpos = cam_eye2Dpos;
+			
+			cam_eyetargetpos.y -= 100;
+			//cam_eyetargetpos = cam_eye2Dpos;
 			break;
 		case '3':
-			cam_eyetargetpos = cam_eye3Dpos;
+			cam_eyetargetpos.y += 100;
+			if(cam_eyetargetpos.y > height/2){
+				cam_eyetargetpos.y = height/2;
+			}
+			//cam_eyetargetpos = cam_eye3Dpos;
 			break;
 
 		case '9':
