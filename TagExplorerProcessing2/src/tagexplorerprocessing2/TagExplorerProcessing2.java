@@ -50,6 +50,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	PGraphics pg;
 
 	Timeline timeline;
+	TimeChooser timeChooser;
 
 	// Tag_User user = new Tag_User("users", 0, "noname", "no Password");
 	Tag_User mainUser = null;
@@ -170,6 +171,8 @@ public class TagExplorerProcessing2 extends PApplet {
 	PImage close;
 	PImage close_h;
 	PImage open;
+	
+	PImage cameraImg;
 
 	PImage texture_connection;
 
@@ -232,6 +235,9 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	int cButtonBright;
 	int cDropdownHover;
+	
+	int cPopUp;
+	int cTagDark;
 
 	Tag_Comparator_Id comp_id;
 	Tag_Comparator_Time comp_time;
@@ -274,6 +280,9 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		cButtonBright = color(241);
 		cDropdownHover = color(230);
+		
+		cPopUp = color(111, 126, 132);
+		cTagDark = color(72,86,92);
 
 		// Date Formatter
 		sdf = new SimpleDateFormat();
@@ -370,16 +379,18 @@ public class TagExplorerProcessing2 extends PApplet {
 		mainscreen.camera(cam_eyeaktuellpos.x, cam_eyeaktuellpos.y, cam_eyeaktuellpos.z, cam_target.x, cam_target.y,
 				cam_target.z, 0, 1, 0);
 
-		transition = loadShader("../shader/transition.glsl");
-		transition.set("res", (float) (mainscreen.width), (float) (mainscreen.height));
-		transition.set("color", (1.0f), (1.0f), (1.0f));
-
-		transition2 = loadShader("../shader/transition.glsl");
-		transition2.set("res", 100.0f, 100.0f);
-		transition2.set("color", (1.0f), (0.1f), (0.1f));
-
-		plifShader = loadShader("../shader/plifFrag.glsl", "../shader/plifVert.glsl");
-		env_plif = loadImage("../data/env_plif.jpg");
+		
+		
+//		transition = loadShader("../shader/transition.glsl");
+//		transition.set("res", (float) (mainscreen.width), (float) (mainscreen.height));
+//		transition.set("color", (1.0f), (1.0f), (1.0f));
+//
+//		transition2 = loadShader("../shader/transition.glsl");
+//		transition2.set("res", 100.0f, 100.0f);
+//		transition2.set("color", (1.0f), (0.1f), (0.1f));
+//
+//		plifShader = loadShader("../shader/plifFrag.glsl", "../shader/plifVert.glsl");
+//		env_plif = loadImage("../data/env_plif.jpg");
 
 		// fileShape = createShape(SPHERE, 10);
 		fileShape = createShape(BOX, 20);
@@ -411,6 +422,9 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		// TIMELINE
 		timeline = new Timeline(this);
+		
+		// TimeChooser
+		timeChooser = new TimeChooser(this, width - 80, height/5);
 
 		// Comparator
 		comp_id = new Tag_Comparator_Id();
@@ -543,8 +557,8 @@ public class TagExplorerProcessing2 extends PApplet {
 		// println("mouseActive: " + mouseActive);
 
 		// calcBillboardRotation();
-		transition.set("shaderTime", (millis() / 1000.0f));
-		transition2.set("shaderTime", (millis() / 1000.0f));
+//		transition.set("shaderTime", (millis() / 1000.0f));
+//		transition2.set("shaderTime", (millis() / 1000.0f));
 
 		// plifShader.set("shininess", 5.1f);
 		// plifShader.set("EnvMap", 0);
@@ -552,7 +566,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		// plifShader.set("SpecularVal", 0.2f);
 
 		// modelTextur
-		drawPGTexture();
+//		drawPGTexture();
 
 		// control p5 Promt
 		// removeController by Button cancel
@@ -622,6 +636,16 @@ public class TagExplorerProcessing2 extends PApplet {
 		// MenuPlane
 		menuPlane.render();
 		menuPlane.update();
+		
+		
+		
+		// TimeChoose
+		timeChooser.render();
+		
+		
+		
+		
+		
 
 		// NewsFeed
 		if (mainUser != null) {
@@ -866,6 +890,7 @@ public class TagExplorerProcessing2 extends PApplet {
 					if(draw2DShape && (position1D || file.y > renderer.height/2 - 70)){
 						PShape shadow = createShape();
 						shadow.fill(0);
+						shadow.noStroke();
 						shadow.texture(schatten);
 						
 						shadow.vertex(file.x - 70, file.y +59, file.z+12, 0, 0);
@@ -3235,6 +3260,8 @@ public class TagExplorerProcessing2 extends PApplet {
 		mapImg = loadImage("../data/map.png");
 		userImg = loadImage("../data/userProfil.png");
 		controlImg = loadImage("../data/control.png");
+		
+		cameraImg = loadImage("../data/camera.png");
 
 		newsButton = loadImage("../data/newsButton.png");
 		newsButton_h = loadImage("../data/newsButton_h.png");

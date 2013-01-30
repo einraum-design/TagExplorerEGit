@@ -9,6 +9,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.TreeSet;
 
+import processing.core.PApplet;
 import processing.core.PImage;
 
 import tagexplorerprocessing2.Connection.ConnectionType;
@@ -578,7 +579,7 @@ public class SQLhelper {
 
 			Timestamp now = new Timestamp(System.currentTimeMillis());
 
-			String startOrEndTime;
+//			String startOrEndTime;
 			if (start) {
 				String execu = "INSERT INTO filter_time (tag_ID, type, start_time) VALUES (" + tag.id + ", \""
 						+ tag.type + "\", \"" + now + "\")";
@@ -598,7 +599,7 @@ public class SQLhelper {
 	}
 
 	private FileType getFileType(String fileName) {
-		String[] extensions = p5.split(fileName, ".");
+		String[] extensions = PApplet.split(fileName, ".");
 		FileType fileType = null;
 
 		if (extensions.length > 1) {
@@ -812,29 +813,29 @@ public class SQLhelper {
 			// FileType
 			if (fileTypeString != null && fileTypeString.length() > 0) {
 				// IMAGE
-				if (fileTypeString.equals(FileType.IMAGE.toString())) {
-					String name = msql.getString("name");
-
-					String blancName = name.substring(0, name.lastIndexOf('.'));
-
-					PImage img = null;
-
-					try {
-						img = p5.loadImage(VersionBuilder.versionsVerzeichnis + "prev" + String.format("%06d", id)
-								+ blancName + ".png");
-					} catch (Exception e) {
-						img = p5.loadImage(VersionBuilder.versionsVerzeichnis + "/prev.png");
-					}
-
-					tag = new Tag_File_Image(tableName, id, name, msql.getFloat("size"), msql.getString("path"),
-							msql.getTimestamp("creation_time"), msql.getTimestamp("expiration_time"),
-							msql.getInt("parent_ID"), msql.getInt("origin_ID"), msql.getInt("score"), img);
-
-					tag.setFileType(FileType.IMAGE);
-				}
+//				if (fileTypeString.equals(FileType.IMAGE.toString())) {
+//					String name = msql.getString("name");
+//
+//					String blancName = name.substring(0, name.lastIndexOf('.'));
+//
+//					PImage img = null;
+//
+//					try {
+//						img = p5.loadImage(VersionBuilder.versionsVerzeichnis + "prev" + String.format("%06d", id)
+//								+ blancName + ".png");
+//					} catch (Exception e) {
+//						img = p5.loadImage(VersionBuilder.versionsVerzeichnis + "/prev.png");
+//					}
+//
+//					tag = new Tag_File_Image(tableName, id, name, msql.getFloat("size"), msql.getString("path"),
+//							msql.getTimestamp("creation_time"), msql.getTimestamp("expiration_time"),
+//							msql.getInt("parent_ID"), msql.getInt("origin_ID"), msql.getInt("score"), img);
+//
+//					tag.setFileType(FileType.IMAGE);
+//				}
 				
 				// Default FileType
-				else {
+//				else {
 					tag = new Tag_File(tableName, id, msql.getString("name"), msql.getFloat("size"),
 							msql.getString("path"), msql.getTimestamp("creation_time"),
 							msql.getTimestamp("expiration_time"), msql.getInt("parent_ID"), msql.getInt("origin_ID"),
@@ -873,7 +874,7 @@ public class SQLhelper {
 						tag.setFileType(FileType.DEFAULT);
 						break;
 					}
-				}
+//				}
 			}
 			// sonstige File
 			else {
@@ -952,7 +953,7 @@ public class SQLhelper {
 	public ArrayList<Access> getFileAccesses(int id) {
 		ArrayList<Access> accesses = new ArrayList<Access>();
 
-		if (msql2.connect()) {
+//		if (msql2.connect()) {
 
 			String s = "SELECT * FROM accesses WHERE fileID = \"" + id + "\"";
 			msql2.query(s);
@@ -963,7 +964,7 @@ public class SQLhelper {
 				accesses.add(c);
 			}
 			// System.out.println(id + " accesses: " + accesses.size());
-		}
+//		}
 
 		return accesses;
 	}

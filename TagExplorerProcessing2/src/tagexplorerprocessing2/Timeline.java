@@ -118,7 +118,7 @@ public class Timeline {
 		renderer.vertex(renderer.width / 2, renderer.height / 2, -mapExpMillis(time), zeitbereich_hover.width,
 				zeitbereich_hover.height);
 		renderer.vertex(-renderer.width / 2, renderer.height / 2, -mapExpMillis(time), 0, zeitbereich_hover.height);
-		renderer.endShape(p5.CLOSE);
+		renderer.endShape(PConstants.CLOSE);
 		
 		
 
@@ -138,7 +138,7 @@ public class Timeline {
 		renderer.vertex(renderer.width / 2, renderer.height / 2, -mapExpMillis(endTime), zeitbereich_hover.width,
 				zeitbereich_hover.height);
 		renderer.vertex(-renderer.width / 2, renderer.height / 2, -mapExpMillis(endTime), 0, zeitbereich_hover.height);
-		renderer.endShape(p5.CLOSE);
+		renderer.endShape(PConstants.CLOSE);
 
 		// renderer.translate(0, 0, mapExpMillis(startTime));
 	}
@@ -160,14 +160,33 @@ public class Timeline {
 		// System.out.println("delta time: " + time);
 		return mapExpMillis(time);
 	}
+	
+	// für timeChooser
+	public float mapExp(Timestamp ts, int h) {
+		// System.out.println("ts time: " + ts.getTime());
+		long time = System.currentTimeMillis() - ts.getTime();
+		// System.out.println("delta time: " + time);
+		return mapExpMillis(time, h);
+	}
 
 	public float mapExpMillis(long time) {
 
 		if (oldest == null) {
 			return 0;
 		}
-		float val = p5.map(p5.sqrt(time / 1000), 0,
-				p5.sqrt(System.currentTimeMillis() / 1000 - oldest.getTime() / 1000), 0, timelineLength);
+		float val = PApplet.map(PApplet.sqrt(time / 1000), 0,
+				PApplet.sqrt(System.currentTimeMillis() / 1000 - oldest.getTime() / 1000), 0, timelineLength);
+		// System.out.println("val: " + p5.sqrt(time));
+		return val;
+	}
+	
+	public float mapExpMillis(long time, int h) {
+
+		if (oldest == null) {
+			return 0;
+		}
+		float val = PApplet.map(PApplet.sqrt(time / 1000), 0,
+				PApplet.sqrt(System.currentTimeMillis() / 1000 - oldest.getTime() / 1000), 0, h);
 		// System.out.println("val: " + p5.sqrt(time));
 		return val;
 	}
@@ -177,7 +196,7 @@ public class Timeline {
 		if (oldest == null) {
 			return 0;
 		}
-		float val = p5.map(p5.sqrt(time), 0, p5.sqrt(System.currentTimeMillis() / 1000 - oldest.getTime() / 1000), 0,
+		float val = PApplet.map(PApplet.sqrt(time), 0, PApplet.sqrt(System.currentTimeMillis() / 1000 - oldest.getTime() / 1000), 0,
 				timelineLength);
 		// System.out.println("val: " + p5.sqrt(time));
 		return val;
@@ -186,7 +205,7 @@ public class Timeline {
 	public void setWertebereich(Timestamp ts) {
 		if (ts != null) {
 			oldest = ts;
-			timelineLength = (int) p5.sqrt((System.currentTimeMillis() - oldest.getTime()) / 10000);
+			timelineLength = (int) PApplet.sqrt((System.currentTimeMillis() - oldest.getTime()) / 10000);
 			System.out.println(System.currentTimeMillis() + " - " + oldest.getTime());
 			System.out.println(System.currentTimeMillis() - oldest.getTime());
 			System.out.println("setWertebereich: timelineLength: " + timelineLength);
