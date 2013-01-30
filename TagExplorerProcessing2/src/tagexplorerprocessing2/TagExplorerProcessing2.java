@@ -2755,10 +2755,18 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	public void mouseDragged() {
 
+		float mouseDraggedY = (lastMouseY - mouseY);
+		lastMouseY = mouseY;
+		
+		
 		// nur wenn zeitachse aktiviert ist
-		if (setZTimeAxis) {
-			cam_eyetargetpos.z += (lastMouseY - mouseY) / 2;
-			lastMouseY = mouseY;
+//		if (setZTimeAxis) {
+//			cam_eyetargetpos.z += mouseDraggedY/2;
+//		}
+		
+		// CamMover
+		if(timeChooser.camMover.mouseOver()){
+			timeChooser.camMover.setY(mouseY);
 		}
 	}
 

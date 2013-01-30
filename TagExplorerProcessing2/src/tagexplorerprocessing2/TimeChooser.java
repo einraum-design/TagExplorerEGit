@@ -10,9 +10,11 @@ public class TimeChooser extends Vec2D {
 
 	TagExplorerProcessing2 p5;
 	int w = 20;
-	int h = 1200;
+	int h;
 
 	PShape scala;
+	
+	CamMover camMover;
 
 	public TimeChooser(TagExplorerProcessing2 p5, int x, int y) {
 		super(x, y);
@@ -24,6 +26,8 @@ public class TimeChooser extends Vec2D {
 		this.h = p5.mainscreen.height - y;
 
 		scala = createScala();
+		
+		camMover = new CamMover(p5, x + w, (int) (this.y + this.h));
 	}
 
 	public void render() {
@@ -80,38 +84,9 @@ public class TimeChooser extends Vec2D {
 		}
 		
 		// draw CameraMove
+		camMover.render();
 		
-//		p5.textAlign(PConstants.RIGHT, PConstants.BOTTOM);
-//		p5.textFont(p5.font, 16);
-
-		p5.fill(p5.cTagDark, 120);
-		p5.noStroke();
-
-		int fieldHeight = 36;
-
-		float xFeld = x + w;
-		float yFeld = y + h - p5.timeline.mapExp(new Timestamp(System.currentTimeMillis()), h) - fieldHeight;
-
-		// MinTime Feld
-		p5.beginShape();
-
-		p5.vertex(xFeld+fieldHeight, yFeld);
-		p5.vertex(xFeld + fieldHeight*2, yFeld);
-		p5.vertex(xFeld + fieldHeight*2, yFeld + fieldHeight);
-		p5.vertex(xFeld, yFeld + fieldHeight);
-
-		p5.endShape(PConstants.CLOSE);
-		
-		p5.imageMode(PConstants.CORNER);
-		p5.image(p5.cameraImg, xFeld+fieldHeight, yFeld, fieldHeight, fieldHeight);
-
-		// p5.sdf.applyPattern("dd. MM. yyyy");
-		// p5.text(p5.sdf.format(minTime), x - w / 2 + rand, y - 40);
-//		p5.fill(p5.cBorderHover);
-//		p5.text("letzter Besuch", x - 20, y + h - p5.timeline.mapExp(p5.minTime, h) - 2);
-		
-		
-
+		// draw Skala
 		p5.shape(scala);
 	}
 
@@ -133,6 +108,8 @@ public class TimeChooser extends Vec2D {
 
 		return lines;
 	}
+	
+	
 
 	public boolean mouseOver() {
 		boolean over = false;

@@ -25,7 +25,7 @@ public class Timeline {
 
 		// timelineLength = pg.height - 80;
 
-		timelineLength = 2000;
+		timelineLength = 4000;
 	}
 
 	public void render(PGraphics renderer) {
@@ -177,6 +177,17 @@ public class Timeline {
 		float val = PApplet.map(PApplet.sqrt(time / 1000), 0,
 				PApplet.sqrt(System.currentTimeMillis() / 1000 - oldest.getTime() / 1000), 0, timelineLength);
 		// System.out.println("val: " + p5.sqrt(time));
+		return val;
+	}
+	
+	public float mapExpCam(float aktuellCamWert, int h){
+		
+		if (oldest == null) {
+			return 0;
+		}
+		
+		float val = PApplet.map(aktuellCamWert, 0, timelineLength, 0, h);
+		//float val = PApplet.map(aktuellCamWert, (p5.height / 2.0f) / PApplet.tan(PConstants.PI * 30.0f / 180.0f), (p5.height / 2.0f) / PApplet.tan(PConstants.PI * 30.0f / 180.0f) + timelineLength, 0, h);
 		return val;
 	}
 	
