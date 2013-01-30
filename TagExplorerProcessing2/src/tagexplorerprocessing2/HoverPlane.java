@@ -126,7 +126,8 @@ public class HoverPlane extends Plane {
 
 			// Open Button
 			openButton.render();
-			if (p5.mouseActive && p5.mousePressed && openButton.mouseOver() && ((Tag_File) tag).delete_time == null) {
+//			if (p5.mouseActive && p5.mousePressed && openButton.mouseOver() && ((Tag_File) tag).delete_time == null) {
+			if(p5.clickNextFrame && openButton.mouseOver() && ((Tag_File)tag).delete_time == null){
 				p5.SQL.setAccessTimeNow((Tag_File) tag);
 
 				PApplet.open(((Tag_File) tag).path);
@@ -137,6 +138,7 @@ public class HoverPlane extends Plane {
 				// mouseClick new Zeit
 				p5.lastClick = new Timestamp(System.currentTimeMillis());
 				p5.mouseActive = false;
+				p5.clickNextFrame = false;
 				System.out.println("ResetLastClick in HoverPlane.render()");
 			}
 
@@ -210,7 +212,8 @@ public class HoverPlane extends Plane {
 				b.y = b.y + cp5.get(Textfield.class, inputFieldName).getHeight() * (i + 1);
 				b.render();
 				if (p5.mouseActive && b.mouseOver() && p5.mousePressed) {
-
+//				if(p5.clickNextFrame && b.mouseOver()){
+					
 					// add TagBinding to Tag_File!
 					((Tag_File) this.tag).attributeBindings.add(tag);
 					p5.SQL.bindTag((Tag_File) this.tag, tag);
@@ -220,6 +223,7 @@ public class HoverPlane extends Plane {
 					p5.updateSprings();
 					p5.lastClick = new Timestamp(System.currentTimeMillis());
 					p5.mouseActive = false;
+					p5.clickNextFrame = false;
 				}
 			}
 			return (sortedTags.size() + 1) * cp5.get(Textfield.class, inputFieldName).getHeight();
@@ -235,7 +239,8 @@ public class HoverPlane extends Plane {
 			// text nicht gleich "" oder infotext
 			if (!cp5.get(Textfield.class, inputFieldName).getText().trim().toLowerCase().equals("")
 					&& !cp5.get(Textfield.class, inputFieldName).getText().equals(infoText)) {
-				if (p5.mouseActive && b.mouseOver() && p5.mousePressed) {
+				//if (p5.mouseActive && b.mouseOver() && p5.mousePressed) {
+				if(p5.clickNextFrame && b.mouseOver()){
 
 					System.out.println(cp5.get(Textfield.class, inputFieldName).getText().trim());
 					// create neuen Tag + update Tags + Springs
@@ -256,6 +261,7 @@ public class HoverPlane extends Plane {
 
 					p5.lastClick = new Timestamp(System.currentTimeMillis());
 					p5.mouseActive = false;
+					p5.clickNextFrame = false;
 				}
 			} else {
 				//

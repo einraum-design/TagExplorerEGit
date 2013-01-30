@@ -77,10 +77,12 @@ public class Tag extends VerletParticle {
 		Button_Symbol b = new Button_Symbol(p5, "close", x + w - h/2, y + h / 2);
 		b.render();
 
-		if (p5.mouseActive && b.mouseOver() && p5.mousePressed) {
+		//if (p5.mouseActive && b.mouseOver() && p5.mousePressed) {
+		if(p5.clickNextFrame && b.mouseOver()){
 			// lŠsst sich nicht wŠhrend scheifendurchlauf lšschen -> passiert nach rendert Tag in HoverPlane.render()
 			//file.attributeBindings.remove(this);
 			p5.SQL.unbindTag(file, this);
+			p5.clickNextFrame = false;
 		}
 
 		return w;

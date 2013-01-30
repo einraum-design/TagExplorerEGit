@@ -69,8 +69,10 @@ public class Filter {
 		b.render();
 
 		// remove From FilterList
-		if (p5.mouseActive && b.mouseOver() && p5.mousePressed) {
+		//if (p5.mouseActive && b.mouseOver() && p5.mousePressed) {
+		if(p5.clickNextFrame && b.mouseOver()){
 			removeFromFilterList(p5);
+			p5.clickNextFrame = false;
 		}
 
 		return w;
@@ -100,8 +102,10 @@ public class Filter {
 		b.render();
 
 		// remove From FilterList
-		if (p5.mouseActive && b.mouseOver() && p5.mousePressed) {
+		//if (p5.mouseActive && b.mouseOver() && p5.mousePressed) {
+		if(p5.clickNextFrame && b.mouseOver()){
 			removeFromFilterList(p5);
+			p5.clickNextFrame = false;
 		}
 
 		return profil.width;

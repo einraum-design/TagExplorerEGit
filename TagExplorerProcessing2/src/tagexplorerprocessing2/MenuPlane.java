@@ -74,7 +74,7 @@ public class MenuPlane extends Plane {
 		if (cp5.get(Textfield.class, inputFieldName).isFocus()) {
 
 			ArrayList<Tag> sortedTags = sort(inputFieldName, 12);
-
+			
 			for (int i = 0; i < sortedTags.size(); i++) {
 				Tag tag = sortedTags.get(i);
 				Button_DropDownGross b = new Button_DropDownGross(p5, tag.name + " " + tag.bindCount, tag.type, cp5
@@ -84,7 +84,8 @@ public class MenuPlane extends Plane {
 				b.y = b.y + cp5.get(Textfield.class, inputFieldName).getHeight() * (i + 1);
 				b.render();
 				if (p5.mouseActive && b.mouseOver() && p5.mousePressed) {
-
+//				if(p5.mouseActive && b.mouseOver()){
+				
 					// add to filterList
 					p5.filterList.add(new Filter(tag, true));
 
@@ -108,6 +109,7 @@ public class MenuPlane extends Plane {
 					// mouseClick new Zeit
 					p5.lastClick = new Timestamp(System.currentTimeMillis());
 					p5.mouseActive = false;
+//					 p5.clickNextFrame = false;
 				}
 			}
 			return (sortedTags.size() + 1) * cp5.get(Textfield.class, inputFieldName).getHeight();

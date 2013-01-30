@@ -114,10 +114,12 @@ public class UserChooserPlane extends Plane {
 		b_ok.render();
 
 		// User Auswahl bestätigen
-		if (user != null && p5.mouseActive && b_ok.mouseOver() && p5.mousePressed) {
+		//if (user != null && p5.mouseActive && b_ok.mouseOver() && p5.mousePressed) {
+		if(user != null && p5.clickNextFrame && b_ok.mouseOver()){
 			ok = true;
 			p5.lastClick = new Timestamp(System.currentTimeMillis());
 			p5.mouseActive = false;
+			p5.clickNextFrame = false;
 
 			p5.mainUser = user;
 			p5.filterList.add(new Filter(p5.mainUser, true));
@@ -156,7 +158,7 @@ public class UserChooserPlane extends Plane {
 				b.y = b.y + cp5.get(Textfield.class, inputFieldName).getHeight() * (i + 1);
 				b.renderOhneFilter();
 				if (p5.mouseActive && b.mouseOverField() && p5.mousePressed) {
-
+//				if(p5.clickNextFrame && b.mouseOver()){
 					// add to filterList
 					// p5.filterList.add(new Filter(tag, true));
 
@@ -180,6 +182,7 @@ public class UserChooserPlane extends Plane {
 					// p5.updateSprings();
 					p5.lastClick = new Timestamp(System.currentTimeMillis());
 					p5.mouseActive = false;
+					p5.clickNextFrame = false;
 				}
 			}
 			return (sortedTags.size() + 1) * cp5.get(Textfield.class, inputFieldName).getHeight();

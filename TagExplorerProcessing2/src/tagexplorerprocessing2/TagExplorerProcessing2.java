@@ -113,6 +113,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	Tag startTag = null;
 	boolean mouseActive = true;
 	
+	boolean startClickNextFrame = false;
 	boolean clickNextFrame = false;
 	
 	Timestamp lastClick;
@@ -479,6 +480,12 @@ public class TagExplorerProcessing2 extends PApplet {
 			first = false;
 
 		}
+		
+		if(startClickNextFrame){
+			clickNextFrame = true;
+			startClickNextFrame = false;
+		}
+		
 
 		// if (updateTextures) {
 		//
@@ -527,11 +534,11 @@ public class TagExplorerProcessing2 extends PApplet {
 		shape(back);
 
 		// set Mouse active nach jeweils 600 millis;
-		if (System.currentTimeMillis() > lastClick.getTime() + 1200) {
-			mouseActive = true;
-		} else {
-			mouseActive = false;
-		}
+//		if (System.currentTimeMillis() > lastClick.getTime() + 1200) {
+//			mouseActive = true;
+//		} else {
+//			mouseActive = false;
+//		}
 
 		// println("mouseActive: " + mouseActive);
 
@@ -595,13 +602,15 @@ public class TagExplorerProcessing2 extends PApplet {
 		// drawApplications
 		for (Button_App b : appButtons) {
 			b.render();
-			if (mouseActive && b.mouseOver() && mousePressed) {
+			//if (mouseActive && b.mouseOver() && mousePressed) {
+			if(clickNextFrame && b.mouseOver()){
 				if (b.app != null && b.app.url != null) {
 					println("open: " + b.app.url);
 					open(b.app.url);
 				}
 				lastClick = new Timestamp(System.currentTimeMillis());
 				mouseActive = false;
+				clickNextFrame = false;
 			}
 		}
 
@@ -653,7 +662,8 @@ public class TagExplorerProcessing2 extends PApplet {
 			for (Button_LabelToggle b : testButton) {
 				b.render();
 
-				if (mouseActive && b.mouseOver() && mousePressed) {
+				//if (mouseActive && b.mouseOver() && mousePressed) {
+				if(clickNextFrame && b.mouseOver()){
 
 					switch (b.label) {
 					case "showVersions":
@@ -712,6 +722,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 					lastClick = new Timestamp(System.currentTimeMillis());
 					mouseActive = false;
+					clickNextFrame = false;
 				}
 			}
 		}
@@ -720,6 +731,9 @@ public class TagExplorerProcessing2 extends PApplet {
 		filePhysics.update();
 		appPhysics.update();
 		
+//		if(startClickNextFrame){
+//			startClickNextFrame = false;
+//		}
 		clickNextFrame = false;
 	}
 
@@ -2708,6 +2722,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	}
 
 	public void mousePressed() {
+		mouseActive = true;
 		// mouseDragged
 		lastMouseY = mouseY;
 
@@ -2728,6 +2743,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	public void mouseReleased() {
 		lastClick = new Timestamp(System.currentTimeMillis());
+		startClickNextFrame = true;
 
 		if (startTag != null) {
 			if (startTag instanceof Tag_File) {
