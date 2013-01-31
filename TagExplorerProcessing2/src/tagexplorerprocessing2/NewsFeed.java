@@ -21,18 +21,18 @@ public class NewsFeed extends Vec2D{
 		
 		
 		
-		news.add(new News(new Timestamp(System.currentTimeMillis() - 6L * 60 * 60 * 1000)));
-		news.add(new News(new Timestamp(System.currentTimeMillis() - 8L * 60 * 60 * 1000)));
-		news.add(new News(new Timestamp(System.currentTimeMillis() - 16L * 60 * 60 * 1000)));
-		news.add(new News(new Timestamp(System.currentTimeMillis() - 24L * 60 * 60 * 1000)));
-		news.add(new News(new Timestamp(System.currentTimeMillis() - 26L * 60 * 60 * 1000)));
-		news.add(new News(new Timestamp(System.currentTimeMillis() - 27L * 60 * 60 * 1000)));
-		news.add(new News(new Timestamp(System.currentTimeMillis() - 44L * 60 * 60 * 1000)));
-		news.add(new News(new Timestamp(System.currentTimeMillis() - 49L * 60 * 60 * 1000)));
-		news.add(new News(new Timestamp(System.currentTimeMillis() - 50L * 60 * 60 * 1000)));
-		news.add(new News(new Timestamp(System.currentTimeMillis() - 66L * 60 * 60 * 1000)));
-		news.add(new News(new Timestamp(System.currentTimeMillis() - 70L * 60 * 60 * 1000)));
-		news.add(new News(new Timestamp(System.currentTimeMillis() - 73L * 60 * 60 * 1000)));
+		news.add(new News(p5, new Timestamp(System.currentTimeMillis() - 6L * 60 * 60 * 1000)));
+		news.add(new News(p5, new Timestamp(System.currentTimeMillis() - 8L * 60 * 60 * 1000)));
+		news.add(new News(p5, new Timestamp(System.currentTimeMillis() - 16L * 60 * 60 * 1000)));
+		news.add(new News(p5, new Timestamp(System.currentTimeMillis() - 24L * 60 * 60 * 1000)));
+		news.add(new News(p5, new Timestamp(System.currentTimeMillis() - 26L * 60 * 60 * 1000)));
+		news.add(new News(p5, new Timestamp(System.currentTimeMillis() - 27L * 60 * 60 * 1000)));
+		news.add(new News(p5, new Timestamp(System.currentTimeMillis() - 44L * 60 * 60 * 1000)));
+		news.add(new News(p5, new Timestamp(System.currentTimeMillis() - 49L * 60 * 60 * 1000)));
+		news.add(new News(p5, new Timestamp(System.currentTimeMillis() - 50L * 60 * 60 * 1000)));
+		news.add(new News(p5, new Timestamp(System.currentTimeMillis() - 66L * 60 * 60 * 1000)));
+		news.add(new News(p5, new Timestamp(System.currentTimeMillis() - 70L * 60 * 60 * 1000)));
+		news.add(new News(p5, new Timestamp(System.currentTimeMillis() - 73L * 60 * 60 * 1000)));
 		
 		
 		newButton = new Button_Image(p5, "news", x-80 , y);
@@ -65,14 +65,14 @@ public class NewsFeed extends Vec2D{
 		
 		p5.sdf.applyPattern("dd. MM. yyyy");
 		
-//		for(News n : news){
-//			
-//			p5.imageMode(PConstants.CENTER);
-//			p5.image(getTypeImage(n.type), x-40, y + yShift + 25 )
-//			
-//			p5.text(p5.sdf.format(n.ts), x-40, y + yShift + 50);
-//			yShift += 60;
-//		}
+		for(News n : news){
+			
+			p5.imageMode(PConstants.CENTER);
+			p5.image(getTypeImage(n.type), x-40, y + yShift + 25 );
+			
+			p5.text(p5.sdf.format(n.ts), x-40, y + yShift + 50);
+			yShift += 60;
+		}
 		
 //		for(int i = 0; i<12; i++){
 //			p5.text("12. 1. 2013", x-40, y + 50 + yShift);
@@ -83,23 +83,26 @@ public class NewsFeed extends Vec2D{
 	}
 
 
-//	private PImage getTypeImage(String type) {
-//		
-//		PImage typeImage;
-//		
-//		switch(type){
-//		case "call":
-////			typeImage = 
-//			break;
-//		case "message":
-//			break;
-//		case "file":
-//			break;
-//		case "appointment":
-//			break;
-//		default:
-//			break;
-//		}
-//		return typeImage;
-//	}
+	private PImage getTypeImage(String type) {
+		PImage typeImage;
+		
+		switch(type){
+		case "call":
+			typeImage = p5.newsCall;
+			break;
+		case "message":
+			typeImage = p5.newsMessage;
+			break;
+		case "file":
+			typeImage = p5.newsFile;
+			break;
+		case "appointment":
+			typeImage = p5.newsAppointment;
+			break;
+		default:
+			typeImage = p5.newsCall;
+			break;
+		}
+		return typeImage;
+	}
 }

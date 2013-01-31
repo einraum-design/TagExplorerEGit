@@ -3,14 +3,15 @@ package tagexplorerprocessing2;
 import java.sql.Timestamp;
 
 public class News {
-	
+	TagExplorerProcessing2 p5;
 	Timestamp ts;
 	String type; // symbol
 	Tag_User user;
 	String comment;
 	
 	
-	public News(Timestamp ts){
+	public News(TagExplorerProcessing2 p5, Timestamp ts){
+		this.p5 = p5;
 		this.ts = ts;
 		this.type = generateType();
 		this.user = generateUser();
@@ -38,8 +39,10 @@ public class News {
 		return user;
 	}
 	
+	String [] types = {"call", "message", "file", "appointment"};
+	
 	public String generateType(){	
-		String type = "call"; // "call", "message", "file", "appointment"
+		String type = types[(int)p5.random(0, types.length- 0.1f)];
 		return type;
 	}
 	

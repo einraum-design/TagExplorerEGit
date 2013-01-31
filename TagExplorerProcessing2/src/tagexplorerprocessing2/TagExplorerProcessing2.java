@@ -228,6 +228,12 @@ public class TagExplorerProcessing2 extends PApplet {
 	PImage newKeyword;
 	PImage newProject;
 	PImage newEvent;
+	
+	// news Types
+	PImage newsCall;
+	PImage newsAppointment;
+	PImage newsFile;
+	PImage newsMessage;
 
 	// colors
 	int cBorderHover;
@@ -3346,6 +3352,13 @@ public class TagExplorerProcessing2 extends PApplet {
 		newKeyword = loadImage("../data/newKeyword.png");
 		newProject = loadImage("../data/newProject.png");
 		newEvent = loadImage("../data/newEvent.png");
+		
+		// news Images
+		newsCall = loadImage("../data/news_call.png");
+		newsAppointment = loadImage("../data/news_appointment.png");
+		newsFile = loadImage("../data/news_file.png");
+		newsMessage = loadImage("../data/news_message.png");
+		
 	}
 
 	public static void main(String _args[]) {
