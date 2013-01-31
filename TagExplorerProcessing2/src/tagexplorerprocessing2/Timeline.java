@@ -16,6 +16,7 @@ public class Timeline {
 
 	int timelineLength;
 	int timelineMaxLength;
+	float timelineScaleFactor = 4.0f;
 
 	public Timeline(TagExplorerProcessing2 p5) {
 		this.p5 = p5;
@@ -26,8 +27,9 @@ public class Timeline {
 
 		// timelineLength = pg.height - 80;
 
-		timelineLength = 4000;
-		timelineMaxLength = 4000; // fix!
+		
+		timelineMaxLength = 8000; // fix!
+		timelineLength = timelineMaxLength;
 	}
 
 	public void render(PGraphics renderer) {
@@ -218,7 +220,7 @@ public class Timeline {
 	public void setWertebereich(Timestamp ts) {
 		if (ts != null) {
 			oldest = ts;
-			timelineLength = (int) PApplet.sqrt((System.currentTimeMillis() - oldest.getTime()) / 10000);
+			timelineLength = (int) (PApplet.sqrt((System.currentTimeMillis() - oldest.getTime()) / 10000) * timelineScaleFactor);
 			System.out.println(System.currentTimeMillis() + " - " + oldest.getTime());
 			System.out.println(System.currentTimeMillis() - oldest.getTime());
 			System.out.println("setWertebereich: timelineLength: " + timelineLength);

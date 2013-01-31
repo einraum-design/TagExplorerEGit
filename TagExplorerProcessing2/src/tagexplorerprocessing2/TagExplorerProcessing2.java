@@ -463,7 +463,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		attributes = initTagsFromDB();
 		initFilterTagTypeList(); // add these to Filterauswahl/
 		// availbleFilterList (oder so Šhnlich)
-		
+
 		initFilesFromDB();
 
 		oldest_File = (Tag_File) getOldestTagFile(files);
@@ -1519,20 +1519,20 @@ public class TagExplorerProcessing2 extends PApplet {
 
 			// count matches mit filterList
 			for (Filter f : filterList) {
-				
+
 				// FiltType Filter
 				if (f.tag instanceof Tag_FileType) {
-					if (f.inOut){
-						if(file.fileType == ((Tag_FileType)f.tag).fileType){
-							file.matches ++;
+					if (f.inOut) {
+						if (file.fileType == ((Tag_FileType) f.tag).fileType) {
+							file.matches++;
 						}
-					} else{
-						if(file.fileType == ((Tag_FileType)f.tag).fileType){
-							file.matches --;
+					} else {
+						if (file.fileType == ((Tag_FileType) f.tag).fileType) {
+							file.matches--;
 						}
 					}
-				} 
-				
+				}
+
 				// normaler Tag Filter
 				else {
 
@@ -1744,14 +1744,18 @@ public class TagExplorerProcessing2 extends PApplet {
 			for (int i = sortedFiles.size() - 1; i >= 0; i--) {
 				// println("sortedFiles name: " + sortedFiles.get(i).name);
 				// positoniere alle neuesten Dateiversionen
-
-				dropParticle(physics, (dist * (perRow - 1) / 2) - xShiftCount * dist, yStartUnten - yShiftCount * dist,
-						sortedFiles.get(i), true); // links/rechts
-
+				if (!setZTimeAxis) {
+					dropParticle(physics, (dist * (perRow - 1) / 2) - xShiftCount * dist, yStartUnten - yShiftCount
+							* dist, sortedFiles.get(i), true); // links/rechts
+				} else {
+					// setzte auf yStartUnten
+					dropParticle(physics, (dist * (perRow - 1) / 2) - xShiftCount * dist, yStartUnten, sortedFiles.get(i), true); // links/rechts
+				}
 				xShiftCount++;
 				if (xShiftCount >= perRow) {
 					yShiftCount++;
 					xShiftCount = 0;
+
 				}
 			}
 
@@ -1791,10 +1795,15 @@ public class TagExplorerProcessing2 extends PApplet {
 
 				// println("sortedFiles name: " + sortedFiles.get(i).name);
 
+				if (!setZTimeAxis) {
 				// jede Datei aus sortedFiles muss positoniert werden
 				dropParticle(physics, xShiftCount * dist - (dist * (perRow - 1) / 2), yShiftCount * dist - yStartOben,
 						sortedFiles.get(i), true); // links/rechts
-
+				} else {
+					// setzte auf yStartUnten
+					dropParticle(physics, xShiftCount * dist - (dist * (perRow - 1) / 2), yStartUnten,
+							sortedFiles.get(i), true); // links/rechts
+				}
 				xShiftCount++;
 				if (xShiftCount >= perRow) {
 					yShiftCount++;
