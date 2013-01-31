@@ -130,7 +130,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	// Vec3D cam_eye_target;
 
 	Vec3D cam_eye2Dpos;
-	Vec3D cam_eye3Dpos;
+//	Vec3D cam_eye3Dpos;
 	Vec3D cam_eyeaktuellpos;
 	Vec3D cam_eyetargetpos;
 
@@ -381,7 +381,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		// cam_up.y, cam_up.z);
 
 		cam_eye2Dpos = new Vec3D(width / 2.0f, height / 2.0f, (height / 2.0f) / tan(PI * 30.0f / 180.0f));
-		cam_eye3Dpos = new Vec3D(width / 2.0f, height * 2, (height / 2.0f) / tan(PI * 30.0f / 180.0f));
+		//cam_eye3Dpos = new Vec3D(width / 2.0f, height * 2, (height / 2.0f) / tan(PI * 30.0f / 180.0f));
 
 		cam_eyeaktuellpos = cam_eye2Dpos.copy();
 		cam_eyetargetpos = cam_eyeaktuellpos;
@@ -535,11 +535,16 @@ public class TagExplorerProcessing2 extends PApplet {
 		//
 		// }
 
+		if(!position1D){
+			cam_eyetargetpos.x = cam_eye2Dpos.x;
+		}
+		
 		// update interpolate cam position
 		cam_eyeaktuellpos = interpolateVec(cam_eyeaktuellpos, cam_eyetargetpos);
 
 		// target.z wird mitverschoben
 		cam_target.z = cam_eyeaktuellpos.z - (height / 2.0f) / tan(PI * 30.0f / 180.0f);
+		cam_target.x = cam_eyeaktuellpos.x;
 
 		// bei neu hinzugefügten Files textur generieren
 		for (Tag t : showFiles) {
@@ -1887,6 +1892,69 @@ public class TagExplorerProcessing2 extends PApplet {
 		// neuest Versionen
 		for (int i = 0; i < sortedFiles.size(); i++) {
 			// jede Datei aus sortedFiles muss positoniert werden
+			
+			dropParticle(physics, -mainscreen.width/2 + 120 + shiftCount * dist, yStartUnten, sortedFiles.get(i),	true);
+
+//			dropParticle(physics, shiftCount * dist - ((dist * (count - 1)) / 2.0f), yStartUnten, sortedFiles.get(i), true); // links/rechts
+
+			shiftCount++;
+		}
+
+		// wenn showVersions alle Versionen an neuester Datei ansetzen
+		if (showVersions) {
+
+			for (int i = 0; i < _files.size(); i++) {
+				if (!inSortedFiles(_files.get(i).id, sortedFiles)) {
+					Tag_File position;
+
+					// origin
+					if (((Tag_File) _files.get(i)).origin_ID == 0) {
+						// suche file mit dessen Id zur positionierung
+						position = (Tag_File) getTagByIDandType(((Tag_File) _files.get(i)).id, sortedFiles);
+
+					} // andere Verson
+					else {
+						position = (Tag_File) getTagByIDandType(((Tag_File) _files.get(i)).origin_ID, sortedFiles);
+
+					}
+					dropParticle(physics, position.x, position.y, _files.get(i), true);
+				}
+			}
+		}
+	}
+	
+	private void setParticlesPosition1D_(VerletPhysics physics, ArrayList<Tag> _files) {
+		// drop Particles
+		// set Position
+		physics.particles.clear();
+
+		int count = 0;
+		if (showVersions) {
+			count = getSizeWithoutVersion(_files);
+		} else {
+			count = _files.size();
+		}
+		// println("count: " + count);
+
+		float dist;
+		if (count > 1) {
+			// dist = ((float) height - 40) / (count - 1);
+			// dist = ((float) width - 40) / (count - 1);
+			dist = 120;
+		} else {
+			dist = 0;
+		}
+
+		int shiftCount = 0;
+		int yStartUnten = (int) (mainscreen.height / 2 - dist / 2);
+
+		ArrayList<Tag> sortedFiles = getFilesSortedLastAccess(_files);
+		println("setParticlesPosition1D(): _files.size:" + _files.size());
+		println("setParticlesPosition1D(): sortedFiles.size:" + sortedFiles.size());
+
+		// neuest Versionen
+		for (int i = 0; i < sortedFiles.size(); i++) {
+			// jede Datei aus sortedFiles muss positoniert werden
 			dropParticle(physics, shiftCount * dist - ((dist * (count - 1)) / 2.0f), yStartUnten, sortedFiles.get(i),
 					true); // links/rechts
 
@@ -1914,34 +1982,6 @@ public class TagExplorerProcessing2 extends PApplet {
 				}
 			}
 		}
-
-		// for (int i = 0; i < _files.size(); i++) {
-		// // wenn versionen nicht ausgeblendet sind && parent_ID -> set x & y
-		// // wert nach parent.
-		// if (showVersions && ((Tag_File) _files.get(i)).parent_ID != 0) {
-		//
-		// // get parent
-		// Tag_File parent = (Tag_File) getTagByID(_files.get(i).type,
-		// ((Tag_File) _files.get(i)).parent_ID);
-		// dropParticle(physics, parent.x, parent.y - 120, _files.get(i), true);
-		// }
-		//
-		// // ist neueste Version!
-		// else {
-		// dropParticle(physics, shiftCount * dist - ((dist * (count - 1)) /
-		// 2.0f), 0, _files.get(i), true); // links/rechts
-		//
-		// // println("i: " + i + " x: " + (shiftCount * dist) +
-		// // "verschiebeung um " + -(dist * (count - 1) / 2.0f));
-		// // von 0
-		// shiftCount++;
-		// }
-		// }
-
-		// set z position creation time -> setZTimeAxis()
-		// if(showTimeline){
-		// setZNewestTime();
-		// }
 	}
 
 	public void setShape() {
@@ -2819,11 +2859,15 @@ public class TagExplorerProcessing2 extends PApplet {
 	// ///////// INPUT ///////////////////
 
 	int lastMouseY;
+	int lastMouseX;
 
 	public void mouseDragged() {
 
 		float mouseDraggedY = (lastMouseY - mouseY);
 		lastMouseY = mouseY;
+		
+		float mouseDraggedX = (lastMouseX - mouseX);
+		lastMouseX = mouseX;
 
 		// nur wenn zeitachse aktiviert ist
 		// if (setZTimeAxis) {
@@ -2842,6 +2886,14 @@ public class TagExplorerProcessing2 extends PApplet {
 				cam_eyetargetpos.y = height / 2;
 			}
 		}
+		
+		if(position1D && !timeChooser.mouseOverScala() && !timeChooser.camMover.mouseOver()){
+			cam_eyetargetpos.x += mouseDraggedX;
+			
+			if (cam_eyetargetpos.x < width / 2) {
+				cam_eyetargetpos.x = width / 2;
+			}
+		}
 	}
 	
 
@@ -2849,6 +2901,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		mouseActive = true;
 		// mouseDragged
 		lastMouseY = mouseY;
+		lastMouseX = mouseX;
 
 		// lastClick = new Timestamp(System.currentTimeMillis());
 
@@ -3555,7 +3608,7 @@ public class TagExplorerProcessing2 extends PApplet {
 			// cp5_Test.get(Toggle.class, "position2D").setState(false);
 			position2D = false;
 			setButtonState("position2D", false);
-		}
+		} 
 		updateShowFiles();
 	}
 
