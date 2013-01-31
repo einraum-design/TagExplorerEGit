@@ -1,4 +1,4 @@
-package tagexplorerprocessing2;
+      package tagexplorerprocessing2;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -10,7 +10,7 @@ import toxi.geom.Vec2D;
 public class NewsFeed extends Vec2D{
 	
 	TagExplorerProcessing2 p5;
-	int w = 380;
+	
 	
 	Button_Image newButton;
 	ArrayList<News> news = new ArrayList<News>();
@@ -44,35 +44,47 @@ public class NewsFeed extends Vec2D{
 	}
 	
 	public void render(){
-		p5.noStroke();
-		p5.fill(p5.cBorder);
-		p5.rect(x-w, y, w, 22);
 		
-		p5.fill(p5.cButtonBright);
-		p5.stroke(p5.cBorder);
+		int yShift = 30; // platz für "NEWS"
 		
-		int yShift = 22;
-		for(int i = 0; i<12; i++){
-			p5.rect(x-w, y + yShift, w, 60);
-			yShift += 60;
-		}
-		
-		yShift = 22;
-		
-		p5.textAlign(PConstants.CENTER);
-		p5.textFont(p5.font, 12);
-		p5.fill(p5.cFont);
-		
-		p5.sdf.applyPattern("dd. MM. yyyy");
+		p5.textAlign(PConstants.CENTER, PConstants.BOTTOM);
 		
 		for(News n : news){
+			n.render(0, y + yShift);
 			
-			p5.imageMode(PConstants.CENTER);
-			p5.image(getTypeImage(n.type), x-40, y + yShift + 25 );
+			yShift += n.h;
 			
-			p5.text(p5.sdf.format(n.ts), x-40, y + yShift + 50);
-			yShift += 60;
 		}
+		
+//		p5.noStroke();
+//		p5.fill(p5.cBorder);
+//		p5.rect(x, y, w, 22);
+//		
+//		p5.fill(p5.cButtonBright);
+//		p5.stroke(p5.cBorder);
+//		
+//		int yShift = 22;
+//		for(int i = 0; i<12; i++){
+//			p5.rect(x-w, y + yShift, w, 60);
+//			yShift += 60;
+//		}
+//		
+//		yShift = 22;
+//		
+//		p5.textAlign(PConstants.CENTER);
+//		p5.textFont(p5.font, 12);
+//		p5.fill(p5.cFont);
+//		
+//		p5.sdf.applyPattern("dd. MM. yyyy");
+//		
+//		for(News n : news){
+//			
+//			p5.imageMode(PConstants.CENTER);
+//			p5.image(getTypeImage(n.type), x-40, y + yShift + 20, 30, 20);
+//			
+//			p5.text(p5.sdf.format(n.ts), x-40, y + yShift + 50);
+//			yShift += 60;
+//		}
 		
 //		for(int i = 0; i<12; i++){
 //			p5.text("12. 1. 2013", x-40, y + 50 + yShift);
@@ -83,26 +95,5 @@ public class NewsFeed extends Vec2D{
 	}
 
 
-	private PImage getTypeImage(String type) {
-		PImage typeImage;
-		
-		switch(type){
-		case "call":
-			typeImage = p5.newsCall;
-			break;
-		case "message":
-			typeImage = p5.newsMessage;
-			break;
-		case "file":
-			typeImage = p5.newsFile;
-			break;
-		case "appointment":
-			typeImage = p5.newsAppointment;
-			break;
-		default:
-			typeImage = p5.newsCall;
-			break;
-		}
-		return typeImage;
-	}
+	
 }

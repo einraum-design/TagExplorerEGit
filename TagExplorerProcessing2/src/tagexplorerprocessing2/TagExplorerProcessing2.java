@@ -358,7 +358,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		menuPlane = new MenuPlane(this);
 
-		newsFeed = new NewsFeed(this, 80, height / 5);
+		newsFeed = new NewsFeed(this, 0, height / 5);
 
 		mainscreen = createGraphics(width, height - 40, P3D);
 		pg = createGraphics(100, 100, P2D);
@@ -574,10 +574,16 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		back.texture(backgroundTransition);
 
-		back.vertex(-100, 0, 0, 0);
-		back.vertex(width + 200, 0, backgroundTransition.width, 0);
-		back.vertex(width + 200, height, backgroundTransition.width, backgroundTransition.height);
-		back.vertex(-100, height, 0, backgroundTransition.height);
+		back.vertex(0, 0, 0, 0);
+		back.vertex(width , 0, backgroundTransition.width, 0);
+		back.vertex(width , height, backgroundTransition.width, backgroundTransition.height);
+		back.vertex(0, height, 0, backgroundTransition.height);
+
+		
+//		back.vertex(-100, 0, 0, 0);
+//		back.vertex(width + 200, 0, backgroundTransition.width, 0);
+//		back.vertex(width + 200, height, backgroundTransition.width, backgroundTransition.height);
+//		back.vertex(-100, height, 0, backgroundTransition.height);
 		// back.fill(255);
 		back.end();
 
@@ -586,7 +592,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		shape(back);
 
 		// set Mouse active nach jeweils 600 millis;
-		if (System.currentTimeMillis() > lastClick.getTime() + 1200) {
+		if (System.currentTimeMillis() > lastClick.getTime() + 800) { // 1200
 			mouseActive = true;
 		} else {
 			mouseActive = false;
@@ -1604,9 +1610,9 @@ public class TagExplorerProcessing2 extends PApplet {
 
 			}
 
-			for (Tag ftype : filterTagTypeList) {
-				System.out.println(ftype.name + " " + ftype.bindCount);
-			}
+//			for (Tag ftype : filterTagTypeList) {
+//				System.out.println(ftype.name + " " + ftype.bindCount);
+//			}
 
 		}
 

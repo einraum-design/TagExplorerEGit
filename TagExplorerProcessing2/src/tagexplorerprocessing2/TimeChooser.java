@@ -37,14 +37,18 @@ public class TimeChooser extends Vec2D {
 		if (p5.minTime != null) {
 
 			// blaues fŸll feld zeitbereich
-			p5.fill(p5.cBorderHover, 120);
+			if(mouseOverScala()){
+				p5.fill(p5.cBorderHover, 200);
+			} else{
+				p5.fill(p5.cBorderHover, 120);
+			}
 			p5.noStroke();
 
 			p5.beginShape();
 			p5.vertex(x, y + h);
-//			p5.vertex(x, y + h - p5.timeline.mapExp(p5.minTime, h));
+			// p5.vertex(x, y + h - p5.timeline.mapExp(p5.minTime, h));
 			p5.vertex(x, y + h - mapExp(p5.minTime, h));
-//			p5.vertex(x + w, y + h - p5.timeline.mapExp(p5.minTime, h));
+			// p5.vertex(x + w, y + h - p5.timeline.mapExp(p5.minTime, h));
 			p5.vertex(x + w, y + h - mapExp(p5.minTime, h));
 			p5.vertex(x + w, y + h);
 			p5.endShape(PConstants.CLOSE);
@@ -58,8 +62,13 @@ public class TimeChooser extends Vec2D {
 
 			int fieldHeight = 20;
 
-			float xFeld = x - p5.textWidth("letzter Besuch") - fieldHeight - 7; // 7 ist textabstand zu closeButton
-			//float yFeld = y + h - p5.timeline.mapExp(p5.minTime, h) - fieldHeight;
+			float xFeld = x - p5.textWidth("letzter Besuch") - fieldHeight - 7; // 7
+																				// ist
+																				// textabstand
+																				// zu
+																				// closeButton
+			// float yFeld = y + h - p5.timeline.mapExp(p5.minTime, h) -
+			// fieldHeight;
 			float yFeld = y + h - mapExp(p5.minTime, h) - fieldHeight;
 
 			// MinTime Feld
@@ -76,8 +85,8 @@ public class TimeChooser extends Vec2D {
 			// p5.text(p5.sdf.format(minTime), x - w / 2 + rand, y - 40);
 			p5.fill(p5.cBorderHover);
 
-			
-			//p5.text(p5.sdf.format(p5.minTime), x - 20, y + h - p5.timeline.mapExp(p5.minTime, h) - 2);
+			// p5.text(p5.sdf.format(p5.minTime), x - 20, y + h -
+			// p5.timeline.mapExp(p5.minTime, h) - 2);
 			p5.text(p5.sdf.format(p5.minTime), x - 20, y + h - mapExp(p5.minTime, h) - 2);
 
 			Button_Symbol closeButtonMinTime = new Button_Symbol(p5, "close", (int) (xFeld + fieldHeight / 2.0f),
@@ -93,31 +102,37 @@ public class TimeChooser extends Vec2D {
 		}
 
 		// draw CameraMove
-		camMover.render();
+		if (p5.setZTimeAxis) {
+			camMover.render();
+		}
 
 		// draw Skala
 		p5.shape(scala);
 
 		// setzte Zeitbereich
 		if (mouseOverScala() && p5.mousePressed) {
-			
+
 			int timelineLength = p5.timeline.timelineMaxLength;
 
-			//float yVal = PApplet.map(p5.mouseY, y + h, y, 0, p5.timeline.timelineLength);
+			// float yVal = PApplet.map(p5.mouseY, y + h, y, 0,
+			// p5.timeline.timelineLength);
 			float yVal = PApplet.map(p5.mouseY, y + h, y, 0, timelineLength);
 
 			// System.out.println("mouseY: " + p5.mouseY + " " + (y + h) + " " +
 			// (y) + "yVal: " + yVal);
 
 			if (p5.timeline.oldest != null) {
-				//float val = PApplet.map(yVal, 0, p5.timeline.timelineLength, 0,	PApplet.sqrt(System.currentTimeMillis() - p5.timeline.oldest.getTime()));
-				float val = PApplet.map(yVal, 0, timelineLength, 0,	PApplet.sqrt(System.currentTimeMillis() - p5.oldest_File.creation_time.getTime()));
+				// float val = PApplet.map(yVal, 0, p5.timeline.timelineLength,
+				// 0, PApplet.sqrt(System.currentTimeMillis() -
+				// p5.timeline.oldest.getTime()));
+				float val = PApplet.map(yVal, 0, timelineLength, 0,
+						PApplet.sqrt(System.currentTimeMillis() - p5.oldest_File.creation_time.getTime()));
 
 				// System.out.println("val: " + val);
 
 				val *= val; // quadriere
 				p5.minTime = new Timestamp(System.currentTimeMillis() - (long) val);
-			} else{
+			} else {
 				p5.minTime = null;
 				p5.updateShowFiles();
 			}
@@ -158,22 +173,21 @@ public class TimeChooser extends Vec2D {
 	public boolean mouseOverScala() {
 		boolean over = false;
 
-		int zusatz = 15;
+		int zusatz = 50;
 		// referenz links oben
 		if (p5.mouseX >= x - zusatz && p5.mouseX < x + w && p5.mouseY > y && p5.mouseY < y + h) {
 			over = true;
 		}
 		return over;
 	}
-	
-	
+
 	public float mapExp(Timestamp ts, int h) {
 		// System.out.println("ts time: " + ts.getTime());
 		long time = System.currentTimeMillis() - ts.getTime();
 		// System.out.println("delta time: " + time);
 		return mapExpMillis(time, h);
 	}
-	
+
 	public float mapExpMillis(long time, int h) {
 
 		if (p5.oldest_File == null) {

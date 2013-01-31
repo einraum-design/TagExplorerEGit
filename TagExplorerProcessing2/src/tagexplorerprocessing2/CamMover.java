@@ -94,18 +94,18 @@ public class CamMover extends Vec2D {
 
 	public boolean mouseOver(float x, float y, float w, float h) {
 		boolean over = false;
-
+		int zusatz = 80;
 		// referenz links oben
-		if (p5.mouseX >= x && p5.mouseX < x + w && p5.mouseY > y && p5.mouseY < y + h) {
+		if (p5.mouseX >= x && p5.mouseX < x + w && p5.mouseY > y - zusatz && p5.mouseY < y + h + zusatz) {
 			over = true;
 		}
 		return over;
 	}
 	public boolean mouseOver() {
 		boolean over = false;
-
+		int zusatz = 80;
 		// referenz links oben
-		if (p5.mouseX >= x && p5.mouseX < x + w && p5.mouseY > y && p5.mouseY < y + h) {
+		if (p5.mouseX >= x && p5.mouseX < x + w && p5.mouseY > y - zusatz && p5.mouseY < y + h + zusatz) {
 			over = true;
 		}
 		return over;
