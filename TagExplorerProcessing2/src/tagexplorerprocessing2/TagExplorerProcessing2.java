@@ -68,6 +68,8 @@ public class TagExplorerProcessing2 extends PApplet {
 	ArrayList<Tag> showFiles = null;
 	ArrayList<Tag> availableTags = new ArrayList<Tag>();
 	ArrayList<Tag> availableUsers = new ArrayList<Tag>();
+	
+	ArrayList<Tag> filterTagTypeList = new ArrayList<Tag>();
 
 	ArrayList<Tag> applications = new ArrayList<Tag>();
 	ArrayList<Tag> showApplications = new ArrayList<Tag>();
@@ -468,6 +470,9 @@ public class TagExplorerProcessing2 extends PApplet {
 		updateSprings();
 
 		initApplications();
+		
+		initFilterTagTypeList(); //add these to Filterauswahl/ availbleFilterList (oder so Šhnlich)
+		
 
 		// sets Default main user
 		mainUser = (Tag_User) getTagByID("users", 2);
@@ -481,6 +486,8 @@ public class TagExplorerProcessing2 extends PApplet {
 	// println("mousewheel: " + delta);
 	// cam_eye.z += delta;
 	// }
+
+	
 
 	// /////////// draw ////////////////////
 	// /////////// draw ////////////////////
@@ -1200,6 +1207,12 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		// oldest_showFile = ((Tag_File) getOldestTagFile(this.files));
 		// return files;
+	}
+	
+	private void initFilterTagTypeList() {
+		for(Tag_File.FileType typ : Tag_File.FileType.values()){
+			filterTagTypeList.add(new Tag_FileType(typ));
+		}
 	}
 
 	public void initTextures() {
