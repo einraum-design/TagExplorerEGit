@@ -2834,7 +2834,16 @@ public class TagExplorerProcessing2 extends PApplet {
 		if (setZTimeAxis && timeChooser.camMover.mouseOver()) {
 			timeChooser.camMover.setY(mouseY);
 		}
+		
+		if(!timeChooser.mouseOverScala() && !timeChooser.camMover.mouseOver()){
+			cam_eyetargetpos.y += mouseDraggedY * 10;
+			
+			if (cam_eyetargetpos.y > height / 2) {
+				cam_eyetargetpos.y = height / 2;
+			}
+		}
 	}
+	
 
 	public void mousePressed() {
 		mouseActive = true;
@@ -2843,17 +2852,19 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		// lastClick = new Timestamp(System.currentTimeMillis());
 
-		for (Tag t : showFiles) {
-
-			if (mouseOver(mainscreen, t.x + mainscreen.width / 2, t.y + mainscreen.height / 2, t.z, 30, 30)) {
-				startTag = t;
-			}
-		}
-		for (Tag t : attributes) {
-			if (mouseOver(mainscreen, t.x + mainscreen.width / 2, t.y + mainscreen.height / 2, t.z, 30, 30)) {
-				startTag = t;
-			}
-		}
+		System.out.println("void mousePressed auskommentiert Tag verbindung Interaktion!");
+		// TagVerbindungen
+//		for (Tag t : showFiles) {
+//
+//			if (mouseOver(mainscreen, t.x + mainscreen.width / 2, t.y + mainscreen.height / 2, t.z, 30, 30)) {
+//				startTag = t;
+//			}
+//		}
+//		for (Tag t : attributes) {
+//			if (mouseOver(mainscreen, t.x + mainscreen.width / 2, t.y + mainscreen.height / 2, t.z, 30, 30)) {
+//				startTag = t;
+//			}
+//		}
 	}
 
 	Timestamp lastMinTime = null;
