@@ -287,14 +287,33 @@ public class HoverPlane extends Plane {
 		ArrayList<Tag> sortedTags = new ArrayList<Tag>();
 		// nicht gleich "":
 		String inputText = cp5.get(Textfield.class, inputFieldName).getText().trim();
+		
+		
+		// attributes without Tag_FileTypes
+		ArrayList<Tag> addAttributes = (ArrayList<Tag>) p5.attributes.clone();
+		
+		ArrayList<Integer> deleteNumbers = new ArrayList<Integer>();
+		for(int i = addAttributes.size()-1; i >= 0; i--){
+			if(addAttributes.get(i) instanceof Tag_FileType){
+				deleteNumbers.add(i);
+			}
+		}
+		// remove Tag_FileTypes
+		for(int i : deleteNumbers){
+			addAttributes.remove(i);
+		}
+		
+		
 		if (inputText.equals("")) {
 			// sortiere nach HŠufigkeit
-			sortedTags = (ArrayList<Tag>) p5.attributes.clone();
+			sortedTags = addAttributes;
+//			sortedTags = (ArrayList<Tag>) p5.attributes.clone();
 			Collections.sort(sortedTags, comp_bindCount);
 		} else {
 			// sortiere nach Anfangsbuchstaben
 
-			for (Tag tag : p5.attributes) {
+//			for (Tag tag : p5.attributes) {
+			for (Tag tag : addAttributes) {
 				if (tag.name.toLowerCase().startsWith(
 						cp5.get(Textfield.class, inputFieldName).getText().trim().toLowerCase())) {
 					sortedTags.add(tag);

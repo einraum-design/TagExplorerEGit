@@ -58,7 +58,7 @@ public class TimeChooser extends Vec2D {
 
 			int fieldHeight = 20;
 
-			float xFeld = x - p5.textWidth("letzter Besuch") - fieldHeight;
+			float xFeld = x - p5.textWidth("letzter Besuch") - fieldHeight - 7; // 7 ist textabstand zu closeButton
 			//float yFeld = y + h - p5.timeline.mapExp(p5.minTime, h) - fieldHeight;
 			float yFeld = y + h - mapExp(p5.minTime, h) - fieldHeight;
 

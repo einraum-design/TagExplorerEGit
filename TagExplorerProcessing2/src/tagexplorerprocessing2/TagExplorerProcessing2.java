@@ -461,6 +461,9 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		// erst Tags, dann Files!
 		attributes = initTagsFromDB();
+		initFilterTagTypeList(); // add these to Filterauswahl/
+		// availbleFilterList (oder so Šhnlich)
+		
 		initFilesFromDB();
 
 		oldest_File = (Tag_File) getOldestTagFile(files);
@@ -470,9 +473,6 @@ public class TagExplorerProcessing2 extends PApplet {
 		updateSprings();
 
 		initApplications();
-
-		initFilterTagTypeList(); // add these to Filterauswahl/
-									// availbleFilterList (oder so Šhnlich)
 
 		// sets Default main user
 		mainUser = (Tag_User) getTagByID("users", 2);
@@ -2858,6 +2858,7 @@ public class TagExplorerProcessing2 extends PApplet {
 			// neuer timestamp:
 			if (lastMinTime != minTime) {
 				updateShowFiles();
+				updateTags();
 			}
 		}
 
