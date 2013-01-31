@@ -2,6 +2,8 @@ package tagexplorerprocessing2;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 import controlP5.Textfield;
 
@@ -116,6 +118,42 @@ public class MenuPlane extends Plane {
 		}
 		return 0;
 	}
+	
+//	public ArrayList<Tag> sort(String inputFieldName) {
+//		ArrayList<Tag> sortedTags = new ArrayList<Tag>();
+//		// nicht gleich "":
+//		String inputText = cp5.get(Textfield.class, inputFieldName).getText().trim();
+//		if (inputText.equals("")) {
+//			// sortiere nach Häufigkeit
+//			sortedTags = (ArrayList<Tag>) p5.availableTags.clone();
+//			
+//			// bei MenuPlane add Tag_FileTypen
+//			sortedTags.addAll((Collection<? extends Tag>) p5.filterTagTypeList.clone());
+//			
+//			
+//			Collections.sort(p5.availableTags, comp_bindCount);
+//		} else {
+//			// sortiere nach Anfangsbuchstaben
+//
+//			for (Tag tag : p5.attributes) {
+//				if (tag.name.toLowerCase().startsWith(
+//						cp5.get(Textfield.class, inputFieldName).getText().trim().toLowerCase())) {
+//					sortedTags.add(tag);
+//				}
+//			}
+//
+//			Collections.sort(sortedTags, comp_bindCount); // oder comp_Name
+//		}
+//
+//		// entferne schon gewählt Tags aus sorted Tags
+//		for (Filter f : p5.filterList) {
+//			if (sortedTags.contains(f.tag)) {
+//				sortedTags.remove(f.tag);
+//			}
+//		}
+//
+//		return sortedTags;
+//	}
 
 	public void createTextField(String name, String value, float x, float y, int w, int h) {
 		// System.out.println("createTextfield");

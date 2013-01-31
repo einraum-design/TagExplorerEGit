@@ -8,6 +8,7 @@ public class Tag_FileType extends Tag {
 
 		type = "fileType";
 		this.fileType = fileType; 
+		this.name = fileType.toString();
 		
 	}
 }

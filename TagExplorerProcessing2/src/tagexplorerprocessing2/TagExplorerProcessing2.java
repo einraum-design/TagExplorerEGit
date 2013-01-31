@@ -68,7 +68,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	ArrayList<Tag> showFiles = null;
 	ArrayList<Tag> availableTags = new ArrayList<Tag>();
 	ArrayList<Tag> availableUsers = new ArrayList<Tag>();
-	
+
 	ArrayList<Tag> filterTagTypeList = new ArrayList<Tag>();
 
 	ArrayList<Tag> applications = new ArrayList<Tag>();
@@ -230,7 +230,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	PImage newKeyword;
 	PImage newProject;
 	PImage newEvent;
-	
+
 	// news Types
 	PImage newsCall;
 	PImage newsAppointment;
@@ -462,17 +462,17 @@ public class TagExplorerProcessing2 extends PApplet {
 		// erst Tags, dann Files!
 		attributes = initTagsFromDB();
 		initFilesFromDB();
-		
+
 		oldest_File = (Tag_File) getOldestTagFile(files);
-		
+
 		updateShowFiles();
 		updateTags();
 		updateSprings();
 
 		initApplications();
-		
-		initFilterTagTypeList(); //add these to Filterauswahl/ availbleFilterList (oder so ähnlich)
-		
+
+		initFilterTagTypeList(); // add these to Filterauswahl/
+									// availbleFilterList (oder so ähnlich)
 
 		// sets Default main user
 		mainUser = (Tag_User) getTagByID("users", 2);
@@ -486,8 +486,6 @@ public class TagExplorerProcessing2 extends PApplet {
 	// println("mousewheel: " + delta);
 	// cam_eye.z += delta;
 	// }
-
-	
 
 	// /////////// draw ////////////////////
 	// /////////// draw ////////////////////
@@ -1208,9 +1206,9 @@ public class TagExplorerProcessing2 extends PApplet {
 		// oldest_showFile = ((Tag_File) getOldestTagFile(this.files));
 		// return files;
 	}
-	
+
 	private void initFilterTagTypeList() {
-		for(Tag_File.FileType typ : Tag_File.FileType.values()){
+		for (Tag_File.FileType typ : Tag_File.FileType.values()) {
 			filterTagTypeList.add(new Tag_FileType(typ));
 		}
 	}
@@ -1345,7 +1343,8 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 
 		oldest_showFile = (Tag_File) getOldestTagFile(showFiles);
-		//System.out.println("oldest_showFile: " + oldest_showFile.creation_time.toGMTString());
+		// System.out.println("oldest_showFile: " +
+		// oldest_showFile.creation_time.toGMTString());
 
 		// set Timeline Wertebereich
 		if (oldest_showFile != null) {
@@ -1520,28 +1519,41 @@ public class TagExplorerProcessing2 extends PApplet {
 
 			// count matches mit filterList
 			for (Filter f : filterList) {
-
-				// davor/danach bis wann?
-				// if(f.tag instanceof Tag_Event){
-				//
-				// }
-
-				if (f.inOut) {
-					for (Tag tt : file.attributeBindings) {
-						if (tt.type.equals(f.tag.type) && tt.id == f.tag.id) {
-							file.matches++;
+				
+				// FiltType Filter
+				if (f.tag instanceof Tag_FileType) {
+					if (f.inOut){
+						if(file.fileType == ((Tag_FileType)f.tag).fileType){
+							file.matches ++;
+						}
+					} else{
+						if(file.fileType == ((Tag_FileType)f.tag).fileType){
+							file.matches --;
 						}
 					}
-					// contains funktioniert nicht
-					// if (file.attributeBindings.contains(f.tag)) {
-					// file.matches++;
-					// println("updateMatches(): " + file.name + " id " +
-					// file.id + " contains Tag: " + f.tag.name);
-					// }
-				} else {
-					for (Tag tt : file.attributeBindings) {
-						if (tt.type.equals(f.tag.type) && tt.id == f.tag.id) {
-							file.matches--;
+				} 
+				
+				// normaler Tag Filter
+				else {
+
+					if (f.inOut) {
+						for (Tag tt : file.attributeBindings) {
+							if (tt.type.equals(f.tag.type) && tt.id == f.tag.id) {
+								file.matches++;
+							}
+						}
+
+						// contains funktioniert nicht
+						// if (file.attributeBindings.contains(f.tag)) {
+						// file.matches++;
+						// println("updateMatches(): " + file.name + " id " +
+						// file.id + " contains Tag: " + f.tag.name);
+						// }
+					} else {
+						for (Tag tt : file.attributeBindings) {
+							if (tt.type.equals(f.tag.type) && tt.id == f.tag.id) {
+								file.matches--;
+							}
 						}
 					}
 				}
@@ -1587,8 +1599,13 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		attributes = initTagsFromDB();
 
-		// reset bindCount
+		// reset bindCount attributes
 		for (Tag tag : attributes) {
+			tag.bindCount = 0;
+		}
+
+		// reset bindCount fileTagTypeList
+		for (Tag tag : filterTagTypeList) {
 			tag.bindCount = 0;
 		}
 
@@ -1596,11 +1613,29 @@ public class TagExplorerProcessing2 extends PApplet {
 		if (showFiles != null) {
 			for (Tag f : showFiles) {
 				Tag_File file = (Tag_File) f;
+
 				for (Tag tag : file.attributeBindings) {
+					// zählt files, die mit Attribut verbunden snd
 					tag.bindCount++;
 				}
+
+				// zählt fileTypen hoch
+				for (Tag ftype : filterTagTypeList) {
+					if (file.fileType == ((Tag_FileType) ftype).fileType) {
+						ftype.bindCount++;
+					}
+				}
+
 			}
+
+			for (Tag ftype : filterTagTypeList) {
+				System.out.println(ftype.name + " " + ftype.bindCount);
+			}
+
 		}
+
+		// add filterTagTypeList to all attributes
+		attributes.addAll(filterTagTypeList);
 
 		// get mit showFiles verknüpfte Tags & Häufigkeit
 		this.availableTags = getTagcountAndTags(showFiles);
@@ -2819,14 +2854,12 @@ public class TagExplorerProcessing2 extends PApplet {
 			if (lastMinTime == null) {
 				lastMinTime = (Timestamp) minTime.clone();
 			}
-			
+
 			// neuer timestamp:
 			if (lastMinTime != minTime) {
 				updateShowFiles();
 			}
 		}
-
-		
 
 		lastClick = new Timestamp(System.currentTimeMillis());
 		startClickNextFrame = true;
@@ -3365,13 +3398,13 @@ public class TagExplorerProcessing2 extends PApplet {
 		newKeyword = loadImage("../data/newKeyword.png");
 		newProject = loadImage("../data/newProject.png");
 		newEvent = loadImage("../data/newEvent.png");
-		
+
 		// news Images
 		newsCall = loadImage("../data/news_call.png");
 		newsAppointment = loadImage("../data/news_appointment.png");
 		newsFile = loadImage("../data/news_file.png");
 		newsMessage = loadImage("../data/news_message.png");
-		
+
 	}
 
 	public static void main(String _args[]) {

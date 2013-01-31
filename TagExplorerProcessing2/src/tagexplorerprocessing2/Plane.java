@@ -69,6 +69,11 @@ public class Plane extends Vec2D {
 		if (inputText.equals("")) {
 			// sortiere nach HŠufigkeit
 			sortedTags = (ArrayList<Tag>) p5.availableTags.clone();
+			
+			// bei MenuPlane add Tag_FileTypen
+			
+			
+			
 			Collections.sort(p5.availableTags, comp_bindCount);
 		} else {
 			// sortiere nach Anfangsbuchstaben
