@@ -845,7 +845,11 @@ public class TagExplorerProcessing2 extends PApplet {
 		// renderer.camera(cam_eye.x, cam_eye.y, cam_eye.z, cam_target.x,
 		// cam_target.y, cam_target.z, cam_up.x, cam_up.y,
 		// cam_up.z);
-
+		float fov = PI/3.0f;
+		float cameraZ = (mainscreen.height/2.0f) / tan(fov/2.0f);
+		
+		renderer.perspective(fov, (float)(renderer.width)/(float)(renderer.height), cameraZ/10.0f, cameraZ*25.0f);
+//		renderer.perspective(fov, (float)(renderer.width)/(float)(renderer.height), cameraZ/10.0f, cameraZ*10.0f);
 		renderer.camera(cam_eyeaktuellpos.x, cam_eyeaktuellpos.y, cam_eyeaktuellpos.z, cam_target.x, cam_target.y,
 				cam_target.z, 0, 1, 0);
 
@@ -997,38 +1001,6 @@ public class TagExplorerProcessing2 extends PApplet {
 					// println("Create hoverPlane");
 				}
 			}
-		}
-	}
-
-	public void drawApplications() { // PGraphics renderer
-		if (showApplications.size() > 0) {
-			// int allAccesses = 0;
-			// for (Tag tag : showApplications) {
-			// Tag_App app = (Tag_App) tag;
-			// allAccesses += app.count;
-			// }
-			//
-			// int xShift = 0;
-			// for (Tag tag : showApplications) {
-			// Tag_App app = (Tag_App) tag;
-			//
-			// int w = (int) map(app.count, 0, allAccesses, 0, width);
-			// fill(220);
-			// stroke(0);
-			// rect(xShift, height - 100, w, 20);
-			// xShift += w;
-			// }
-
-			// particle Visualisierung
-			// pushMatrix();
-			// translate(width / 2, height - 200, 0);
-			// for (int i = 0; i < appPhysics.particles.size(); i++) {
-			// Tag_App app = (Tag_App) appPhysics.particles.get(i);
-			//
-			// image(app.img, app.x, app.y, 100, 100);
-			// }
-			//
-			// popMatrix();
 		}
 	}
 
@@ -1445,10 +1417,9 @@ public class TagExplorerProcessing2 extends PApplet {
 			}
 		}
 		if (showApplications.size() == 0) {
-			xShift = width - seitenAbstand - h;
+			xShift = width - seitenAbstand*2 - h;
 		}
-		appButtons.add(new Button_App(this, "show all", appsButton, h + wApps, h, xShift + seitenAbstand, height - h
-				- 10));
+		appButtons.add(new Button_App(this, "show all", appsButton, h + wApps, h, xShift + seitenAbstand, height - h - 10));
 
 		// particle visualisierung
 

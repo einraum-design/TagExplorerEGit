@@ -158,8 +158,9 @@ public class TimeChooser extends Vec2D {
 	public boolean mouseOverScala() {
 		boolean over = false;
 
+		int zusatz = 15;
 		// referenz links oben
-		if (p5.mouseX >= x && p5.mouseX < x + w && p5.mouseY > y && p5.mouseY < y + h) {
+		if (p5.mouseX >= x - zusatz && p5.mouseX < x + w && p5.mouseY > y && p5.mouseY < y + h) {
 			over = true;
 		}
 		return over;
