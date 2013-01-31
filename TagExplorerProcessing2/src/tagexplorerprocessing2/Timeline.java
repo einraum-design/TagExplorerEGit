@@ -15,6 +15,7 @@ public class Timeline {
 	Timestamp oldest = null;
 
 	int timelineLength;
+	int timelineMaxLength;
 
 	public Timeline(TagExplorerProcessing2 p5) {
 		this.p5 = p5;
@@ -26,6 +27,7 @@ public class Timeline {
 		// timelineLength = pg.height - 80;
 
 		timelineLength = 4000;
+		timelineMaxLength = 4000; // fix!
 	}
 
 	public void render(PGraphics renderer) {
