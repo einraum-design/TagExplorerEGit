@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import processing.core.PConstants;
+import processing.core.PImage;
 import toxi.geom.Vec2D;
 
 public class NewsFeed extends Vec2D{
@@ -64,10 +65,14 @@ public class NewsFeed extends Vec2D{
 		
 		p5.sdf.applyPattern("dd. MM. yyyy");
 		
-		for(News n : news){
-			p5.text(p5.sdf.format(n.ts), x-40, y + 50 + yShift);
-			yShift += 60;
-		}
+//		for(News n : news){
+//			
+//			p5.imageMode(PConstants.CENTER);
+//			p5.image(getTypeImage(n.type), x-40, y + yShift + 25 )
+//			
+//			p5.text(p5.sdf.format(n.ts), x-40, y + yShift + 50);
+//			yShift += 60;
+//		}
 		
 //		for(int i = 0; i<12; i++){
 //			p5.text("12. 1. 2013", x-40, y + 50 + yShift);
@@ -76,4 +81,25 @@ public class NewsFeed extends Vec2D{
 		newButton.render();
 		
 	}
+
+
+//	private PImage getTypeImage(String type) {
+//		
+//		PImage typeImage;
+//		
+//		switch(type){
+//		case "call":
+////			typeImage = 
+//			break;
+//		case "message":
+//			break;
+//		case "file":
+//			break;
+//		case "appointment":
+//			break;
+//		default:
+//			break;
+//		}
+//		return typeImage;
+//	}
 }

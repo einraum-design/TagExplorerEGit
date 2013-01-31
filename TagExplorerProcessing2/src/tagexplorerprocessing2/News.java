@@ -39,7 +39,7 @@ public class News {
 	}
 	
 	public String generateType(){	
-		String type = "call"; // "call", "message", "file"
+		String type = "call"; // "call", "message", "file", "appointment"
 		return type;
 	}
 	
