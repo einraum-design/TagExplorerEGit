@@ -1326,7 +1326,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 
 		oldest_showFile = (Tag_File) getOldestTagFile(showFiles);
-		System.out.println("oldest_showFile: " + oldest_showFile.creation_time.toGMTString());
+		//System.out.println("oldest_showFile: " + oldest_showFile.creation_time.toGMTString());
 
 		// set Timeline Wertebereich
 		if (oldest_showFile != null) {
@@ -2796,16 +2796,16 @@ public class TagExplorerProcessing2 extends PApplet {
 	Timestamp lastMinTime = null;
 
 	public void mouseReleased() {
-//		if (minTime != null) {
-//			if (lastMinTime == null) {
-//				lastMinTime = (Timestamp) minTime.clone();
-//			}
-//			
-//			// neuer timestamp:
-//			if (lastMinTime != minTime) {
-//				updateShowFiles();
-//			}
-//		}
+		if (minTime != null) {
+			if (lastMinTime == null) {
+				lastMinTime = (Timestamp) minTime.clone();
+			}
+			
+			// neuer timestamp:
+			if (lastMinTime != minTime) {
+				updateShowFiles();
+			}
+		}
 
 		
 
