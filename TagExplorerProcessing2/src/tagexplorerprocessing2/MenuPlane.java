@@ -103,7 +103,7 @@ public class MenuPlane extends Plane {
 						tag.lastEndFilterTime = p5.SQL.getFilterTime(tag, "end_time");
 						
 						// wenn minTime mindestens 6h her ist
-						if(tag.lastStartFilterTime.before(new Timestamp(System.currentTimeMillis() - 6 * 60 * 60 * 1000))){
+						if(tag.lastStartFilterTime != null && tag.lastStartFilterTime.before(new Timestamp(System.currentTimeMillis() - 6 * 60 * 60 * 1000))){
 							System.out.println("MenuPlane.drawTagList() set inTime");
 							p5.minTime = tag.lastStartFilterTime;
 						}

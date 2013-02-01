@@ -35,12 +35,24 @@ public class NewsFeed extends Vec2D{
 		news.add(new News(p5, new Timestamp(System.currentTimeMillis() - 73L * 60 * 60 * 1000)));
 		
 		
-		newButton = new Button_Image(p5, "news", x-80 , y);
+		newButton = new Button_Image(p5, "news", x , y);
 	}
 	
 	
 	public void update(){
-		
+
+	}
+	
+	public void setNewNews(ArrayList<Tag> newTags){
+		for(int i = 0; i<newTags.size(); i++){
+			
+			Tag_File file = (Tag_File) newTags.get(i);
+			
+			if(file.getAccesses().size() > 0){
+				Access access = file.getAccesses().get(file.getAccesses().size() - 1);
+				news.add(i, new News(p5, access.date, "file", access.user, access.comment));
+			}	
+		}
 	}
 	
 	public void render(){

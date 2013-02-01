@@ -7,11 +7,16 @@ import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.SimpleTimeZone;
+import java.util.TimeZone;
 import java.util.TreeSet;
 
 import controlP5.ControlP5;
@@ -130,7 +135,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	// Vec3D cam_eye_target;
 
 	Vec3D cam_eye2Dpos;
-//	Vec3D cam_eye3Dpos;
+	// Vec3D cam_eye3Dpos;
 	Vec3D cam_eyeaktuellpos;
 	Vec3D cam_eyetargetpos;
 
@@ -148,6 +153,15 @@ public class TagExplorerProcessing2 extends PApplet {
 	VerletPhysics appPhysics;
 
 	PShape fileShape;
+	PShape backgroundLines;
+	PShape scala;
+	
+	ArrayList<ScalaWert> scalaWerte = new ArrayList<ScalaWert>();
+
+	int contentBorders = 120;
+
+	int contentStartOben;
+	int contentStartUnten;
 
 	String[] imageExtension = { "jpg", "jpeg", "png", "gif", "psd", "tif", "tiff", "bmp", "tga" };
 	String[] vectorExtension = { "ai", "drw", "eps", "ps", "svg", "c4d" };
@@ -360,7 +374,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		newsFeed = new NewsFeed(this, 0, height / 5);
 
-		mainscreen = createGraphics(width, height - 40, P3D);
+		mainscreen = createGraphics(width, height, P3D); // height-40
 		pg = createGraphics(100, 100, P2D);
 		// mainscreen.smooth(4);
 
@@ -381,7 +395,8 @@ public class TagExplorerProcessing2 extends PApplet {
 		// cam_up.y, cam_up.z);
 
 		cam_eye2Dpos = new Vec3D(width / 2.0f, height / 2.0f, (height / 2.0f) / tan(PI * 30.0f / 180.0f));
-		//cam_eye3Dpos = new Vec3D(width / 2.0f, height * 2, (height / 2.0f) / tan(PI * 30.0f / 180.0f));
+		// cam_eye3Dpos = new Vec3D(width / 2.0f, height * 2, (height / 2.0f) /
+		// tan(PI * 30.0f / 180.0f));
 
 		cam_eyeaktuellpos = cam_eye2Dpos.copy();
 		cam_eyetargetpos = cam_eyeaktuellpos;
@@ -412,6 +427,12 @@ public class TagExplorerProcessing2 extends PApplet {
 		// fileShape.emissive(0, 0, 50);
 
 		// ball.shininess(0);
+
+		// am start
+		// int contentBorders = 120;
+
+		contentStartOben = mainscreen.height / 2 - (int) menuPlane.h - contentBorders / 2;
+		contentStartUnten = mainscreen.height / 2 - contentBorders / 2;
 
 		Path p = FileSystems.getDefault().getPath("/Users/manuel/Documents/Testumgebung/UserOrdner");
 		// Path p =
@@ -480,6 +501,10 @@ public class TagExplorerProcessing2 extends PApplet {
 		println("Default main User in setup: " + mainUser.name);
 
 		lastClick = new Timestamp(System.currentTimeMillis());
+
+		// Background Lines
+		backgroundLines = generateBackgroundLines();
+		scala = generateScala();
 	}
 
 	// void mouseWheel(int delta) {
@@ -535,10 +560,10 @@ public class TagExplorerProcessing2 extends PApplet {
 		//
 		// }
 
-		if(!position1D){
+		if (!position1D) {
 			cam_eyetargetpos.x = cam_eye2Dpos.x;
 		}
-		
+
 		// update interpolate cam position
 		cam_eyeaktuellpos = interpolateVec(cam_eyeaktuellpos, cam_eyetargetpos);
 
@@ -575,15 +600,15 @@ public class TagExplorerProcessing2 extends PApplet {
 		back.texture(backgroundTransition);
 
 		back.vertex(0, 0, 0, 0);
-		back.vertex(width , 0, backgroundTransition.width, 0);
-		back.vertex(width , height, backgroundTransition.width, backgroundTransition.height);
+		back.vertex(width, 0, backgroundTransition.width, 0);
+		back.vertex(width, height, backgroundTransition.width, backgroundTransition.height);
 		back.vertex(0, height, 0, backgroundTransition.height);
 
-		
-//		back.vertex(-100, 0, 0, 0);
-//		back.vertex(width + 200, 0, backgroundTransition.width, 0);
-//		back.vertex(width + 200, height, backgroundTransition.width, backgroundTransition.height);
-//		back.vertex(-100, height, 0, backgroundTransition.height);
+		// back.vertex(-100, 0, 0, 0);
+		// back.vertex(width + 200, 0, backgroundTransition.width, 0);
+		// back.vertex(width + 200, height, backgroundTransition.width,
+		// backgroundTransition.height);
+		// back.vertex(-100, height, 0, backgroundTransition.height);
 		// back.fill(255);
 		back.end();
 
@@ -825,7 +850,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		renderer.beginDraw();
 		renderer.smooth(4);
 
-		renderer.background(255, 0);
+		renderer.background(150, 0);
 
 		// pulse shader
 		// renderer.hint(DISABLE_DEPTH_MASK);
@@ -851,11 +876,14 @@ public class TagExplorerProcessing2 extends PApplet {
 		// renderer.camera(cam_eye.x, cam_eye.y, cam_eye.z, cam_target.x,
 		// cam_target.y, cam_target.z, cam_up.x, cam_up.y,
 		// cam_up.z);
-		float fov = PI/3.0f;
-		float cameraZ = (mainscreen.height/2.0f) / tan(fov/2.0f);
-		
-		renderer.perspective(fov, (float)(renderer.width)/(float)(renderer.height), cameraZ/10.0f, cameraZ*25.0f);
-//		renderer.perspective(fov, (float)(renderer.width)/(float)(renderer.height), cameraZ/10.0f, cameraZ*10.0f);
+		float fov = PI / 3.0f;
+		float cameraZ = (mainscreen.height / 2.0f) / tan(fov / 2.0f);
+
+		renderer.perspective(fov, (float) (renderer.width) / (float) (renderer.height), cameraZ / 10.0f,
+				cameraZ * 25.0f);
+		// renderer.perspective(fov,
+		// (float)(renderer.width)/(float)(renderer.height), cameraZ/10.0f,
+		// cameraZ*10.0f);
 		renderer.camera(cam_eyeaktuellpos.x, cam_eyeaktuellpos.y, cam_eyeaktuellpos.z, cam_target.x, cam_target.y,
 				cam_target.z, 0, 1, 0);
 
@@ -872,6 +900,26 @@ public class TagExplorerProcessing2 extends PApplet {
 		// renderer.vertex(-delta, 0, -delta);
 		// renderer.vertex(delta, 0, -delta);
 		// renderer.endShape(CLOSE);
+
+		renderer.shape(backgroundLines);
+		renderer.shape(scala);
+		
+		renderer.textAlign(PConstants.RIGHT, PConstants.BOTTOM);
+		renderer.textFont(font, 24);
+		renderer.fill(0);
+		
+		for(ScalaWert sw : scalaWerte){
+			
+			renderer.pushMatrix();
+			renderer.translate(-renderer.width / 2, renderer.height / 2, sw.z);
+			renderer.translate(-50, -50, 0);
+			renderer.rotateZ(PI/4.0f);
+			
+			renderer.text(sw.zeit, 0, 0);
+			renderer.popMatrix();
+			
+		}
+		
 
 		if (showTimeline) {
 			timeline.render(renderer);
@@ -1340,6 +1388,22 @@ public class TagExplorerProcessing2 extends PApplet {
 		// println("before setParticelPositions : setZTimeAxis = " +
 		// setZTimeAxis);
 
+		// schicke 8 aktuellsten meldungen an NewsFeed
+
+		// funktioniert noch nicht
+		// ArrayList<Tag> sortedFiles = getFilesSortedLastAccess(showFiles);
+		// ArrayList<Tag> filesToNews = new ArrayList<Tag>();
+		// if(sortedFiles.size() > 10){
+		// for(int i = 0; i<10; i++){
+		// filesToNews.add(sortedFiles.get(i));
+		// }
+		// } else{
+		// filesToNews = sortedFiles;
+		// }
+		//
+		// println("filesToNews.size()" + filesToNews.size());
+		// newsFeed.setNewNews(filesToNews);
+
 		// set Partikel Position
 		setParticlePositions(showFiles);
 
@@ -1423,9 +1487,10 @@ public class TagExplorerProcessing2 extends PApplet {
 			}
 		}
 		if (showApplications.size() == 0) {
-			xShift = width - seitenAbstand*2 - h;
+			xShift = width - seitenAbstand * 2 - h;
 		}
-		appButtons.add(new Button_App(this, "show all", appsButton, h + wApps, h, xShift + seitenAbstand, height - h - 10));
+		appButtons.add(new Button_App(this, "show all", appsButton, h + wApps, h, xShift + seitenAbstand, height - h
+				- 10));
 
 		// particle visualisierung
 
@@ -1610,9 +1675,9 @@ public class TagExplorerProcessing2 extends PApplet {
 
 			}
 
-//			for (Tag ftype : filterTagTypeList) {
-//				System.out.println(ftype.name + " " + ftype.bindCount);
-//			}
+			// for (Tag ftype : filterTagTypeList) {
+			// System.out.println(ftype.name + " " + ftype.bindCount);
+			// }
 
 		}
 
@@ -1698,12 +1763,12 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		// int count = getSizeWithoutVersion(files);
 
-		int dist = 120;
+		// int dist = 120; // stattdessen contentBorders
 
 		// bei maxRows yStarOben und yStartUntern noch Programm hšhe abziehen
 
-		int perRow = (int) ((mainscreen.width - 2 * 120) / dist);
-		int maxRows = (int) ((mainscreen.height - menuPlane.h) / dist);
+		int perRow = (int) ((mainscreen.width - 2 * contentBorders) / contentBorders);
+		int maxRows = (int) ((mainscreen.height - menuPlane.h) / contentBorders);
 
 		int max1Seite = perRow * maxRows;
 
@@ -1711,8 +1776,9 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		int yShiftCount = 0;
 
-		int yStartOben = mainscreen.height / 2 - (int) menuPlane.h - dist / 2;
-		int yStartUnten = mainscreen.height / 2 - dist / 2;
+		// int yStartOben = mainscreen.height / 2 - (int) menuPlane.h - dist /
+		// 2;
+		// int yStartUnten = mainscreen.height / 2 - dist / 2;
 
 		// sortiere nach letztem genutzten Zeitpunkt nur neuesten
 		// FilesVersionen! - es kšnne Šlter Versionen neuere Accesses haben!
@@ -1727,11 +1793,12 @@ public class TagExplorerProcessing2 extends PApplet {
 				// println("sortedFiles name: " + sortedFiles.get(i).name);
 				// positoniere alle neuesten Dateiversionen
 				if (!setZTimeAxis) {
-					dropParticle(physics, (dist * (perRow - 1) / 2) - xShiftCount * dist, yStartUnten - yShiftCount
-							* dist, sortedFiles.get(i), true); // links/rechts
+					dropParticle(physics, (contentBorders * (perRow - 1) / 2) - xShiftCount * contentBorders,
+							contentStartUnten - yShiftCount * contentBorders, sortedFiles.get(i), true); // links/rechts
 				} else {
 					// setzte auf yStartUnten
-					dropParticle(physics, (dist * (perRow - 1) / 2) - xShiftCount * dist, yStartUnten, sortedFiles.get(i), true); // links/rechts
+					dropParticle(physics, (contentBorders * (perRow - 1) / 2) - xShiftCount * contentBorders,
+							contentStartUnten, sortedFiles.get(i), true); // links/rechts
 				}
 				xShiftCount++;
 				if (xShiftCount >= perRow) {
@@ -1778,13 +1845,13 @@ public class TagExplorerProcessing2 extends PApplet {
 				// println("sortedFiles name: " + sortedFiles.get(i).name);
 
 				if (!setZTimeAxis) {
-				// jede Datei aus sortedFiles muss positoniert werden
-				dropParticle(physics, xShiftCount * dist - (dist * (perRow - 1) / 2), yShiftCount * dist - yStartOben,
-						sortedFiles.get(i), true); // links/rechts
+					// jede Datei aus sortedFiles muss positoniert werden
+					dropParticle(physics, xShiftCount * contentBorders - (contentBorders * (perRow - 1) / 2),
+							yShiftCount * contentBorders - contentStartOben, sortedFiles.get(i), true); // links/rechts
 				} else {
 					// setzte auf yStartUnten
-					dropParticle(physics, xShiftCount * dist - (dist * (perRow - 1) / 2), yStartUnten,
-							sortedFiles.get(i), true); // links/rechts
+					dropParticle(physics, xShiftCount * contentBorders - (contentBorders * (perRow - 1) / 2),
+							contentStartUnten, sortedFiles.get(i), true); // links/rechts
 				}
 				xShiftCount++;
 				if (xShiftCount >= perRow) {
@@ -1850,17 +1917,17 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 		// println("count: " + count);
 
-		float dist;
-		if (count > 1) {
-			// dist = ((float) height - 40) / (count - 1);
-			// dist = ((float) width - 40) / (count - 1);
-			dist = 120;
-		} else {
-			dist = 0;
-		}
+		// float dist;
+		// if (count > 1) {
+		// // dist = ((float) height - 40) / (count - 1);
+		// // dist = ((float) width - 40) / (count - 1);
+		// dist = 120;
+		// } else {
+		// dist = 0;
+		// }
 
 		int shiftCount = 0;
-		int yStartUnten = (int) (mainscreen.height / 2 - dist / 2);
+		// int yStartUnten = (int) (mainscreen.height / 2 - contentBorders / 2);
 
 		ArrayList<Tag> sortedFiles = getFilesSortedLastAccess(_files);
 		println("setParticlesPosition1D(): _files.size:" + _files.size());
@@ -1869,10 +1936,12 @@ public class TagExplorerProcessing2 extends PApplet {
 		// neuest Versionen
 		for (int i = 0; i < sortedFiles.size(); i++) {
 			// jede Datei aus sortedFiles muss positoniert werden
-			
-			dropParticle(physics, -mainscreen.width/2 + 120 + shiftCount * dist, yStartUnten, sortedFiles.get(i),	true);
 
-//			dropParticle(physics, shiftCount * dist - ((dist * (count - 1)) / 2.0f), yStartUnten, sortedFiles.get(i), true); // links/rechts
+			dropParticle(physics, -mainscreen.width / 2 + contentBorders + shiftCount * contentBorders,
+					contentStartUnten, sortedFiles.get(i), true);
+
+			// dropParticle(physics, shiftCount * dist - ((dist * (count - 1)) /
+			// 2.0f), yStartUnten, sortedFiles.get(i), true); // links/rechts
 
 			shiftCount++;
 		}
@@ -1899,7 +1968,7 @@ public class TagExplorerProcessing2 extends PApplet {
 			}
 		}
 	}
-	
+
 	private void setParticlesPosition1D_(VerletPhysics physics, ArrayList<Tag> _files) {
 		// drop Particles
 		// set Position
@@ -1913,17 +1982,17 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 		// println("count: " + count);
 
-		float dist;
-		if (count > 1) {
-			// dist = ((float) height - 40) / (count - 1);
-			// dist = ((float) width - 40) / (count - 1);
-			dist = 120;
-		} else {
-			dist = 0;
-		}
+		// float dist;
+		// if (count > 1) {
+		// // dist = ((float) height - 40) / (count - 1);
+		// // dist = ((float) width - 40) / (count - 1);
+		// dist = 120;
+		// } else {
+		// dist = 0;
+		// }
 
 		int shiftCount = 0;
-		int yStartUnten = (int) (mainscreen.height / 2 - dist / 2);
+		// int yStartUnten = (int) (mainscreen.height / 2 - contentBorders / 2);
 
 		ArrayList<Tag> sortedFiles = getFilesSortedLastAccess(_files);
 		println("setParticlesPosition1D(): _files.size:" + _files.size());
@@ -1932,8 +2001,8 @@ public class TagExplorerProcessing2 extends PApplet {
 		// neuest Versionen
 		for (int i = 0; i < sortedFiles.size(); i++) {
 			// jede Datei aus sortedFiles muss positoniert werden
-			dropParticle(physics, shiftCount * dist - ((dist * (count - 1)) / 2.0f), yStartUnten, sortedFiles.get(i),
-					true); // links/rechts
+			dropParticle(physics, shiftCount * contentBorders - ((contentBorders * (count - 1)) / 2.0f),
+					contentStartUnten, sortedFiles.get(i), true); // links/rechts
 
 			shiftCount++;
 		}
@@ -2491,6 +2560,229 @@ public class TagExplorerProcessing2 extends PApplet {
 	// return shape;
 	// }
 
+	public Timestamp createTimestamp(int year, int month, int day) {
+
+		String dateString = nf(day, 2) + "/" + nf(month, 2) + "/" + nf(year, 4);
+
+		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		Date date;
+		try {
+			date = dateFormat.parse(dateString);
+			long time = date.getTime();
+			return new Timestamp(time);
+
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	public Timestamp createTimestamp(int year, int month, int day, int hour) {
+
+		String dateString = nf(day, 2) + "/" + nf(month, 2) + "/" + nf(year, 4) + "/" + nf(hour, 2);
+
+		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy/HH");
+		Date date;
+		try {
+			date = dateFormat.parse(dateString);
+			long time = date.getTime();
+			return new Timestamp(time);
+
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+	
+	
+
+	public PShape generateScala() {
+		PShape scala = createShape(LINES);
+
+		scala.stroke(0);
+		scala.strokeWeight(3);
+
+		int laenge = 50;
+//		int lineDist = 50;
+
+		// Calendar rightNow = Calendar.getInstance();
+
+		long startTimestamp = System.currentTimeMillis();
+
+		// Calender Instance
+		Calendar cal = Calendar.getInstance();
+		cal.setTimeInMillis(startTimestamp);
+
+//		int startH = cal.get(Calendar.HOUR_OF_DAY);
+//		int startD = cal.get(Calendar.DAY_OF_MONTH);
+//		int startM = cal.get(Calendar.MONTH) + 1;
+//		int startY = cal.get(Calendar.YEAR);
+
+		// Timestamp heuteStunde = createTimestamp(cal.get(Calendar.YEAR),
+		// cal.get(Calendar.MONTH) + 1,
+		// cal.get(Calendar.DAY_OF_MONTH), cal.get(Calendar.HOUR_OF_DAY));
+		// Timestamp heuteTag = createTimestamp(cal.get(Calendar.YEAR),
+		// cal.get(Calendar.MONTH) + 1,
+		// cal.get(Calendar.DAY_OF_MONTH));
+
+		// speicher Text und z position in Array
+
+//		for (int i = 0; i < 6; i++) {
+		for (int i = 0; i <= cal.get(Calendar.HOUR_OF_DAY); i++) {
+
+			int startH = cal.get(Calendar.HOUR_OF_DAY) - i;
+			int startD = cal.get(Calendar.DAY_OF_MONTH);
+			int startM = cal.get(Calendar.MONTH) + 1;
+			int startY = cal.get(Calendar.YEAR);
+			
+			if (startH <= 0) {
+				startH = 24 + cal.get(Calendar.HOUR_OF_DAY) - i;
+				startD = cal.get(Calendar.DAY_OF_MONTH) - 1;
+				if (startD <= 0) {
+					startD = 31;
+					startM = cal.get(Calendar.MONTH) + 1 - 1;
+					if (startM <= 0) {
+						startM = 12;
+						startY = cal.get(Calendar.YEAR) - 1;
+					}
+				}
+			}
+
+			Timestamp stunde = createTimestamp(startY, startM, startD, startH);
+
+			float zVal = -timeline.mapExp(stunde);
+
+			scala.vertex(-mainscreen.width / 2, mainscreen.height / 2, zVal);
+			scala.vertex(-mainscreen.width / 2 - laenge, mainscreen.height / 2 - laenge, zVal);
+			
+			scalaWerte.add(new ScalaWert("" + startD + ". " + startM + ". " + startY + "  " + nf(startH,2) + ":00", zVal));
+		}
+
+		for (int i = 1; i < 14; i++) {
+
+			int startD = cal.get(Calendar.DAY_OF_MONTH) - i;
+			int startM = cal.get(Calendar.MONTH) + 1;
+			int startY = cal.get(Calendar.YEAR);
+			
+			if (startD <= 0) {
+				startD = 31 + cal.get(Calendar.DAY_OF_MONTH) - i;
+				startM = cal.get(Calendar.MONTH) + 1 - 1;
+				if (startM <= 0) {
+					startM = 12;
+					startY = cal.get(Calendar.YEAR) - 1;
+				}
+			}
+
+			Timestamp tag = createTimestamp(startY, startM, startD);
+			
+			float zVal = -timeline.mapExp(tag);
+			scala.vertex(-mainscreen.width / 2, mainscreen.height / 2, zVal);
+			scala.vertex(-mainscreen.width / 2 - laenge, mainscreen.height / 2 - laenge, zVal);
+			
+			scalaWerte.add(new ScalaWert("" + startD + ". " + startM + ". " + startY, zVal));
+		}
+
+		for (int i = 1; i < 12; i++) {
+
+			int startD = cal.get(Calendar.DAY_OF_MONTH);
+			int startM = cal.get(Calendar.MONTH) + 1 - i;
+			int startY = cal.get(Calendar.YEAR);
+
+			if (startM <= 0) {
+				startM = 12 + cal.get(Calendar.MONTH) + 1 - i;
+				startY = cal.get(Calendar.YEAR) - 1;
+			}
+
+			Timestamp monat = createTimestamp(startY, startM, 1);
+
+			float zVal = -timeline.mapExp(monat);
+
+			scala.vertex(-mainscreen.width / 2, mainscreen.height / 2, zVal);
+			scala.vertex(-mainscreen.width / 2 - laenge, mainscreen.height / 2 - laenge, zVal);
+			
+			scalaWerte.add(new ScalaWert("" + startD + ". " + startM + ". " + startY, zVal));
+		}
+		
+		for (int i = 1; i < 10; i++) {
+			int startD = cal.get(Calendar.DAY_OF_MONTH);
+			int startM = cal.get(Calendar.MONTH) + 1;
+			int startY = cal.get(Calendar.YEAR) - i;
+
+			Timestamp year = createTimestamp(startY, 1, 1);
+
+			float zVal = -timeline.mapExp(year);
+
+			scala.vertex(-mainscreen.width / 2, mainscreen.height / 2, zVal);
+			scala.vertex(-mainscreen.width / 2 - laenge, mainscreen.height / 2 - laenge, zVal);
+			
+			scalaWerte.add(new ScalaWert("" + startY, zVal)); // + ". " + startM + ". " + startY
+		}
+
+		// println("heuteStunde: " + heuteStunde.getTime());
+		// println("heuteTag: " + heuteTag.getTime());
+		//
+		// println("tag  " + timeline.mapExp(heuteStunde));
+		//
+		// println("heute" + timeline.mapExp(heuteTag));
+		//
+		// scala.vertex(-mainscreen.width / 2, mainscreen.height / 2,
+		// -timeline.mapExp(heuteStunde));
+		// scala.vertex(-mainscreen.width / 2 - laenge, mainscreen.height / 2 -
+		// laenge, timeline.mapExp(heuteStunde));
+		//
+		// scala.vertex(-mainscreen.width / 2, mainscreen.height / 2,
+		// -timeline.mapExp(heuteTag));
+		// scala.vertex(-mainscreen.width / 2 - laenge, mainscreen.height / 2 -
+		// laenge, timeline.mapExp(heuteTag));
+
+		println(cal.get(Calendar.YEAR));
+		println(cal.get(Calendar.MONTH));
+		println(cal.get(Calendar.DAY_OF_MONTH));
+		println("jetzt: " + cal.getTimeInMillis());
+
+		// for (int i = 0; i < 200; i++) {
+		// scala.vertex(-mainscreen.width/2, mainscreen.height/2, -i *
+		// lineDist);
+		// scala.vertex(-mainscreen.width/2 - laenge, mainscreen.height/2 -
+		// laenge, -i * lineDist);
+		// }
+
+		scala.end();
+
+		return scala;
+	}
+
+	public PShape generateBackgroundLines() {
+		PShape backgroundLines = createShape(QUADS);
+
+		backgroundLines.fill(0, 130);
+		backgroundLines.noStroke();
+
+		int lineDist = 120;
+		float lineW = 3f;
+
+		for (int i = -30; i < 200; i++) {
+
+			backgroundLines.vertex(-mainscreen.width / 2 - lineW + i * lineDist, mainscreen.height / 2 + 1, 800);
+			backgroundLines.vertex(-mainscreen.width / 2 - lineW + i * lineDist, mainscreen.height / 2 + 1, -40000);
+			backgroundLines.vertex(-mainscreen.width / 2 + lineW + i * lineDist, mainscreen.height / 2 + 1, -40000);
+			backgroundLines.vertex(-mainscreen.width / 2 + lineW + i * lineDist, mainscreen.height / 2 + 1, 800);
+
+			// s.vertex(-50, -50, 0, 0, 0);
+			// s.vertex(+50, -50, 0, file.textur.width, 0);
+			// s.vertex(+50, +50, 0, file.textur.width, file.textur.height);
+			// s.vertex(-50, +50, 0, 0, file.textur.height);
+		}
+
+		backgroundLines.end();
+
+		return backgroundLines;
+	}
+
 	public PShape generate2DShape(Tag_File file) {
 		PShape s = createShape();
 		s.noStroke();
@@ -2842,7 +3134,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		float mouseDraggedY = (lastMouseY - mouseY);
 		lastMouseY = mouseY;
-		
+
 		float mouseDraggedX = (lastMouseX - mouseX);
 		lastMouseX = mouseX;
 
@@ -2855,24 +3147,23 @@ public class TagExplorerProcessing2 extends PApplet {
 		if (setZTimeAxis && timeChooser.camMover.mouseOver()) {
 			timeChooser.camMover.setY(mouseY);
 		}
-		
-		if(!timeChooser.mouseOverScala() && !timeChooser.camMover.mouseOver()){
+
+		if (!timeChooser.mouseOverScala() && !timeChooser.camMover.mouseOver()) {
 			cam_eyetargetpos.y += mouseDraggedY * 10;
-			
+
 			if (cam_eyetargetpos.y > height / 2) {
 				cam_eyetargetpos.y = height / 2;
 			}
 		}
-		
-		if(position1D && !timeChooser.mouseOverScala() && !timeChooser.camMover.mouseOver()){
+
+		if (position1D && !timeChooser.mouseOverScala() && !timeChooser.camMover.mouseOver()) {
 			cam_eyetargetpos.x += mouseDraggedX;
-			
+
 			if (cam_eyetargetpos.x < width / 2) {
 				cam_eyetargetpos.x = width / 2;
 			}
 		}
 	}
-	
 
 	public void mousePressed() {
 		mouseActive = true;
@@ -2884,17 +3175,19 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		System.out.println("void mousePressed auskommentiert Tag verbindung Interaktion!");
 		// TagVerbindungen
-//		for (Tag t : showFiles) {
-//
-//			if (mouseOver(mainscreen, t.x + mainscreen.width / 2, t.y + mainscreen.height / 2, t.z, 30, 30)) {
-//				startTag = t;
-//			}
-//		}
-//		for (Tag t : attributes) {
-//			if (mouseOver(mainscreen, t.x + mainscreen.width / 2, t.y + mainscreen.height / 2, t.z, 30, 30)) {
-//				startTag = t;
-//			}
-//		}
+		// for (Tag t : showFiles) {
+		//
+		// if (mouseOver(mainscreen, t.x + mainscreen.width / 2, t.y +
+		// mainscreen.height / 2, t.z, 30, 30)) {
+		// startTag = t;
+		// }
+		// }
+		// for (Tag t : attributes) {
+		// if (mouseOver(mainscreen, t.x + mainscreen.width / 2, t.y +
+		// mainscreen.height / 2, t.z, 30, 30)) {
+		// startTag = t;
+		// }
+		// }
 	}
 
 	Timestamp lastMinTime = null;
@@ -3422,7 +3715,9 @@ public class TagExplorerProcessing2 extends PApplet {
 		appsButton = loadImage(VersionBuilder.versionsVerzeichnis + "applications/apps.png");
 		backgroundApp = loadImage("../data/backgroundApp.png");
 
-		backgroundTransition = loadImage("../data/hintergrund_1600x1200.png");
+		backgroundTransition = loadImage("../data/backgroundTransition_linesTop.png");
+		// backgroundTransition =
+		// loadImage("../data/hintergrund_1600x1200.png");
 		// backgroundTransition = loadImage("../data/background.png");
 
 		// Label miniaturen Dropdown Menu & Filter
@@ -3585,7 +3880,7 @@ public class TagExplorerProcessing2 extends PApplet {
 			// cp5_Test.get(Toggle.class, "position2D").setState(false);
 			position2D = false;
 			setButtonState("position2D", false);
-		} 
+		}
 		updateShowFiles();
 	}
 

@@ -26,17 +26,24 @@ public class News {
 		this.comment = generateComment();
 	}
 
-	public News(Timestamp ts, String type) {
+	public News(TagExplorerProcessing2 p5, Timestamp ts, String type) {
 		this.ts = ts;
 		this.type = type;
 		this.user = generateUser();
 		this.comment = generateComment();
 	}
 
-	public News(Timestamp ts, String type, Tag_User user, String comment) {
+	public News(TagExplorerProcessing2 p5, Timestamp ts, String type, Tag_User user, String comment) {
+		System.out.println("new News: " + ts.toGMTString() + " " + type + " " + user + " " + comment);
+		
 		this.ts = ts;
 		this.type = type;
-		this.user = user;
+		if(user != null){
+			this.user = user;
+		} else{
+			this.user = generateUser();
+		}
+		
 		this.comment = comment;
 	}
 
