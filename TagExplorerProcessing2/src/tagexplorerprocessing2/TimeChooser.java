@@ -24,7 +24,8 @@ public class TimeChooser extends Vec2D {
 		this.x = x;
 		this.y = y;
 
-		this.h = p5.mainscreen.height - y;
+		this.h = p5.mainscreen.height - y - (p5.mainscreen.height - (p5.contentStartUnten + p5.mainscreen.height/2)) + p5.planeSize/2;
+		System.out.println("Timechooser.h " + h + " " + (p5.mainscreen.height - y) + " " +  (p5.mainscreen.height - (p5.contentStartUnten + p5.mainscreen.height/2)));
 
 		scala = createScala();
 

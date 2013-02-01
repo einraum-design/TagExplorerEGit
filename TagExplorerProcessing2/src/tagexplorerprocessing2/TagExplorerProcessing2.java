@@ -158,7 +158,9 @@ public class TagExplorerProcessing2 extends PApplet {
 	
 	ArrayList<ScalaWert> scalaWerte = new ArrayList<ScalaWert>();
 
-	int contentBorders = 120;
+	int contentBorders = 170;
+	int contentDist = 120;
+	int planeSize = 100;
 
 	int contentStartOben;
 	int contentStartUnten;
@@ -324,31 +326,6 @@ public class TagExplorerProcessing2 extends PApplet {
 		// ControlP5
 		cp5_Promt = new ControlP5(this);
 		cp5_Menu = new ControlP5(this);
-		cp5_Test = new ControlP5(this);
-
-		// cp5_Test.addToggle("showVersions", false, width - 120, 20, 10,
-		// 10).getCaptionLabel().setColor(color(0));
-		// cp5_Test.addToggle("drawAccessShapes", false, width - 120, 60, 10,
-		// 10).getCaptionLabel().setColor(color(0));
-		// cp5_Test.addToggle("draw2DShape", false, width - 120, 90, 10,
-		// 10).getCaptionLabel().setColor(color(0));
-		// cp5_Test.addToggle("setZTimeAxis", false, width - 120, 130, 10,
-		// 10).getCaptionLabel().setColor(color(0));
-		// cp5_Test.addToggle("position1D", false, width - 120, 170, 10,
-		// 10).getCaptionLabel().setColor(color(0));
-		// cp5_Test.addToggle("position2D", true, width - 120, 200, 10,
-		// 10).getCaptionLabel().setColor(color(0));
-		//
-		// cp5_Test.addToggle("last", false, width - 120, 240, 10,
-		// 10).getCaptionLabel().setColor(color(0));
-		//
-		// cp5_Test.addToggle("enableVersionBinding", false, width - 120, 280,
-		// 10, 10).getCaptionLabel()
-		// .setColor(color(0));
-		// cp5_Test.addToggle("enableTagBinding", false, width - 120, 310, 10,
-		// 10).getCaptionLabel().setColor(color(0));
-		// cp5_Test.addToggle("enableFileBinding", false, width - 120, 340, 10,
-		// 10).getCaptionLabel().setColor(color(0));
 
 		testButton.add(new Button_LabelToggle(this, "showVersions", false, 10, 20, width - 120, 20));
 		testButton.add(new Button_LabelToggle(this, "drawAccessShapes", false, 10, 20, width - 120, 50));
@@ -431,8 +408,10 @@ public class TagExplorerProcessing2 extends PApplet {
 		// am start
 		// int contentBorders = 120;
 
-		contentStartOben = mainscreen.height / 2 - (int) menuPlane.h - contentBorders / 2;
-		contentStartUnten = mainscreen.height / 2 - contentBorders / 2;
+		contentStartOben = mainscreen.height / 2 - (int) menuPlane.h - contentDist / 2 - 10;
+//		contentStartOben = (int) (menuPlane.h  + planeSize/2);
+		contentStartUnten = mainscreen.height / 2 - contentBorders + 30;
+		println("contentStartUnten: " + contentStartUnten);
 
 		Path p = FileSystems.getDefault().getPath("/Users/manuel/Documents/Testumgebung/UserOrdner");
 		// Path p =
@@ -458,7 +437,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		timeline = new Timeline(this);
 
 		// TimeChooser
-		timeChooser = new TimeChooser(this, width - 80, height / 5);
+		timeChooser = new TimeChooser(this, width - 100, mainscreen.height/2 - contentStartOben - planeSize/2);
 
 		// Comparator
 		comp_id = new Tag_Comparator_Id();
@@ -907,6 +886,11 @@ public class TagExplorerProcessing2 extends PApplet {
 		// renderer.endShape(CLOSE);
 
 		renderer.shape(backgroundLines);
+		
+		// render scala
+		
+		renderer.pushMatrix();
+		renderer.translate(cam_eyeaktuellpos.x - cam_eye2Dpos.x, 0, 0);
 		renderer.shape(scala);
 		
 		renderer.textAlign(PConstants.RIGHT, PConstants.BOTTOM);
@@ -917,13 +901,14 @@ public class TagExplorerProcessing2 extends PApplet {
 			
 			renderer.pushMatrix();
 			renderer.translate(-renderer.width / 2, renderer.height / 2, sw.z);
-			renderer.translate(-50, -50, 0);
+			renderer.translate(-50, -47, 0);
 			renderer.rotateZ(PI/4.0f);
 			
 			renderer.text(sw.zeit, 0, 0);
 			renderer.popMatrix();
 			
 		}
+		renderer.popMatrix();
 		
 
 		if (showTimeline) {
@@ -1766,14 +1751,10 @@ public class TagExplorerProcessing2 extends PApplet {
 	private void setParticlesPosition2D(VerletPhysics physics, ArrayList<Tag> _files) {
 		physics.particles.clear();
 
-		// int count = getSizeWithoutVersion(files);
 
-		// int dist = 120; // stattdessen contentBorders
-
-		// bei maxRows yStarOben und yStartUntern noch Programm höhe abziehen
-
-		int perRow = (int) ((mainscreen.width - 2 * contentBorders) / contentBorders);
-		int maxRows = (int) ((mainscreen.height - menuPlane.h) / contentBorders);
+		int perRow = (int) ((mainscreen.width + (contentDist-planeSize) - 2 * contentBorders) / (contentDist));
+		int maxRows = (int) ((mainscreen.height - menuPlane.h) / (contentDist));
+		maxRows -= 1; // ausgleich für auflösung
 
 		int max1Seite = perRow * maxRows;
 
@@ -1798,11 +1779,11 @@ public class TagExplorerProcessing2 extends PApplet {
 				// println("sortedFiles name: " + sortedFiles.get(i).name);
 				// positoniere alle neuesten Dateiversionen
 				if (!setZTimeAxis) {
-					dropParticle(physics, (contentBorders * (perRow - 1) / 2) - xShiftCount * contentBorders,
-							contentStartUnten - yShiftCount * contentBorders, sortedFiles.get(i), true); // links/rechts
+					dropParticle(physics, (contentDist * (perRow - 1) / 2) - xShiftCount * contentDist,
+							contentStartUnten - yShiftCount * contentDist, sortedFiles.get(i), true); // links/rechts
 				} else {
 					// setzte auf yStartUnten
-					dropParticle(physics, (contentBorders * (perRow - 1) / 2) - xShiftCount * contentBorders,
+					dropParticle(physics, (contentDist * (perRow - 1) / 2) - xShiftCount * contentDist,
 							contentStartUnten, sortedFiles.get(i), true); // links/rechts
 				}
 				xShiftCount++;
@@ -1851,11 +1832,11 @@ public class TagExplorerProcessing2 extends PApplet {
 
 				if (!setZTimeAxis) {
 					// jede Datei aus sortedFiles muss positoniert werden
-					dropParticle(physics, xShiftCount * contentBorders - (contentBorders * (perRow - 1) / 2),
-							yShiftCount * contentBorders - contentStartOben, sortedFiles.get(i), true); // links/rechts
+					dropParticle(physics, xShiftCount * contentDist - (contentDist * (perRow - 1) / 2),
+							yShiftCount * contentDist - contentStartOben, sortedFiles.get(i), true); // links/rechts
 				} else {
 					// setzte auf yStartUnten
-					dropParticle(physics, xShiftCount * contentBorders - (contentBorders * (perRow - 1) / 2),
+					dropParticle(physics, xShiftCount * contentDist - (contentDist * (perRow - 1) / 2),
 							contentStartUnten, sortedFiles.get(i), true); // links/rechts
 				}
 				xShiftCount++;
@@ -1945,7 +1926,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		for (int i = 0; i < sortedFiles.size(); i++) {
 			// jede Datei aus sortedFiles muss positoniert werden
 
-			dropParticle(physics, -mainscreen.width / 2 + contentBorders + shiftCount * contentBorders,
+			dropParticle(physics, -mainscreen.width / 2 + contentBorders + planeSize/2 + shiftCount * contentDist,
 					contentStartUnten, sortedFiles.get(i), true);
 
 			// dropParticle(physics, shiftCount * dist - ((dist * (count - 1)) /
@@ -2009,7 +1990,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		// neuest Versionen
 		for (int i = 0; i < sortedFiles.size(); i++) {
 			// jede Datei aus sortedFiles muss positoniert werden
-			dropParticle(physics, shiftCount * contentBorders - ((contentBorders * (count - 1)) / 2.0f),
+			dropParticle(physics, shiftCount * contentDist - ((contentBorders * (count - 1)) / 2.0f),
 					contentStartUnten, sortedFiles.get(i), true); // links/rechts
 
 			shiftCount++;
@@ -2747,10 +2728,10 @@ public class TagExplorerProcessing2 extends PApplet {
 		// scala.vertex(-mainscreen.width / 2 - laenge, mainscreen.height / 2 -
 		// laenge, timeline.mapExp(heuteTag));
 
-		println(cal.get(Calendar.YEAR));
-		println(cal.get(Calendar.MONTH));
-		println(cal.get(Calendar.DAY_OF_MONTH));
-		println("jetzt: " + cal.getTimeInMillis());
+//		println(cal.get(Calendar.YEAR));
+//		println(cal.get(Calendar.MONTH));
+//		println(cal.get(Calendar.DAY_OF_MONTH));
+//		println("jetzt: " + cal.getTimeInMillis());
 
 		// for (int i = 0; i < 200; i++) {
 		// scala.vertex(-mainscreen.width/2, mainscreen.height/2, -i *
@@ -2758,6 +2739,9 @@ public class TagExplorerProcessing2 extends PApplet {
 		// scala.vertex(-mainscreen.width/2 - laenge, mainscreen.height/2 -
 		// laenge, -i * lineDist);
 		// }
+		
+		scala.vertex(-mainscreen.width / 2, mainscreen.height / 2, 0);
+		scala.vertex(-mainscreen.width / 2 , mainscreen.height / 2 , -40000);
 
 		scala.end();
 
@@ -3868,6 +3852,11 @@ public class TagExplorerProcessing2 extends PApplet {
 				draw2DShape(true);
 				drawAccessShapes = false;
 			}
+			
+			// bei position2D wieder kacheln
+//			if(position2D){
+//				updateShowFiles();
+//			}
 
 			showTimeline = false;
 			println("setZTimeAxis: " + setZTimeAxis + " resetZshowFiles()");

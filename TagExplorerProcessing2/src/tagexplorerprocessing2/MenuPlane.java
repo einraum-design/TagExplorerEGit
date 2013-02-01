@@ -9,9 +9,9 @@ import controlP5.Textfield;
 
 public class MenuPlane extends Plane {
 
-	float minH = 200;
+	//float minH = 200;
 
-	float h = minH;
+	float h = 120;
 
 	// methode in TagExplorerProcessing.class muss genauso hei§en!
 	String infoText = "search or new Tagname";
@@ -176,26 +176,26 @@ public class MenuPlane extends Plane {
 		// cp5.get(Textfield.class, inputFieldName).getLabel().
 	}
 
-	public boolean mouseOver() {
-		boolean over = false;
-
-		// referenz links oben
-		if (p5.mouseY < h) { // p5.mouseX >= x && p5.mouseX < x + w && &&
-								// p5.mouseY < y+h
-			over = true;
-		} else if (dropDownHeight > 0 && cp5.get(Textfield.class, inputFieldName).isFocus()
-		// && p5.mouseX >= cp5.get(Textfield.class,
-		// inputFieldName).getPosition().x - 10
-		// && p5.mouseX < cp5.get(Textfield.class,
-		// inputFieldName).getPosition().x + cp5.get(Textfield.class,
-		// inputFieldName).getWidth() + 10
-		// && p5.mouseY > cp5.get(Textfield.class,
-		// inputFieldName).getPosition().y - 10
-		// && p5.mouseY < cp5.get(Textfield.class,
-		// inputFieldName).getPosition().y + dropDownHeight + 10
-		) {
-			over = true;
-		}
-		return over;
-	}
+//	public boolean mouseOver() {
+//		boolean over = false;
+//
+//		// referenz links oben
+//		if (p5.mouseY < h) { // p5.mouseX >= x && p5.mouseX < x + w && &&
+//								// p5.mouseY < y+h
+//			over = true;
+//		} else if (dropDownHeight > 0 && cp5.get(Textfield.class, inputFieldName).isFocus()
+//		// && p5.mouseX >= cp5.get(Textfield.class,
+//		// inputFieldName).getPosition().x - 10
+//		// && p5.mouseX < cp5.get(Textfield.class,
+//		// inputFieldName).getPosition().x + cp5.get(Textfield.class,
+//		// inputFieldName).getWidth() + 10
+//		// && p5.mouseY > cp5.get(Textfield.class,
+//		// inputFieldName).getPosition().y - 10
+//		// && p5.mouseY < cp5.get(Textfield.class,
+//		// inputFieldName).getPosition().y + dropDownHeight + 10
+//		) {
+//			over = true;
+//		}
+//		return over;
+//	}
 }
