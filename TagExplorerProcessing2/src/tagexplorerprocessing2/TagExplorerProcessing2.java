@@ -543,6 +543,8 @@ public class TagExplorerProcessing2 extends PApplet {
 			clickNextFrame = true;
 			startClickNextFrame = false;
 		}
+		
+		
 
 		// if (updateTextures) {
 		//
@@ -743,6 +745,9 @@ public class TagExplorerProcessing2 extends PApplet {
 		// reset mouseHover & interation status
 		interaction = false;
 		hoverPoint = null;
+		
+		
+		setButtonStates();
 
 		if (showButtons) {
 			for (Button_LabelToggle b : testButton) {
@@ -1328,7 +1333,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		// Filter nach minTime
 		if (minTime != null) {
-			println("updateShowFiles(): showFiles.size():" + showFiles.size());
+			println("	updateShowFiles(): showFiles.size():" + showFiles.size());
 			// Filter nach verwendungszeit später als:
 			ArrayList<Tag> results = new ArrayList<Tag>();
 
@@ -1344,7 +1349,7 @@ public class TagExplorerProcessing2 extends PApplet {
 			}
 			if (!showVersions) {
 				showFiles = results;
-				println("updateShowFiles(): showFiles.size():" + showFiles.size());
+				println("	updateShowFiles(): showFiles.size():" + showFiles.size());
 			} else {
 
 				// mit Versionen
@@ -1358,7 +1363,7 @@ public class TagExplorerProcessing2 extends PApplet {
 					}
 				}
 				showFiles = resultsAndVersions;
-				println("updateShowFiles(): showFiles.size():" + showFiles.size());
+				println("	updateShowFiles(): showFiles.size():" + showFiles.size());
 			}
 
 		}
@@ -1366,7 +1371,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		// create Map Position für Treemap
 		if (drawTreemap && showFiles.size() > 0) {
 			if (!showVersions) {
-				println("updateShowFiles(): createTreeMap");
+				println("	updateShowFiles(): createTreeMap");
 				createTreeMap(showFiles);
 			} else {
 				createTreeMap(getNewestTagFileVersions(showFiles));
@@ -1408,7 +1413,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		setParticlePositions(showFiles);
 
 		// setzt shape oder null
-		setShape();
+		 setShape(); // wird direkt bei drawTreemap(), draw2DShape() und drawAccessShape() aufgerufen
 
 		// println("setZTimeAxis = " + setZTimeAxis);
 		setZTimeAxis(setZTimeAxis); // macht auch updateSprings
@@ -1418,10 +1423,10 @@ public class TagExplorerProcessing2 extends PApplet {
 	public void setParticlePositions(ArrayList<Tag> showFiles) {
 		// hard treemap!
 		if (drawTreemap) {
-			System.out.println("setParticlesPositionTreeMap() TreeMap");
+			
 			setParticlesPositionTreeMap(filePhysics, showFiles);
 		} else if (position1D) {
-			System.out.println("setParticlesPosition() 1D");
+			
 			setParticlesPosition1D(filePhysics, showFiles);
 		} else if (position2D) {
 			System.out.println("setParticlesPosition2D() 2D");
@@ -1885,6 +1890,8 @@ public class TagExplorerProcessing2 extends PApplet {
 	}
 
 	private void setParticlesPositionTreeMap(VerletPhysics physics, ArrayList<Tag> _files) {
+		System.out.println("setParticlesPositionTreeMap()");
+		
 		physics.particles.clear();
 
 		for (Tag tag : _files) {
@@ -1905,16 +1912,17 @@ public class TagExplorerProcessing2 extends PApplet {
 	}
 
 	private void setParticlesPosition1D(VerletPhysics physics, ArrayList<Tag> _files) {
+		System.out.println("setParticlesPosition() 1D");
 		// drop Particles
 		// set Position
 		physics.particles.clear();
 
-		int count = 0;
-		if (showVersions) {
-			count = getSizeWithoutVersion(_files);
-		} else {
-			count = _files.size();
-		}
+//		int count = 0;
+//		if (showVersions) {
+//			count = getSizeWithoutVersion(_files);
+//		} else {
+//			count = _files.size();
+//		}
 		// println("count: " + count);
 
 		// float dist;
@@ -1930,8 +1938,8 @@ public class TagExplorerProcessing2 extends PApplet {
 		// int yStartUnten = (int) (mainscreen.height / 2 - contentBorders / 2);
 
 		ArrayList<Tag> sortedFiles = getFilesSortedLastAccess(_files);
-		println("setParticlesPosition1D(): _files.size:" + _files.size());
-		println("setParticlesPosition1D(): sortedFiles.size:" + sortedFiles.size());
+//		println("	setParticlesPosition1D(): _files.size:" + _files.size());
+//		println("	setParticlesPosition1D(): sortedFiles.size:" + sortedFiles.size());
 
 		// neuest Versionen
 		for (int i = 0; i < sortedFiles.size(); i++) {
@@ -3190,16 +3198,13 @@ public class TagExplorerProcessing2 extends PApplet {
 		// }
 	}
 
-	Timestamp lastMinTime = null;
+	Timestamp lastMinTime = new Timestamp(System.currentTimeMillis());
 
 	public void mouseReleased() {
 		if (minTime != null) {
-			if (lastMinTime == null) {
+			if (lastMinTime.getTime() != minTime.getTime()) {
+				println("void mouseRelease(): neue minTime -> updateShowFiles()");
 				lastMinTime = (Timestamp) minTime.clone();
-			}
-
-			// neuer timestamp:
-			if (lastMinTime != minTime) {
 				updateShowFiles();
 				updateTags();
 			}
@@ -3208,6 +3213,8 @@ public class TagExplorerProcessing2 extends PApplet {
 		lastClick = new Timestamp(System.currentTimeMillis());
 		startClickNextFrame = true;
 
+		
+		// tagVerbindungen - auskommentiert in mousePressed
 		if (startTag != null) {
 			if (startTag instanceof Tag_File) {
 				// File -> Attribute
@@ -3765,9 +3772,13 @@ public class TagExplorerProcessing2 extends PApplet {
 		super.stop();
 	}
 
+	
 	public void showVersions(boolean onOff) {
 		println("showVersions(): " + onOff);
 		showVersions = onOff;
+		if(showVersions && !setZTimeAxis){
+			setZTimeAxis(true);
+		}
 		updateShowFiles();
 
 	}
@@ -3778,16 +3789,18 @@ public class TagExplorerProcessing2 extends PApplet {
 		if (drawAccessShapes) {
 
 			draw2DShape = false;
-			drawTreemap = false;
-			setButtonState("draw2DShape", false);
-			setButtonState("drawTreemap", false);
+			
+			if(drawTreemap){
+				drawTreemap = false;
+				position2D(true);
+			}
+			
 
 			setShape();
 
 			// fallse keine zTime Ordnung ist
 			if (setZTimeAxis == false) {
 				setZTimeAxis(true);
-				setButtonState("setZTimeAxis", true);
 			}
 		}
 
@@ -3797,17 +3810,18 @@ public class TagExplorerProcessing2 extends PApplet {
 	public void draw2DShape(boolean onOff) {
 		draw2DShape = onOff;
 		if (draw2DShape) {
-			// cp5_Test.get(Toggle.class, "drawAccessShapes").setState(false);
+
 			drawAccessShapes = false;
-			drawTreemap = false;
 
-			// vor setZTimeAxis!
+			if(drawTreemap){
+				drawTreemap = false;
+				position2D(true);
+			}
+			
 			updateShowFiles();
-			// setShape();
+//			setShape();
 
-			setButtonState("drawAccessShapes", false);
-			setButtonState("drawTreemap", false);
-			setZTimeAxis(setZTimeAxis);
+//			setZTimeAxis(setZTimeAxis); // wird in updateShoFiles
 		}
 	}
 
@@ -3821,24 +3835,15 @@ public class TagExplorerProcessing2 extends PApplet {
 
 			drawAccessShapes = false;
 			draw2DShape = false;
-
-			// vor setZTimeAxis!
-
-			setButtonState("position2D", false);
-			setButtonState("position1D", false);
+			
+			position2D = false;
+			position1D = false;
 
 			// setze Partikelpositon neu als Treemap
 			updateShowFiles();
 
-			// passiert in updateShowFiles
-			// setShape();
-
-			setButtonState("drawAccessShapes", false);
-			setButtonState("draw2DShape", false);
-			// setButtonState("setZTimeAxis", false);
-
 			// passiert in updateShowFiles()
-			// setZTimeAxis(false);
+//			setZTimeAxis(false);
 		}
 	}
 
@@ -3854,15 +3859,14 @@ public class TagExplorerProcessing2 extends PApplet {
 		} else {
 
 			// camera auf nullpunkt
-			println("reset Cameraposition");
-
+			println("setZTimeAxis(): reset Cameraposition");
 			timeChooser.camMover.reset();
-			// cam_eyetargetpos = cam_eye2Dpos;
+			cam_eyetargetpos = cam_eye2Dpos.copy();
 
 			// drawAccessShape nur im ZTime Modus!
 			if (drawAccessShapes) {
 				draw2DShape(true);
-				setButtonState("drawAccessShape", false);
+				drawAccessShapes = false;
 			}
 
 			showTimeline = false;
@@ -3877,9 +3881,8 @@ public class TagExplorerProcessing2 extends PApplet {
 	public void position1D(boolean onOff) {
 		position1D = onOff;
 		if (position1D) {
-			// cp5_Test.get(Toggle.class, "position2D").setState(false);
 			position2D = false;
-			setButtonState("position2D", false);
+			drawTreemap = false;
 		}
 		updateShowFiles();
 	}
@@ -3887,48 +3890,24 @@ public class TagExplorerProcessing2 extends PApplet {
 	public void position2D(boolean onOff) {
 		position2D = onOff;
 		if (position2D) {
-			// cp5_Test.get(Toggle.class, "position1D").setState(false);
 			position1D = false;
-			setButtonState("position1D", false);
+			drawTreemap = false;
 		}
 		updateShowFiles();
 	}
 
-	// public void position2Ddown(boolean onOff) {
-	// position2Ddown = onOff;
-	// if (position2Ddown) {
-	// // cp5_Test.get(Toggle.class, "position1D").setState(false);
-	//
-	// if (position1D || drawTreemap) {
-	// position1D = false;
-	// setButtonState("position1D", false);
-	// drawTreemap = false;
-	// setButtonState("drawTreemap", false);
-	//
-	// setButtonState("position2D", true);
-	// }
-	// }
-	// updateShowFiles();
-	// }
-
 	public void enableVersionBinding(boolean onOff) {
 		enableVersionBinding = onOff;
-		// if (enableVersionBinding) {
-		// }
 		updateSprings();
 	}
 
 	public void enableTagBinding(boolean onOff) {
 		enableTagBinding = onOff;
-		// if (enableTagBinding) {
-		// }
 		updateSprings();
 	}
 
 	public void enableFileBinding(boolean onOff) {
 		enableFileBinding = onOff;
-		// if (enableFileBinding) {
-		// }
 		updateSprings();
 	}
 
@@ -3950,6 +3929,31 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 	}
 
+	public void setButtonStates(){
+		
+		
+	
+		setButtonState("position1D", position1D);
+		setButtonState("position2D", position2D);
+		
+		setButtonState("drawTreemap", drawTreemap);
+		setButtonState("draw2DShape", draw2DShape);
+		setButtonState("drawAccessShapes", drawAccessShapes);
+		
+		setButtonState("setZTimeAxis", setZTimeAxis);
+		
+		setButtonState("showVersions", showVersions);
+		
+		
+		setButtonState("drawTags", drawTags);
+		setButtonState("showTimeline", showTimeline);
+		
+		
+		setButtonState("enableVersionBinding", enableVersionBinding);
+		setButtonState("enableTagBinding", enableTagBinding);
+		setButtonState("enableFileBinding", enableFileBinding);
+	}
+	
 	public void setButtonState(String buttonName, boolean onOff) {
 		for (Button_LabelToggle b : testButton) {
 			if (b.label.equals(buttonName)) {

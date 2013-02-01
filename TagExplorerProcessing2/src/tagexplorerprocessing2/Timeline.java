@@ -221,8 +221,8 @@ public class Timeline {
 		if (ts != null) {
 			oldest = ts;
 			timelineLength = (int) (PApplet.sqrt((System.currentTimeMillis() - oldest.getTime()) / 10000) * timelineScaleFactor);
-			System.out.println(System.currentTimeMillis() + " - " + oldest.getTime());
-			System.out.println(System.currentTimeMillis() - oldest.getTime());
+//			System.out.println(System.currentTimeMillis() + " - " + oldest.getTime());
+//			System.out.println(System.currentTimeMillis() - oldest.getTime());
 			System.out.println("setWertebereich: timelineLength: " + timelineLength);
 		}
 
