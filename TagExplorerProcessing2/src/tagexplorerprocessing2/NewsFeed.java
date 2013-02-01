@@ -33,6 +33,7 @@ public class NewsFeed extends Vec2D{
 		news.add(new News(p5, new Timestamp(System.currentTimeMillis() - 66L * 60 * 60 * 1000)));
 		news.add(new News(p5, new Timestamp(System.currentTimeMillis() - 70L * 60 * 60 * 1000)));
 		news.add(new News(p5, new Timestamp(System.currentTimeMillis() - 73L * 60 * 60 * 1000)));
+		news.add(new News(p5, new Timestamp(System.currentTimeMillis() - 102L * 60 * 60 * 1000)));
 		
 		
 		newButton = new Button_Image(p5, "news", x , y);
@@ -57,7 +58,7 @@ public class NewsFeed extends Vec2D{
 	
 	public void render(){
 		
-		int yShift = 30; // platz für "NEWS"
+		int yShift = 40; // platz für "NEWS"
 		
 		p5.textAlign(PConstants.CENTER, PConstants.BOTTOM);
 		

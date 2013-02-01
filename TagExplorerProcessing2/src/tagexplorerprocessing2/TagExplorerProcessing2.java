@@ -155,7 +155,7 @@ public class TagExplorerProcessing2 extends PApplet {
 	PShape fileShape;
 	PShape backgroundLines;
 	PShape scala;
-	
+
 	ArrayList<ScalaWert> scalaWerte = new ArrayList<ScalaWert>();
 
 	int contentBorders = 170;
@@ -349,7 +349,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		menuPlane = new MenuPlane(this);
 
-		newsFeed = new NewsFeed(this, 0, height / 5);
+		
 
 		mainscreen = createGraphics(width, height, P3D); // height-40
 		pg = createGraphics(100, 100, P2D);
@@ -409,7 +409,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		// int contentBorders = 120;
 
 		contentStartOben = mainscreen.height / 2 - (int) menuPlane.h - contentDist / 2 - 10;
-//		contentStartOben = (int) (menuPlane.h  + planeSize/2);
+		// contentStartOben = (int) (menuPlane.h + planeSize/2);
 		contentStartUnten = mainscreen.height / 2 - contentBorders + 30;
 		println("contentStartUnten: " + contentStartUnten);
 
@@ -437,7 +437,10 @@ public class TagExplorerProcessing2 extends PApplet {
 		timeline = new Timeline(this);
 
 		// TimeChooser
-		timeChooser = new TimeChooser(this, width - 100, mainscreen.height/2 - contentStartOben - planeSize/2);
+		timeChooser = new TimeChooser(this, width - 100, mainscreen.height / 2 - contentStartOben - planeSize / 2);
+		
+		// newsFeed
+		newsFeed = new NewsFeed(this, 0, mainscreen.height / 2 - contentStartOben - planeSize / 2);
 
 		// Comparator
 		comp_id = new Tag_Comparator_Id();
@@ -522,8 +525,6 @@ public class TagExplorerProcessing2 extends PApplet {
 			clickNextFrame = true;
 			startClickNextFrame = false;
 		}
-		
-		
 
 		// if (updateTextures) {
 		//
@@ -724,8 +725,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		// reset mouseHover & interation status
 		interaction = false;
 		hoverPoint = null;
-		
-		
+
 		setButtonStates();
 
 		if (showButtons) {
@@ -886,33 +886,31 @@ public class TagExplorerProcessing2 extends PApplet {
 		// renderer.endShape(CLOSE);
 
 		renderer.shape(backgroundLines);
-		
-		// render scala
-		
-		renderer.pushMatrix();
-		renderer.translate(cam_eyeaktuellpos.x - cam_eye2Dpos.x, 0, 0);
-		renderer.shape(scala);
-		
-		renderer.textAlign(PConstants.RIGHT, PConstants.BOTTOM);
-		renderer.textFont(font, 24);
-		renderer.fill(0);
-		
-		for(ScalaWert sw : scalaWerte){
-			
-			renderer.pushMatrix();
-			renderer.translate(-renderer.width / 2, contentStartUnten + planeSize/2, sw.z);
-			renderer.translate(-50, -47, 0);
-			renderer.rotateZ(PI/4.0f);
-			
-			renderer.text(sw.zeit, 0, 0);
-			renderer.popMatrix();
-			
-		}
-		renderer.popMatrix();
-		
 
+		// render scala
 		if (showTimeline) {
 			timeline.render(renderer);
+
+			renderer.pushMatrix();
+			renderer.translate(cam_eyeaktuellpos.x - cam_eye2Dpos.x, 0, 0);
+			renderer.shape(scala);
+
+			renderer.textAlign(PConstants.RIGHT, PConstants.BOTTOM);
+			renderer.textFont(font, 24);
+			renderer.fill(0);
+
+			for (ScalaWert sw : scalaWerte) {
+
+				renderer.pushMatrix();
+				renderer.translate(-renderer.width / 2, contentStartUnten + planeSize / 2, sw.z);
+				renderer.translate(-50, -47, 0);
+				renderer.rotateZ(PI / 4.0f);
+
+				renderer.text(sw.zeit, 0, 0);
+				renderer.popMatrix();
+
+			}
+			renderer.popMatrix();
 		}
 
 		drawFiles(renderer);
@@ -970,16 +968,16 @@ public class TagExplorerProcessing2 extends PApplet {
 					drawShape = true;
 					s.addChild(file.shape);
 
-					if (draw2DShape && (position1D || file.y > renderer.height / 2 - 70)) {
+					if (draw2DShape && (position1D || file.y == contentStartUnten)) {
 						PShape shadow = createShape();
 						shadow.fill(0);
 						shadow.noStroke();
 						shadow.texture(schatten);
 
-						shadow.vertex(file.x - 70, file.y + 59, file.z + 12, 0, 0);
-						shadow.vertex(file.x - 70, file.y + 59, file.z - 12, 0, schatten.height);
-						shadow.vertex(file.x + 70, file.y + 59, file.z - 12, schatten.width, schatten.height);
-						shadow.vertex(file.x + 70, file.y + 59, file.z + 12, schatten.width, 0);
+						shadow.vertex(file.x - 70, file.y + contentDist/2 - 2, file.z + 12, 0, 0);
+						shadow.vertex(file.x - 70, file.y + contentDist/2 - 2, file.z - 12, 0, schatten.height);
+						shadow.vertex(file.x + 70, file.y + contentDist/2 - 2, file.z - 12, schatten.width, schatten.height);
+						shadow.vertex(file.x + 70, file.y + contentDist/2 - 2, file.z + 12, schatten.width, 0);
 
 						shadow.end();
 						s.addChild(shadow);
@@ -1398,7 +1396,8 @@ public class TagExplorerProcessing2 extends PApplet {
 		setParticlePositions(showFiles);
 
 		// setzt shape oder null
-		 setShape(); // wird direkt bei drawTreemap(), draw2DShape() und drawAccessShape() aufgerufen
+		setShape(); // wird direkt bei drawTreemap(), draw2DShape() und
+					// drawAccessShape() aufgerufen
 
 		// println("setZTimeAxis = " + setZTimeAxis);
 		setZTimeAxis(setZTimeAxis); // macht auch updateSprings
@@ -1408,10 +1407,10 @@ public class TagExplorerProcessing2 extends PApplet {
 	public void setParticlePositions(ArrayList<Tag> showFiles) {
 		// hard treemap!
 		if (drawTreemap) {
-			
+
 			setParticlesPositionTreeMap(filePhysics, showFiles);
 		} else if (position1D) {
-			
+
 			setParticlesPosition1D(filePhysics, showFiles);
 		} else if (position2D) {
 			System.out.println("setParticlesPosition2D() 2D");
@@ -1751,12 +1750,11 @@ public class TagExplorerProcessing2 extends PApplet {
 	private void setParticlesPosition2D(VerletPhysics physics, ArrayList<Tag> _files) {
 		physics.particles.clear();
 
-
-		int perRow = (int) ((mainscreen.width + (contentDist-planeSize) - 2 * contentBorders) / (contentDist));
+		int perRow = (int) ((mainscreen.width + (contentDist - planeSize) - 2 * contentBorders) / (contentDist));
 		int maxRows = (int) ((mainscreen.height - menuPlane.h) / (contentDist));
-		maxRows -= 1; // ausgleich für auflösung
+		//maxRows -= 1; // ausgleich für auflösung
 
-		int max1Seite = perRow * maxRows;
+		int max1Seite = perRow * (maxRows-1);
 
 		int xShiftCount = 0;
 
@@ -1832,8 +1830,8 @@ public class TagExplorerProcessing2 extends PApplet {
 
 				if (!setZTimeAxis) {
 					// jede Datei aus sortedFiles muss positoniert werden
-					dropParticle(physics, xShiftCount * contentDist - (contentDist * (perRow - 1) / 2),
-							yShiftCount * contentDist - contentStartOben, sortedFiles.get(i), true); // links/rechts
+					dropParticle(physics, xShiftCount * contentDist - (contentDist * (perRow - 1) / 2), yShiftCount
+							* contentDist - contentStartOben, sortedFiles.get(i), true); // links/rechts
 				} else {
 					// setzte auf yStartUnten
 					dropParticle(physics, xShiftCount * contentDist - (contentDist * (perRow - 1) / 2),
@@ -1872,7 +1870,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 	private void setParticlesPositionTreeMap(VerletPhysics physics, ArrayList<Tag> _files) {
 		System.out.println("setParticlesPositionTreeMap()");
-		
+
 		physics.particles.clear();
 
 		for (Tag tag : _files) {
@@ -1898,12 +1896,12 @@ public class TagExplorerProcessing2 extends PApplet {
 		// set Position
 		physics.particles.clear();
 
-//		int count = 0;
-//		if (showVersions) {
-//			count = getSizeWithoutVersion(_files);
-//		} else {
-//			count = _files.size();
-//		}
+		// int count = 0;
+		// if (showVersions) {
+		// count = getSizeWithoutVersion(_files);
+		// } else {
+		// count = _files.size();
+		// }
 		// println("count: " + count);
 
 		// float dist;
@@ -1919,14 +1917,15 @@ public class TagExplorerProcessing2 extends PApplet {
 		// int yStartUnten = (int) (mainscreen.height / 2 - contentBorders / 2);
 
 		ArrayList<Tag> sortedFiles = getFilesSortedLastAccess(_files);
-//		println("	setParticlesPosition1D(): _files.size:" + _files.size());
-//		println("	setParticlesPosition1D(): sortedFiles.size:" + sortedFiles.size());
+		// println("	setParticlesPosition1D(): _files.size:" + _files.size());
+		// println("	setParticlesPosition1D(): sortedFiles.size:" +
+		// sortedFiles.size());
 
 		// neuest Versionen
 		for (int i = 0; i < sortedFiles.size(); i++) {
 			// jede Datei aus sortedFiles muss positoniert werden
 
-			dropParticle(physics, -mainscreen.width / 2 + contentBorders + planeSize/2 + shiftCount * contentDist,
+			dropParticle(physics, -mainscreen.width / 2 + contentBorders + planeSize / 2 + shiftCount * contentDist,
 					contentStartUnten, sortedFiles.get(i), true);
 
 			// dropParticle(physics, shiftCount * dist - ((dist * (count - 1)) /
@@ -2139,7 +2138,8 @@ public class TagExplorerProcessing2 extends PApplet {
 		// ------ treemap data is ready ------
 		mapData.finishAdd();
 
-		map = new Treemap(mapData, 120, height / 5, width - 240, height - 1 * height / 5 - 60);
+		map = new Treemap(mapData, contentBorders, mainscreen.height / 2 - (contentStartOben + planeSize / 2),
+				mainscreen.width - contentBorders * 2, timeChooser.h);
 
 		// map = new Treemap(mapData, 120 - mainscreen.width/2, height / 5 -
 		// mainscreen.height/2, width - 240 - mainscreen.width/2, height - 2 *
@@ -2181,7 +2181,9 @@ public class TagExplorerProcessing2 extends PApplet {
 				}
 			}
 			if (drawTreemap) {
-				((Tag_File) t).shape.translate(0, 0, -t.z);
+				if (((Tag_File) t).shape != null) {
+					((Tag_File) t).shape.translate(0, 0, -t.z);
+				}
 			}
 			t.z = 0;
 		}
@@ -2586,8 +2588,6 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		return null;
 	}
-	
-	
 
 	public PShape generateScala() {
 		PShape scala = createShape(LINES);
@@ -2596,7 +2596,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		scala.strokeWeight(3);
 
 		int laenge = 50;
-//		int lineDist = 50;
+		// int lineDist = 50;
 
 		// Calendar rightNow = Calendar.getInstance();
 
@@ -2606,10 +2606,10 @@ public class TagExplorerProcessing2 extends PApplet {
 		Calendar cal = Calendar.getInstance();
 		cal.setTimeInMillis(startTimestamp);
 
-//		int startH = cal.get(Calendar.HOUR_OF_DAY);
-//		int startD = cal.get(Calendar.DAY_OF_MONTH);
-//		int startM = cal.get(Calendar.MONTH) + 1;
-//		int startY = cal.get(Calendar.YEAR);
+		// int startH = cal.get(Calendar.HOUR_OF_DAY);
+		// int startD = cal.get(Calendar.DAY_OF_MONTH);
+		// int startM = cal.get(Calendar.MONTH) + 1;
+		// int startY = cal.get(Calendar.YEAR);
 
 		// Timestamp heuteStunde = createTimestamp(cal.get(Calendar.YEAR),
 		// cal.get(Calendar.MONTH) + 1,
@@ -2620,14 +2620,14 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		// speicher Text und z position in Array
 
-//		for (int i = 0; i < 6; i++) {
+		// for (int i = 0; i < 6; i++) {
 		for (int i = 0; i <= cal.get(Calendar.HOUR_OF_DAY); i++) {
 
 			int startH = cal.get(Calendar.HOUR_OF_DAY) - i;
 			int startD = cal.get(Calendar.DAY_OF_MONTH);
 			int startM = cal.get(Calendar.MONTH) + 1;
 			int startY = cal.get(Calendar.YEAR);
-			
+
 			if (startH <= 0) {
 				startH = 24 + cal.get(Calendar.HOUR_OF_DAY) - i;
 				startD = cal.get(Calendar.DAY_OF_MONTH) - 1;
@@ -2645,10 +2645,11 @@ public class TagExplorerProcessing2 extends PApplet {
 
 			float zVal = -timeline.mapExp(stunde);
 
-			scala.vertex(-mainscreen.width / 2, contentStartUnten + planeSize/2, zVal);
-			scala.vertex(-mainscreen.width / 2 - laenge, contentStartUnten + planeSize/2 - laenge, zVal);
-			
-			scalaWerte.add(new ScalaWert("" + startD + ". " + startM + ". " + startY + "  " + nf(startH,2) + ":00", zVal));
+			scala.vertex(-mainscreen.width / 2, contentStartUnten + contentDist / 2, zVal);
+			scala.vertex(-mainscreen.width / 2 - laenge, contentStartUnten + contentDist / 2 - laenge, zVal);
+
+			scalaWerte.add(new ScalaWert("" + startD + ". " + startM + ". " + startY + "  " + nf(startH, 2) + ":00",
+					zVal));
 		}
 
 		for (int i = 1; i < 14; i++) {
@@ -2656,7 +2657,7 @@ public class TagExplorerProcessing2 extends PApplet {
 			int startD = cal.get(Calendar.DAY_OF_MONTH) - i;
 			int startM = cal.get(Calendar.MONTH) + 1;
 			int startY = cal.get(Calendar.YEAR);
-			
+
 			if (startD <= 0) {
 				startD = 31 + cal.get(Calendar.DAY_OF_MONTH) - i;
 				startM = cal.get(Calendar.MONTH) + 1 - 1;
@@ -2667,11 +2668,11 @@ public class TagExplorerProcessing2 extends PApplet {
 			}
 
 			Timestamp tag = createTimestamp(startY, startM, startD);
-			
+
 			float zVal = -timeline.mapExp(tag);
-			scala.vertex(-mainscreen.width / 2, contentStartUnten + planeSize/2, zVal);
-			scala.vertex(-mainscreen.width / 2 - laenge, contentStartUnten + planeSize/2 - laenge, zVal);
-			
+			scala.vertex(-mainscreen.width / 2, contentStartUnten + contentDist / 2, zVal);
+			scala.vertex(-mainscreen.width / 2 - laenge, contentStartUnten + contentDist / 2 - laenge, zVal);
+
 			scalaWerte.add(new ScalaWert("" + startD + ". " + startM + ". " + startY, zVal));
 		}
 
@@ -2690,12 +2691,12 @@ public class TagExplorerProcessing2 extends PApplet {
 
 			float zVal = -timeline.mapExp(monat);
 
-			scala.vertex(-mainscreen.width / 2, contentStartUnten + planeSize/2, zVal);
-			scala.vertex(-mainscreen.width / 2 - laenge, contentStartUnten + planeSize/2 - laenge, zVal);
-			
+			scala.vertex(-mainscreen.width / 2, contentStartUnten + contentDist / 2, zVal);
+			scala.vertex(-mainscreen.width / 2 - laenge, contentStartUnten + contentDist / 2 - laenge, zVal);
+
 			scalaWerte.add(new ScalaWert("" + startD + ". " + startM + ". " + startY, zVal));
 		}
-		
+
 		for (int i = 1; i < 10; i++) {
 			int startD = cal.get(Calendar.DAY_OF_MONTH);
 			int startM = cal.get(Calendar.MONTH) + 1;
@@ -2705,10 +2706,12 @@ public class TagExplorerProcessing2 extends PApplet {
 
 			float zVal = -timeline.mapExp(year);
 
-			scala.vertex(-mainscreen.width / 2, contentStartUnten + planeSize/2, zVal);
-			scala.vertex(-mainscreen.width / 2 - laenge, contentStartUnten + planeSize/2 - laenge, zVal);
-			
-			scalaWerte.add(new ScalaWert("" + startY, zVal)); // + ". " + startM + ". " + startY
+			scala.vertex(-mainscreen.width / 2, contentStartUnten + contentDist / 2, zVal);
+			scala.vertex(-mainscreen.width / 2 - laenge, contentStartUnten + contentDist / 2 - laenge, zVal);
+
+			scalaWerte.add(new ScalaWert("" + startY, zVal)); // + ". " + startM
+																// + ". " +
+																// startY
 		}
 
 		// println("heuteStunde: " + heuteStunde.getTime());
@@ -2728,10 +2731,10 @@ public class TagExplorerProcessing2 extends PApplet {
 		// scala.vertex(-mainscreen.width / 2 - laenge, mainscreen.height / 2 -
 		// laenge, timeline.mapExp(heuteTag));
 
-//		println(cal.get(Calendar.YEAR));
-//		println(cal.get(Calendar.MONTH));
-//		println(cal.get(Calendar.DAY_OF_MONTH));
-//		println("jetzt: " + cal.getTimeInMillis());
+		// println(cal.get(Calendar.YEAR));
+		// println(cal.get(Calendar.MONTH));
+		// println(cal.get(Calendar.DAY_OF_MONTH));
+		// println("jetzt: " + cal.getTimeInMillis());
 
 		// for (int i = 0; i < 200; i++) {
 		// scala.vertex(-mainscreen.width/2, mainscreen.height/2, -i *
@@ -2739,9 +2742,9 @@ public class TagExplorerProcessing2 extends PApplet {
 		// scala.vertex(-mainscreen.width/2 - laenge, mainscreen.height/2 -
 		// laenge, -i * lineDist);
 		// }
-		
-		scala.vertex(-mainscreen.width / 2, contentStartUnten + planeSize/2, 0);
-		scala.vertex(-mainscreen.width / 2 , contentStartUnten + planeSize/2, -40000);
+
+		scala.vertex(-mainscreen.width / 2, contentStartUnten + contentDist / 2, 0);
+		scala.vertex(-mainscreen.width / 2, contentStartUnten + contentDist / 2, -40000);
 
 		scala.end();
 
@@ -2759,16 +2762,23 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		for (int i = -30; i < 200; i++) {
 
-//			backgroundLines.vertex(-mainscreen.width / 2 - lineW + i * lineDist, mainscreen.height / 2 + 1, 800);
-//			backgroundLines.vertex(-mainscreen.width / 2 - lineW + i * lineDist, mainscreen.height / 2 + 1, -40000);
-//			backgroundLines.vertex(-mainscreen.width / 2 + lineW + i * lineDist, mainscreen.height / 2 + 1, -40000);
-//			backgroundLines.vertex(-mainscreen.width / 2 + lineW + i * lineDist, mainscreen.height / 2 + 1, 800);
-			
-			backgroundLines.vertex(-mainscreen.width / 2 - lineW + i * lineDist, contentStartUnten + planeSize/2 + 1, 800);
-			backgroundLines.vertex(-mainscreen.width / 2 - lineW + i * lineDist, contentStartUnten + planeSize/2 + 1, -40000);
-			backgroundLines.vertex(-mainscreen.width / 2 + lineW + i * lineDist, contentStartUnten + planeSize/2 + 1, -40000);
-			backgroundLines.vertex(-mainscreen.width / 2 + lineW + i * lineDist, contentStartUnten + planeSize/2 + 1, 800);
+			// backgroundLines.vertex(-mainscreen.width / 2 - lineW + i *
+			// lineDist, mainscreen.height / 2 + 1, 800);
+			// backgroundLines.vertex(-mainscreen.width / 2 - lineW + i *
+			// lineDist, mainscreen.height / 2 + 1, -40000);
+			// backgroundLines.vertex(-mainscreen.width / 2 + lineW + i *
+			// lineDist, mainscreen.height / 2 + 1, -40000);
+			// backgroundLines.vertex(-mainscreen.width / 2 + lineW + i *
+			// lineDist, mainscreen.height / 2 + 1, 800);
 
+			backgroundLines.vertex(-mainscreen.width / 2 - lineW + i * lineDist, contentStartUnten + contentDist / 2 + 1,
+					800);
+			backgroundLines.vertex(-mainscreen.width / 2 - lineW + i * lineDist, contentStartUnten + contentDist / 2 + 1,
+					-40000);
+			backgroundLines.vertex(-mainscreen.width / 2 + lineW + i * lineDist, contentStartUnten + contentDist / 2 + 1,
+					-40000);
+			backgroundLines.vertex(-mainscreen.width / 2 + lineW + i * lineDist, contentStartUnten + contentDist / 2 + 1,
+					800);
 
 		}
 
@@ -3143,10 +3153,10 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 
 		if (!timeChooser.mouseOverScala() && !timeChooser.camMover.mouseOver()) {
-			cam_eyetargetpos.y += mouseDraggedY * 10;
+			cam_eyetargetpos.y += mouseDraggedY * 3.0f;
 
-			if (cam_eyetargetpos.y > height / 2) {
-				cam_eyetargetpos.y = height / 2;
+			if (cam_eyetargetpos.y > height/2) {
+				cam_eyetargetpos.y = height/2;
 			}
 		}
 
@@ -3199,7 +3209,6 @@ public class TagExplorerProcessing2 extends PApplet {
 		lastClick = new Timestamp(System.currentTimeMillis());
 		startClickNextFrame = true;
 
-		
 		// tagVerbindungen - auskommentiert in mousePressed
 		if (startTag != null) {
 			if (startTag instanceof Tag_File) {
@@ -3758,11 +3767,10 @@ public class TagExplorerProcessing2 extends PApplet {
 		super.stop();
 	}
 
-	
 	public void showVersions(boolean onOff) {
 		println("showVersions(): " + onOff);
 		showVersions = onOff;
-		if(showVersions && !setZTimeAxis){
+		if (showVersions && !setZTimeAxis) {
 			setZTimeAxis(true);
 		}
 		updateShowFiles();
@@ -3775,12 +3783,11 @@ public class TagExplorerProcessing2 extends PApplet {
 		if (drawAccessShapes) {
 
 			draw2DShape = false;
-			
-			if(drawTreemap){
+
+			if (drawTreemap) {
 				drawTreemap = false;
 				position2D(true);
 			}
-			
 
 			setShape();
 
@@ -3799,15 +3806,15 @@ public class TagExplorerProcessing2 extends PApplet {
 
 			drawAccessShapes = false;
 
-			if(drawTreemap){
+			if (drawTreemap) {
 				drawTreemap = false;
 				position2D(true);
 			}
-			
-			updateShowFiles();
-//			setShape();
 
-//			setZTimeAxis(setZTimeAxis); // wird in updateShoFiles
+			updateShowFiles();
+			// setShape();
+
+			// setZTimeAxis(setZTimeAxis); // wird in updateShoFiles
 		}
 	}
 
@@ -3821,7 +3828,7 @@ public class TagExplorerProcessing2 extends PApplet {
 
 			drawAccessShapes = false;
 			draw2DShape = false;
-			
+
 			position2D = false;
 			position1D = false;
 
@@ -3829,7 +3836,7 @@ public class TagExplorerProcessing2 extends PApplet {
 			updateShowFiles();
 
 			// passiert in updateShowFiles()
-//			setZTimeAxis(false);
+			// setZTimeAxis(false);
 		}
 	}
 
@@ -3854,11 +3861,11 @@ public class TagExplorerProcessing2 extends PApplet {
 				draw2DShape(true);
 				drawAccessShapes = false;
 			}
-			
+
 			// bei position2D wieder kacheln
-//			if(position2D){
-//				updateShowFiles();
-//			}
+			// if(position2D){
+			// updateShowFiles();
+			// }
 
 			showTimeline = false;
 			println("setZTimeAxis: " + setZTimeAxis + " resetZshowFiles()");
@@ -3872,6 +3879,11 @@ public class TagExplorerProcessing2 extends PApplet {
 	public void position1D(boolean onOff) {
 		position1D = onOff;
 		if (position1D) {
+			
+			if(drawTreemap && !draw2DShape){
+				draw2DShape = true;
+			}
+			
 			position2D = false;
 			drawTreemap = false;
 		}
@@ -3881,6 +3893,10 @@ public class TagExplorerProcessing2 extends PApplet {
 	public void position2D(boolean onOff) {
 		position2D = onOff;
 		if (position2D) {
+			if(drawTreemap && !draw2DShape){
+				draw2DShape = true;
+			}
+			
 			position1D = false;
 			drawTreemap = false;
 		}
@@ -3920,31 +3936,27 @@ public class TagExplorerProcessing2 extends PApplet {
 		}
 	}
 
-	public void setButtonStates(){
-		
-		
-	
+	public void setButtonStates() {
+
 		setButtonState("position1D", position1D);
 		setButtonState("position2D", position2D);
-		
+
 		setButtonState("drawTreemap", drawTreemap);
 		setButtonState("draw2DShape", draw2DShape);
 		setButtonState("drawAccessShapes", drawAccessShapes);
-		
+
 		setButtonState("setZTimeAxis", setZTimeAxis);
-		
+
 		setButtonState("showVersions", showVersions);
-		
-		
+
 		setButtonState("drawTags", drawTags);
 		setButtonState("showTimeline", showTimeline);
-		
-		
+
 		setButtonState("enableVersionBinding", enableVersionBinding);
 		setButtonState("enableTagBinding", enableTagBinding);
 		setButtonState("enableFileBinding", enableFileBinding);
 	}
-	
+
 	public void setButtonState(String buttonName, boolean onOff) {
 		for (Button_LabelToggle b : testButton) {
 			if (b.label.equals(buttonName)) {
