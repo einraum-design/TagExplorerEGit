@@ -117,11 +117,11 @@ public class Timeline {
 		// System.out.println("endtime: " + -mapExpMillis(endTime));
 
 		renderer.texture(zeitbereich_wand);
-		renderer.vertex(-renderer.width / 2, -renderer.height / 2, -mapExpMillis(time), 0, 0);
-		renderer.vertex(renderer.width / 2, -renderer.height / 2, -mapExpMillis(time), zeitbereich_hover.width, 0);
-		renderer.vertex(renderer.width / 2, renderer.height / 2, -mapExpMillis(time), zeitbereich_hover.width,
+		renderer.vertex(-renderer.width / 2, -p5.contentStartUnten + p5.planeSize/2, -mapExpMillis(time), 0, 0);
+		renderer.vertex(renderer.width / 2, -p5.contentStartUnten + p5.planeSize/2, -mapExpMillis(time), zeitbereich_hover.width, 0);
+		renderer.vertex(renderer.width / 2, p5.contentStartUnten + p5.planeSize/2, -mapExpMillis(time), zeitbereich_hover.width,
 				zeitbereich_hover.height);
-		renderer.vertex(-renderer.width / 2, renderer.height / 2, -mapExpMillis(time), 0, zeitbereich_hover.height);
+		renderer.vertex(-renderer.width / 2, p5.contentStartUnten + p5.planeSize/2, -mapExpMillis(time), 0, zeitbereich_hover.height);
 		renderer.endShape(PConstants.CLOSE);
 		
 		
@@ -137,11 +137,11 @@ public class Timeline {
 		// System.out.println("endtime: " + -mapExpMillis(endTime));
 
 		renderer.texture(zeitbereich_hover);
-		renderer.vertex(-renderer.width / 2, renderer.height / 2, -mapExpMillis(startTime), 0, 0);
-		renderer.vertex(renderer.width / 2, renderer.height / 2, -mapExpMillis(startTime), zeitbereich_hover.width, 0);
-		renderer.vertex(renderer.width / 2, renderer.height / 2, -mapExpMillis(endTime), zeitbereich_hover.width,
+		renderer.vertex(-renderer.width / 2, p5.contentStartUnten + p5.planeSize/2, -mapExpMillis(startTime), 0, 0);
+		renderer.vertex(renderer.width / 2, p5.contentStartUnten + p5.planeSize/2, -mapExpMillis(startTime), zeitbereich_hover.width, 0);
+		renderer.vertex(renderer.width / 2, p5.contentStartUnten + p5.planeSize/2, -mapExpMillis(endTime), zeitbereich_hover.width,
 				zeitbereich_hover.height);
-		renderer.vertex(-renderer.width / 2, renderer.height / 2, -mapExpMillis(endTime), 0, zeitbereich_hover.height);
+		renderer.vertex(-renderer.width / 2, p5.contentStartUnten + p5.planeSize/2, -mapExpMillis(endTime), 0, zeitbereich_hover.height);
 		renderer.endShape(PConstants.CLOSE);
 
 		// renderer.translate(0, 0, mapExpMillis(startTime));

@@ -900,7 +900,7 @@ public class TagExplorerProcessing2 extends PApplet {
 		for(ScalaWert sw : scalaWerte){
 			
 			renderer.pushMatrix();
-			renderer.translate(-renderer.width / 2, renderer.height / 2, sw.z);
+			renderer.translate(-renderer.width / 2, contentStartUnten + planeSize/2, sw.z);
 			renderer.translate(-50, -47, 0);
 			renderer.rotateZ(PI/4.0f);
 			
@@ -2645,8 +2645,8 @@ public class TagExplorerProcessing2 extends PApplet {
 
 			float zVal = -timeline.mapExp(stunde);
 
-			scala.vertex(-mainscreen.width / 2, mainscreen.height / 2, zVal);
-			scala.vertex(-mainscreen.width / 2 - laenge, mainscreen.height / 2 - laenge, zVal);
+			scala.vertex(-mainscreen.width / 2, contentStartUnten + planeSize/2, zVal);
+			scala.vertex(-mainscreen.width / 2 - laenge, contentStartUnten + planeSize/2 - laenge, zVal);
 			
 			scalaWerte.add(new ScalaWert("" + startD + ". " + startM + ". " + startY + "  " + nf(startH,2) + ":00", zVal));
 		}
@@ -2669,8 +2669,8 @@ public class TagExplorerProcessing2 extends PApplet {
 			Timestamp tag = createTimestamp(startY, startM, startD);
 			
 			float zVal = -timeline.mapExp(tag);
-			scala.vertex(-mainscreen.width / 2, mainscreen.height / 2, zVal);
-			scala.vertex(-mainscreen.width / 2 - laenge, mainscreen.height / 2 - laenge, zVal);
+			scala.vertex(-mainscreen.width / 2, contentStartUnten + planeSize/2, zVal);
+			scala.vertex(-mainscreen.width / 2 - laenge, contentStartUnten + planeSize/2 - laenge, zVal);
 			
 			scalaWerte.add(new ScalaWert("" + startD + ". " + startM + ". " + startY, zVal));
 		}
@@ -2690,8 +2690,8 @@ public class TagExplorerProcessing2 extends PApplet {
 
 			float zVal = -timeline.mapExp(monat);
 
-			scala.vertex(-mainscreen.width / 2, mainscreen.height / 2, zVal);
-			scala.vertex(-mainscreen.width / 2 - laenge, mainscreen.height / 2 - laenge, zVal);
+			scala.vertex(-mainscreen.width / 2, contentStartUnten + planeSize/2, zVal);
+			scala.vertex(-mainscreen.width / 2 - laenge, contentStartUnten + planeSize/2 - laenge, zVal);
 			
 			scalaWerte.add(new ScalaWert("" + startD + ". " + startM + ". " + startY, zVal));
 		}
@@ -2705,8 +2705,8 @@ public class TagExplorerProcessing2 extends PApplet {
 
 			float zVal = -timeline.mapExp(year);
 
-			scala.vertex(-mainscreen.width / 2, mainscreen.height / 2, zVal);
-			scala.vertex(-mainscreen.width / 2 - laenge, mainscreen.height / 2 - laenge, zVal);
+			scala.vertex(-mainscreen.width / 2, contentStartUnten + planeSize/2, zVal);
+			scala.vertex(-mainscreen.width / 2 - laenge, contentStartUnten + planeSize/2 - laenge, zVal);
 			
 			scalaWerte.add(new ScalaWert("" + startY, zVal)); // + ". " + startM + ". " + startY
 		}
@@ -2740,8 +2740,8 @@ public class TagExplorerProcessing2 extends PApplet {
 		// laenge, -i * lineDist);
 		// }
 		
-		scala.vertex(-mainscreen.width / 2, mainscreen.height / 2, 0);
-		scala.vertex(-mainscreen.width / 2 , mainscreen.height / 2 , -40000);
+		scala.vertex(-mainscreen.width / 2, contentStartUnten + planeSize/2, 0);
+		scala.vertex(-mainscreen.width / 2 , contentStartUnten + planeSize/2, -40000);
 
 		scala.end();
 
@@ -2759,15 +2759,17 @@ public class TagExplorerProcessing2 extends PApplet {
 
 		for (int i = -30; i < 200; i++) {
 
-			backgroundLines.vertex(-mainscreen.width / 2 - lineW + i * lineDist, mainscreen.height / 2 + 1, 800);
-			backgroundLines.vertex(-mainscreen.width / 2 - lineW + i * lineDist, mainscreen.height / 2 + 1, -40000);
-			backgroundLines.vertex(-mainscreen.width / 2 + lineW + i * lineDist, mainscreen.height / 2 + 1, -40000);
-			backgroundLines.vertex(-mainscreen.width / 2 + lineW + i * lineDist, mainscreen.height / 2 + 1, 800);
+//			backgroundLines.vertex(-mainscreen.width / 2 - lineW + i * lineDist, mainscreen.height / 2 + 1, 800);
+//			backgroundLines.vertex(-mainscreen.width / 2 - lineW + i * lineDist, mainscreen.height / 2 + 1, -40000);
+//			backgroundLines.vertex(-mainscreen.width / 2 + lineW + i * lineDist, mainscreen.height / 2 + 1, -40000);
+//			backgroundLines.vertex(-mainscreen.width / 2 + lineW + i * lineDist, mainscreen.height / 2 + 1, 800);
+			
+			backgroundLines.vertex(-mainscreen.width / 2 - lineW + i * lineDist, contentStartUnten + planeSize/2 + 1, 800);
+			backgroundLines.vertex(-mainscreen.width / 2 - lineW + i * lineDist, contentStartUnten + planeSize/2 + 1, -40000);
+			backgroundLines.vertex(-mainscreen.width / 2 + lineW + i * lineDist, contentStartUnten + planeSize/2 + 1, -40000);
+			backgroundLines.vertex(-mainscreen.width / 2 + lineW + i * lineDist, contentStartUnten + planeSize/2 + 1, 800);
 
-			// s.vertex(-50, -50, 0, 0, 0);
-			// s.vertex(+50, -50, 0, file.textur.width, 0);
-			// s.vertex(+50, +50, 0, file.textur.width, file.textur.height);
-			// s.vertex(-50, +50, 0, 0, file.textur.height);
+
 		}
 
 		backgroundLines.end();
